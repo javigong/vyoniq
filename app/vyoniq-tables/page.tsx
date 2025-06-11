@@ -5,6 +5,62 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Database, MessageSquare, Zap, Shield } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
+import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Vyoniq Tables | AI-Powered Data Management Platform Coming Soon",
+  description:
+    "Join the waitlist for Vyoniq Tables - the revolutionary AI-powered data management platform with smart data entry, chat interfaces, and MCP server integration. Coming soon!",
+  keywords: [
+    "Vyoniq Tables",
+    "AI data management",
+    "smart data entry",
+    "MCP server integration",
+    "data management platform",
+    "AI chat interface",
+    "intelligent data processing",
+    "data automation",
+    "waitlist",
+  ],
+  openGraph: {
+    title: "Vyoniq Tables | AI-Powered Data Management Platform Coming Soon",
+    description:
+      "Revolutionary AI-powered data management with smart data entry and chat interfaces. Join the exclusive waitlist for early access.",
+    url: "https://vyoniq.com/vyoniq-tables",
+    siteName: "Vyoniq",
+    images: [
+      {
+        url: "/placeholder.svg?height=630&width=1200&text=Vyoniq+Tables+Coming+Soon",
+        width: 1200,
+        height: 630,
+        alt: "Vyoniq Tables AI-powered data management platform",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Vyoniq Tables | AI-Powered Data Management Platform Coming Soon",
+    description:
+      "Revolutionary AI-powered data management with smart data entry and chat interfaces. Join the waitlist!",
+    images: ["/placeholder.svg?height=630&width=1200&text=Vyoniq+Tables+Coming+Soon"],
+  },
+  alternates: {
+    canonical: "https://vyoniq.com/vyoniq-tables",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+}
 
 const features = [
   {
@@ -35,7 +91,7 @@ export default function VyoniqTablesPage() {
       <Header />
 
       {/* Hero Section */}
-      <section className="py-20 bg-gradient-to-br from-vyoniq-blue via-black to-vyoniq-green text-white">
+      <section className="py-20 bg-gradient-to-br from-vyoniq-blue via-black to-vyoniq-green dark:from-vyoniq-dark-bg dark:via-vyoniq-slate dark:to-vyoniq-blue text-white">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-4xl md:text-6xl font-bold mb-6">Vyoniq Tables: Coming Soon</h1>
@@ -54,26 +110,31 @@ export default function VyoniqTablesPage() {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-white dark:bg-vyoniq-dark-bg">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-vyoniq-blue mb-4">Revolutionary Features</h2>
-            <p className="text-lg text-vyoniq-text max-w-2xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold text-vyoniq-blue dark:text-white mb-4">
+              Revolutionary Features
+            </h2>
+            <p className="text-lg text-vyoniq-text dark:text-vyoniq-dark-text max-w-2xl mx-auto">
               Experience the next generation of data management with AI-powered capabilities
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
             {features.map((feature, index) => (
-              <Card key={feature.title} className="text-center border-0 shadow-lg hover:shadow-xl transition-shadow">
+              <Card
+                key={feature.title}
+                className="text-center border-0 shadow-lg hover:shadow-xl dark:hover:shadow-2xl transition-shadow bg-white dark:bg-vyoniq-dark-card"
+              >
                 <CardHeader>
-                  <div className="mx-auto mb-4 p-3 bg-vyoniq-blue/5 rounded-full w-fit">
+                  <div className="mx-auto mb-4 p-3 bg-vyoniq-blue/5 dark:bg-vyoniq-green/10 rounded-full w-fit">
                     <feature.icon className="h-8 w-8 text-vyoniq-green" />
                   </div>
-                  <CardTitle className="text-xl text-vyoniq-blue">{feature.title}</CardTitle>
+                  <CardTitle className="text-xl text-vyoniq-blue dark:text-white">{feature.title}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-vyoniq-text">{feature.description}</p>
+                  <p className="text-vyoniq-text dark:text-vyoniq-dark-text">{feature.description}</p>
                 </CardContent>
               </Card>
             ))}
@@ -101,13 +162,13 @@ export default function VyoniqTablesPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-vyoniq-gray">
+      <section className="py-20 bg-vyoniq-gray dark:bg-vyoniq-slate">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-vyoniq-blue mb-6">
+            <h2 className="text-3xl md:text-4xl font-bold text-vyoniq-blue dark:text-white mb-6">
               Be Among the First to Experience Vyoniq Tables
             </h2>
-            <p className="text-lg text-vyoniq-text mb-8">
+            <p className="text-lg text-vyoniq-text dark:text-vyoniq-dark-text mb-8">
               Join our exclusive waitlist and get early access to the most advanced data management platform ever
               created.
             </p>
