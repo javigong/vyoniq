@@ -1,30 +1,77 @@
 # Vyoniq
 
-*Automatically synced with your [v0.dev](https://v0.dev) deployments*
+[![Deployed with Coolify](https://img.shields.io/badge/Deployed%20with-Coolify-blue?style=for-the-badge&logo=docker)](https://coolify.io/)
 
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/javigongs-projects/v0-vyoniq)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.dev-black?style=for-the-badge)](https://v0.dev/chat/projects/0FlrgCaEqom)
+> Innovate Faster with AI-Powered Software Solutions
 
-## Overview
+Vyoniq is a modern Software Development company powered by AI agents, delivering innovative solutions with the efficiency of a large team. We specialize in Web and Mobile App Development, secure Hosting Services, and cutting-edge AI Integrations.
 
-This repository will stay in sync with your deployed chats on [v0.dev](https://v0.dev).
-Any changes you make to your deployed app will be automatically pushed to this repository from [v0.dev](https://v0.dev).
+This repository contains the source code for the official Vyoniq landing page.
 
-## Deployment
+## ✨ Features
 
-Your project is live at:
+- **Core Services:** A comprehensive showcase of our offerings:
+  - **Web and Mobile App Development:** Scalable, custom applications built with AI-optimized workflows.
+  - **Hosting Services:** Secure, high-performance, and reliable hosting solutions.
+  - **AI Integrations:** Enhance your applications and business processes with intelligent features.
+- **Vyoniq Tables (Coming Soon):** Announcing our forthcoming subscription-based web application for smart data management and interaction, powered by MCP (Multi-Client Platform) servers.
+- **Lead Generation:** A fully functional contact form to handle client inquiries and project requests.
+- **Waitlist Sign-Up:** A dedicated system for users to register their interest in the upcoming Vyoniq Tables application.
+- **Modern Tech Stack:** A responsive, accessible, and performant landing page built for an excellent user experience.
 
-**[https://vercel.com/javigongs-projects/v0-vyoniq](https://vercel.com/javigongs-projects/v0-vyoniq)**
+## 🚀 Tech Stack
 
-## Build your app
+- **Framework:** [Next.js](https://nextjs.org/) (App Router)
+- **UI Components:** [shadcn/ui](https://ui.shadcn.com/)
+- **Styling:** [Tailwind CSS](https://tailwindcss.com/)
+- **Authentication:** [Clerk](https://clerk.com/)
+- **Database:** [PostgreSQL](https://www.postgresql.org/)
+- **Deployment:** [Coolify](https://coolify.io/) on a custom VPS
 
-Continue building your app on:
+## 🛠️ Getting Started
 
-**[https://v0.dev/chat/projects/0FlrgCaEqom](https://v0.dev/chat/projects/0FlrgCaEqom)**
+Follow these instructions to set up the project locally for development and testing.
 
-## How It Works
+### Prerequisites
 
-1. Create and modify your project using [v0.dev](https://v0.dev)
-2. Deploy your chats from the v0 interface
-3. Changes are automatically pushed to this repository
-4. Vercel deploys the latest version from this repository
+- [Node.js](https://nodejs.org/en/) (v18.x or later)
+- [pnpm](https://pnpm.io/installation) (or `npm`/`yarn`)
+
+### Installation
+
+1.  **Clone the repository:**
+
+    ```sh
+    git clone https://github.com/JaviGong/vyoniq.git
+    cd vyoniq
+    ```
+
+2.  **Install dependencies:**
+
+    ```sh
+    pnpm install
+    ```
+
+3.  **Set up environment variables:**
+
+    Create a `.env.local` file in the root of the project. You can copy the `.env.example` file to get started:
+
+    ```sh
+    cp .env.example .env.local
+    ```
+
+    You will need to add your credentials for [Clerk](https://clerk.com/) and connect to your [PostgreSQL](https://www.postgresql.org/) instance.
+
+4.  **Run the development server:**
+
+    ```sh
+    pnpm dev
+    ```
+
+    Open [http://localhost:3000](http://localhost:3000) in your browser to see the result.
+
+## 🚢 Deployment
+
+This project is configured for deployment on a custom VPS managed by [Coolify](https://coolify.io/). Coolify monitors the `main` branch of this repository and automatically triggers a new deployment upon detecting a push.
+
+The deployment pipeline handles building the Next.js application, setting up the necessary services, and running the application in a production environment. For more details on the deployment setup, refer to the Coolify instance managing this project.
