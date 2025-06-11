@@ -1,14 +1,33 @@
 "use client"
 
+import type React from "react"
+
 import { useState } from "react"
 import Link from "next/link"
+import { useRouter, usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Menu, Cpu } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { scrollToContact } from "@/lib/scroll-utils"
 
 export function Header() {
   const [isOpen, setIsOpen] = useState(false)
+  const router = useRouter()
+  const pathname = usePathname()
+
+  const handleContactClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    setIsOpen(false) // Close mobile menu if open
+
+    if (pathname === "/") {
+      // If we're on homepage, scroll to contact section
+      scrollToContact()
+    } else {
+      // If we're on another page, navigate to homepage with contact hash
+      router.push("/#contact")
+    }
+  }
 
   const navItems = [
     { name: "Home", href: "/" },
@@ -16,7 +35,7 @@ export function Header() {
     { name: "Vyoniq Tables", href: "/vyoniq-tables" },
     { name: "Blog", href: "/blog" },
     { name: "About", href: "/about" },
-    { name: "Contact", href: "#contact" },
+    { name: "Contact", href: "#contact", onClick: handleContactClick },
   ]
 
   return (
@@ -32,13 +51,23 @@ export function Header() {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
             {navItems.map((item) => (
-              <Link
-                key={item.name}
-                href={item.href}
-                className="text-white hover:text-vyoniq-green transition-colors duration-200 hover:underline"
-              >
-                {item.name}
-              </Link>
+              <div key={item.name}>
+                {item.onClick ? (
+                  <button
+                    onClick={item.onClick}
+                    className="text-white hover:text-vyoniq-green transition-colors duration-200 hover:underline"
+                  >
+                    {item.name}
+                  </button>
+                ) : (
+                  <Link
+                    href={item.href}
+                    className="text-white hover:text-vyoniq-green transition-colors duration-200 hover:underline"
+                  >
+                    {item.name}
+                  </Link>
+                )}
+              </div>
             ))}
             <ThemeToggle />
           </nav>
@@ -56,14 +85,24 @@ export function Header() {
               <SheetContent side="right" className="bg-vyoniq-slate dark:bg-vyoniq-dark-bg text-white">
                 <nav className="flex flex-col space-y-4 mt-8">
                   {navItems.map((item) => (
-                    <Link
-                      key={item.name}
-                      href={item.href}
-                      className="text-white hover:text-vyoniq-green transition-colors duration-200 text-lg"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      {item.name}
-                    </Link>
+                    <div key={item.name}>
+                      {item.onClick ? (
+                        <button
+                          onClick={item.onClick}
+                          className="text-white hover:text-vyoniq-green transition-colors duration-200 text-lg text-left"
+                        >
+                          {item.name}
+                        </button>
+                      ) : (
+                        <Link
+                          href={item.href}
+                          className="text-white hover:text-vyoniq-green transition-colors duration-200 text-lg"
+                          onClick={() => setIsOpen(false)}
+                        >
+                          {item.name}
+                        </Link>
+                      )}
+                    </div>
                   ))}
                 </nav>
               </SheetContent>
