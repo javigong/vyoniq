@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Linkedin, Github } from "lucide-react"
+import { Linkedin, Github, X } from "lucide-react"
 
 export function Footer() {
   return (
@@ -7,7 +7,9 @@ export function Footer() {
       <div className="container mx-auto px-4">
         <div className="grid md:grid-cols-4 gap-8 mb-8">
           <div className="md:col-span-2">
-            <h3 className="text-2xl font-bold mb-4">Vyoniq</h3>
+            <h3 className="text-2xl font-bold mb-4 tracking-tight" style={{ fontFamily: "Arial, sans-serif" }}>
+              vyoniq
+            </h3>
             <p className="text-gray-300 dark:text-vyoniq-dark-muted mb-4">
               AI-powered software solutions for the future of business.
             </p>
@@ -67,6 +69,9 @@ export function Footer() {
             </Link>
             <Link href="#" className="text-white hover:text-vyoniq-green transition-colors" aria-label="GitHub">
               <Github className="h-6 w-6" />
+            </Link>
+            <Link href="#" className="text-white hover:text-vyoniq-green transition-colors" aria-label="X (Twitter)">
+              <X className="h-6 w-6" />
             </Link>
           </div>
         </div>

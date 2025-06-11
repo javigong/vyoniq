@@ -7,7 +7,7 @@ import Link from "next/link"
 import { useRouter, usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { Menu, Cpu } from "lucide-react"
+import { Menu } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { scrollToContact } from "@/lib/scroll-utils"
 
@@ -43,9 +43,17 @@ export function Header() {
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
-            <Cpu className="h-8 w-8 text-vyoniq-green" />
-            <span className="text-2xl font-bold">Vyoniq</span>
+          <Link href="/">
+            <span
+              className="text-2xl font-bold tracking-tight"
+              style={{
+                fontFamily: "Arial, sans-serif",
+                fontWeight: 600,
+                letterSpacing: "-0.02em",
+              }}
+            >
+              vyoniq
+            </span>
           </Link>
 
           {/* Desktop Navigation */}
