@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Linkedin, Github, Twitter } from "lucide-react"
+import { Linkedin, Github, X } from "lucide-react"
 
 export function Footer() {
   return (
@@ -69,7 +69,7 @@ export function Footer() {
               <Github className="h-6 w-6" />
             </Link>
             <Link href="#" className="text-white hover:text-vyoniq-green transition-colors" aria-label="X (Twitter)">
-              <Twitter className="h-6 w-6" />
+              <X className="h-6 w-6" />
             </Link>
           </div>
         </div>
