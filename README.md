@@ -41,32 +41,32 @@ Follow these instructions to set up the project locally for development and test
 
 1.  **Clone the repository:**
 
-    ```sh
+    \`\`\`sh
     git clone https://github.com/JaviGong/vyoniq.git
     cd vyoniq
-    ```
+    \`\`\`
 
 2.  **Install dependencies:**
 
-    ```sh
+    \`\`\`sh
     pnpm install
-    ```
+    \`\`\`
 
 3.  **Set up environment variables:**
 
     Create a `.env.local` file in the root of the project. You can copy the `.env.example` file to get started:
 
-    ```sh
+    \`\`\`sh
     cp .env.example .env.local
-    ```
+    \`\`\`
 
     You will need to add your credentials for [Clerk](https://clerk.com/) and connect to your [PostgreSQL](https://www.postgresql.org/) instance.
 
 4.  **Run the development server:**
 
-    ```sh
+    \`\`\`sh
     pnpm dev
-    ```
+    \`\`\`
 
     Open [http://localhost:3000](http://localhost:3000) in your browser to see the result.
 
