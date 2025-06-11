@@ -79,3 +79,43 @@
 * {
   transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
 }
+
+/* Mobile-specific button optimizations */
+@media (max-width: 768px) {
+  /* Ensure buttons are properly sized for touch */
+  .touch-manipulation {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Improve button visibility on mobile */
+  button[class*="border-white"] {
+    border-width: 2px;
+    backdrop-filter: blur(4px);
+  }
+
+  /* Ensure text is readable on high-DPI displays */
+  button {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  button[class*="border-white"] {
+    border-width: 3px;
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .transform {
+    transform: none !important;
+  }
+
+  .transition-all {
+    transition: none !important;
+  }
+}

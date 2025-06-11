@@ -24,15 +24,14 @@ export function HeroSection() {
               <Button
                 asChild
                 size="lg"
-                className="bg-vyoniq-purple hover:bg-vyoniq-purple/90 text-white font-semibold px-8 py-3 transform hover:scale-105 transition-all duration-200"
+                className="bg-vyoniq-purple hover:bg-vyoniq-purple/90 active:bg-vyoniq-purple/80 text-white font-semibold px-8 py-4 min-h-[48px] transform hover:scale-105 active:scale-100 transition-all duration-200 touch-manipulation"
               >
                 <Link href="#contact">Get a Quote</Link>
               </Button>
               <Button
                 asChild
-                variant="outline"
                 size="lg"
-                className="border-white text-white hover:bg-vyoniq-green hover:border-vyoniq-green font-semibold px-8 py-3 transform hover:scale-105 transition-all duration-200"
+                className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-vyoniq-blue active:bg-white/90 active:text-vyoniq-blue font-semibold px-8 py-4 min-h-[48px] transform hover:scale-105 active:scale-100 transition-all duration-200 touch-manipulation backdrop-blur-sm"
               >
                 <Link href="/sign-up">Join Vyoniq Tables Waitlist</Link>
               </Button>
