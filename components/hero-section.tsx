@@ -32,7 +32,7 @@ export function HeroSection() {
                 asChild
                 variant="outline"
                 size="lg"
-                className="border-white text-white hover:bg-vyoniq-green hover:border-vyoniq-green font-semibold px-8 py-3 transform hover:scale-105 transition-all duration-200"
+                className="border-white text-white hover:bg-white hover:text-vyoniq-blue hover:border-white font-semibold px-8 py-3 transform hover:scale-105 transition-all duration-200"
               >
                 <Link href="/sign-up">Join Vyoniq Tables Waitlist</Link>
               </Button>
