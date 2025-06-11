@@ -17,7 +17,7 @@ export interface BlogPost {
 
 const defaultAuthor = {
   name: "Javier Gongora",
-  avatar: "/placeholder.svg?height=100&width=100&text=JG",
+  avatar: "", // Remove the placeholder URL
   title: "Founder & Software Developer",
 }
 
