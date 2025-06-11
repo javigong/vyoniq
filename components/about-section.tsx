@@ -15,12 +15,14 @@ export function AboutSection() {
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-vyoniq-blue dark:text-white mb-6">Why Choose Vyoniq?</h2>
           <p className="text-lg text-vyoniq-text dark:text-vyoniq-dark-text mb-8 leading-relaxed">
-            Vyoniq leverages AI agents under the leadership of our Founder and Software Developer to deliver world-class
-            solutions with unmatched efficiency. We combine cutting-edge technology with human expertise to create
-            software that doesn't just meet your needs—it anticipates them.
+            Vyoniq leverages cutting-edge AI technologies under the leadership of founder and software developer{" "}
+            <span className="font-semibold text-vyoniq-blue dark:text-vyoniq-green">Javier Gongora</span> to deliver
+            world-class LLM integration, AI agent development, and modern development solutions with unmatched
+            efficiency. We combine deep expertise in Large Language Models, AI agents, and tools like Cursor with
+            innovative approaches to create software that doesn't just meet your needs—it anticipates them.
           </p>
           <Button asChild variant="link" className="text-vyoniq-green hover:text-vyoniq-purple font-semibold text-lg">
-            <Link href="/about">Meet Our Vision →</Link>
+            <Link href="/about">Meet Javier Gongora →</Link>
           </Button>
         </div>
       </div>

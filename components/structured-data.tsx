@@ -28,7 +28,7 @@ export function OrganizationStructuredData() {
   const organizationData = {
     name: "Vyoniq",
     description:
-      "AI-powered software development company specializing in web & mobile apps, hosting services, and AI integrations.",
+      "AI-powered software development company specializing in LLM integration, AI agents, and modern development tools like Cursor and MCP servers.",
     url: "https://vyoniq.com",
     logo: "https://vyoniq.com/logo.png",
     contactPoint: {
@@ -40,15 +40,18 @@ export function OrganizationStructuredData() {
     foundingDate: "2025",
     founder: {
       "@type": "Person",
-      name: "Founder and Software Developer",
+      name: "Javier Gongora",
+      jobTitle: "Founder & Software Developer",
+      description: "Expert in LLM integration, AI agents, and modern AI development tools",
     },
     areaServed: "Worldwide",
     serviceType: [
+      "LLM Integration",
+      "AI Agent Development",
       "Web Development",
       "Mobile App Development",
-      "AI Integration",
-      "Cloud Hosting",
-      "Software Development",
+      "MCP Server Implementation",
+      "AI Development Consulting",
     ],
   }
 

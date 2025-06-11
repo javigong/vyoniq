@@ -15,17 +15,11 @@ export interface BlogPost {
   featured: boolean
 }
 
-const categories = [
-  "All",
-  "Large Language Models",
-  "AI Agents",
-  "Cursor & AI IDEs",
-  "MCP Servers",
-  "LLM Integration",
-  "AI Development Tools",
-  "Case Studies",
-  "Industry Trends",
-]
+const defaultAuthor = {
+  name: "Javier Gongora",
+  avatar: "/placeholder.svg?height=100&width=100&text=JG",
+  title: "Founder & Software Developer",
+}
 
 export const blogPosts: BlogPost[] = [
   {
@@ -126,11 +120,7 @@ At Vyoniq, we're leveraging Cursor and similar AI development tools to deliver f
     coverImage: "/placeholder.svg?height=400&width=600&text=Cursor+AI+Development",
     publishDate: "June 5, 2025",
     readTime: 8,
-    author: {
-      name: "Alex Morgan",
-      avatar: "/placeholder.svg?height=100&width=100",
-      title: "Chief Technology Officer",
-    },
+    author: defaultAuthor,
     categories: ["Cursor & AI IDEs", "AI Development Tools", "Industry Trends"],
     featured: true,
   },
@@ -263,11 +253,7 @@ At Vyoniq, we're at the forefront of MCP server development, helping organizatio
     coverImage: "/placeholder.svg?height=400&width=600&text=MCP+Servers+Integration",
     publishDate: "May 28, 2025",
     readTime: 7,
-    author: {
-      name: "Sarah Chen",
-      avatar: "/placeholder.svg?height=100&width=100",
-      title: "LLM Integration Specialist",
-    },
+    author: defaultAuthor,
     categories: ["MCP Servers", "LLM Integration", "Enterprise Architecture"],
     featured: true,
   },
@@ -444,11 +430,7 @@ At Vyoniq, we specialize in designing and implementing AI agent solutions that t
     coverImage: "/placeholder.svg?height=400&width=600&text=AI+Agents+Business",
     publishDate: "May 15, 2025",
     readTime: 9,
-    author: {
-      name: "Michael Rodriguez",
-      avatar: "/placeholder.svg?height=100&width=100",
-      title: "AI Agent Solutions Lead",
-    },
+    author: defaultAuthor,
     categories: ["AI Agents", "Business Automation", "LLM Integration"],
     featured: false,
   },
@@ -650,11 +632,7 @@ At Vyoniq, we bring deep expertise in enterprise LLM integration, helping organi
     coverImage: "/placeholder.svg?height=400&width=600&text=Enterprise+LLM+Integration",
     publishDate: "May 3, 2025",
     readTime: 10,
-    author: {
-      name: "Emily Johnson",
-      avatar: "/placeholder.svg?height=100&width=100",
-      title: "Enterprise AI Architect",
-    },
+    author: defaultAuthor,
     categories: ["LLM Integration", "Enterprise Architecture", "Security"],
     featured: false,
   },
@@ -905,11 +883,7 @@ At Vyoniq, we stay at the forefront of the AI development tools ecosystem, helpi
     coverImage: "/placeholder.svg?height=400&width=600&text=AI+Development+Tools",
     publishDate: "April 22, 2025",
     readTime: 8,
-    author: {
-      name: "David Kim",
-      avatar: "/placeholder.svg?height=100&width=100",
-      title: "AI Tools Specialist",
-    },
+    author: defaultAuthor,
     categories: ["AI Development Tools", "Cursor & AI IDEs", "Industry Trends"],
     featured: true,
   },
