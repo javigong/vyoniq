@@ -34,21 +34,23 @@ export function TestimonialsSection() {
   }, [])
 
   return (
-    <section className="py-20 bg-vyoniq-gray">
+    <section className="py-20 bg-vyoniq-gray dark:bg-vyoniq-slate">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-vyoniq-blue mb-4">What Our Clients Say</h2>
-          <p className="text-lg text-vyoniq-text">Trusted by innovative companies worldwide</p>
+          <h2 className="text-3xl md:text-4xl font-bold text-vyoniq-blue dark:text-white mb-4">What Our Clients Say</h2>
+          <p className="text-lg text-vyoniq-text dark:text-vyoniq-dark-text">
+            Trusted by innovative companies worldwide
+          </p>
         </div>
 
         <div className="max-w-4xl mx-auto">
-          <Card className="border-0 shadow-xl">
+          <Card className="border-0 shadow-xl bg-white dark:bg-vyoniq-dark-card">
             <CardContent className="p-8 text-center">
-              <blockquote className="text-xl md:text-2xl text-vyoniq-text mb-6 italic leading-relaxed">
+              <blockquote className="text-xl md:text-2xl text-vyoniq-text dark:text-vyoniq-dark-text mb-6 italic leading-relaxed">
                 "{testimonials[currentIndex].quote}"
               </blockquote>
-              <div className="text-vyoniq-blue font-semibold">{testimonials[currentIndex].author}</div>
-              <div className="text-vyoniq-text">{testimonials[currentIndex].company}</div>
+              <div className="text-vyoniq-blue dark:text-white font-semibold">{testimonials[currentIndex].author}</div>
+              <div className="text-vyoniq-text dark:text-vyoniq-dark-muted">{testimonials[currentIndex].company}</div>
             </CardContent>
           </Card>
 
@@ -59,7 +61,7 @@ export function TestimonialsSection() {
                 key={index}
                 onClick={() => setCurrentIndex(index)}
                 className={`w-3 h-3 rounded-full transition-colors duration-200 ${
-                  index === currentIndex ? "bg-vyoniq-green" : "bg-gray-300"
+                  index === currentIndex ? "bg-vyoniq-green" : "bg-gray-300 dark:bg-gray-600"
                 }`}
                 aria-label={`Go to testimonial ${index + 1}`}
               />

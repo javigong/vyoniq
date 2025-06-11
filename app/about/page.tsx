@@ -3,18 +3,74 @@ import { Footer } from "@/components/footer"
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
 import Link from "next/link"
+import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "About Vyoniq | Visionary AI Software Development Leadership",
+  description:
+    "Meet the founder and software developer behind Vyoniq's AI-powered solutions. Learn about our vision for transforming business through innovative AI-driven software development.",
+  keywords: [
+    "Vyoniq founder",
+    "AI software developer",
+    "software development leadership",
+    "AI innovation",
+    "tech visionary",
+    "artificial intelligence expert",
+    "software engineering",
+    "business transformation",
+  ],
+  openGraph: {
+    title: "About Vyoniq | Visionary AI Software Development Leadership",
+    description:
+      "Meet the founder and software developer behind Vyoniq's AI-powered solutions. Transforming business through innovative AI-driven software development.",
+    url: "https://vyoniq.com/about",
+    siteName: "Vyoniq",
+    images: [
+      {
+        url: "/placeholder.svg?height=630&width=1200&text=About+Vyoniq+Leadership",
+        width: 1200,
+        height: 630,
+        alt: "Vyoniq founder and software developer",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "About Vyoniq | Visionary AI Software Development Leadership",
+    description: "Meet the founder and software developer behind Vyoniq's AI-powered solutions.",
+    images: ["/placeholder.svg?height=630&width=1200&text=About+Vyoniq+Leadership"],
+  },
+  alternates: {
+    canonical: "https://vyoniq.com/about",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+}
 
 export default function AboutPage() {
   return (
     <main className="min-h-screen">
       <Header />
 
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-white dark:bg-vyoniq-dark-bg">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-16">
-              <h1 className="text-4xl md:text-5xl font-bold text-vyoniq-blue mb-6">Our Visionary Leader</h1>
-              <p className="text-xl text-vyoniq-text max-w-3xl mx-auto">
+              <h1 className="text-4xl md:text-5xl font-bold text-vyoniq-blue dark:text-white mb-6">
+                Our Visionary Leader
+              </h1>
+              <p className="text-xl text-vyoniq-text dark:text-vyoniq-dark-text max-w-3xl mx-auto">
                 Meet the innovative mind behind Vyoniq's AI-powered solutions
               </p>
             </div>
@@ -31,8 +87,10 @@ export default function AboutPage() {
               </div>
 
               <div className="flex-1 lg:pl-8">
-                <h2 className="text-3xl font-bold text-vyoniq-blue mb-6">Founder & Software Developer</h2>
-                <div className="text-lg text-vyoniq-text space-y-4 leading-relaxed">
+                <h2 className="text-3xl font-bold text-vyoniq-blue dark:text-white mb-6">
+                  Founder & Software Developer
+                </h2>
+                <div className="text-lg text-vyoniq-text dark:text-vyoniq-dark-text space-y-4 leading-relaxed">
                   <p>
                     With over a decade of experience in software development and artificial intelligence, our founder
                     has been at the forefront of technological innovation. Their vision for Vyoniq stems from a deep

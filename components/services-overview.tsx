@@ -30,11 +30,11 @@ const services = [
 
 export function ServicesOverview() {
   return (
-    <section className="py-20 bg-white">
+    <section className="py-20 bg-white dark:bg-vyoniq-dark-bg">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-vyoniq-blue mb-4">Our Services</h2>
-          <p className="text-lg text-vyoniq-text max-w-2xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-vyoniq-blue dark:text-white mb-4">Our Services</h2>
+          <p className="text-lg text-vyoniq-text dark:text-vyoniq-dark-text max-w-2xl mx-auto">
             Comprehensive AI-powered solutions to accelerate your digital transformation
           </p>
         </div>
@@ -43,19 +43,19 @@ export function ServicesOverview() {
           {services.map((service, index) => (
             <Card
               key={service.title}
-              className="group hover:shadow-xl transition-all duration-300 transform hover:scale-105 border-0 shadow-lg"
+              className="group hover:shadow-xl dark:hover:shadow-2xl transition-all duration-300 transform hover:scale-105 border-0 shadow-lg bg-white dark:bg-vyoniq-dark-card"
               style={{ animationDelay: `${index * 0.2}s` }}
             >
               <CardHeader className="text-center">
-                <div className="mx-auto mb-4 p-3 bg-vyoniq-blue/5 rounded-full w-fit">
+                <div className="mx-auto mb-4 p-3 bg-vyoniq-blue/5 dark:bg-vyoniq-green/10 rounded-full w-fit">
                   <service.icon className="h-8 w-8 text-vyoniq-green" />
                 </div>
-                <CardTitle className="text-xl text-vyoniq-blue group-hover:text-vyoniq-green transition-colors">
+                <CardTitle className="text-xl text-vyoniq-blue dark:text-white group-hover:text-vyoniq-green transition-colors">
                   {service.title}
                 </CardTitle>
               </CardHeader>
               <CardContent className="text-center">
-                <CardDescription className="text-vyoniq-text mb-6 leading-relaxed">
+                <CardDescription className="text-vyoniq-text dark:text-vyoniq-dark-text mb-6 leading-relaxed">
                   {service.description}
                 </CardDescription>
                 <Button asChild variant="link" className="text-vyoniq-green hover:text-vyoniq-purple font-semibold">

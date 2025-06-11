@@ -4,6 +4,63 @@ import { Button } from "@/components/ui/button"
 import { Code, Server, Sparkles, ArrowRight } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
+import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "AI-Powered Software Development Services | Vyoniq",
+  description:
+    "Comprehensive AI-powered software development services including web & mobile apps, hosting solutions, and AI integrations. Transform your business with cutting-edge technology.",
+  keywords: [
+    "AI software development",
+    "web development services",
+    "mobile app development",
+    "AI hosting solutions",
+    "AI integrations",
+    "software development company",
+    "React development",
+    "Next.js development",
+    "cloud hosting",
+    "machine learning integration",
+  ],
+  openGraph: {
+    title: "AI-Powered Software Development Services | Vyoniq",
+    description:
+      "Comprehensive AI-powered software development services including web & mobile apps, hosting solutions, and AI integrations.",
+    url: "https://vyoniq.com/services",
+    siteName: "Vyoniq",
+    images: [
+      {
+        url: "/placeholder.svg?height=630&width=1200&text=Vyoniq+Services",
+        width: 1200,
+        height: 630,
+        alt: "Vyoniq AI-powered software development services",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "AI-Powered Software Development Services | Vyoniq",
+    description:
+      "Comprehensive AI-powered software development services including web & mobile apps, hosting solutions, and AI integrations.",
+    images: ["/placeholder.svg?height=630&width=1200&text=Vyoniq+Services"],
+  },
+  alternates: {
+    canonical: "https://vyoniq.com/services",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+}
 
 const services = [
   {
@@ -38,7 +95,7 @@ export default function ServicesPage() {
       <Header />
 
       {/* Hero Section */}
-      <section className="py-20 bg-gradient-to-br from-vyoniq-blue via-black to-vyoniq-green text-white">
+      <section className="py-20 bg-gradient-to-br from-vyoniq-blue via-black to-vyoniq-green dark:from-vyoniq-dark-bg dark:via-vyoniq-slate dark:to-vyoniq-blue text-white">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-4xl md:text-6xl font-bold mb-6">Our Services</h1>
@@ -50,7 +107,7 @@ export default function ServicesPage() {
       </section>
 
       {/* Services Grid */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-white dark:bg-vyoniq-dark-bg">
         <div className="container mx-auto px-4">
           <div className="space-y-20">
             {services.map((service, index) => (
@@ -60,19 +117,21 @@ export default function ServicesPage() {
               >
                 <div className="flex-1">
                   <div className="flex items-center mb-6">
-                    <div className="p-3 bg-vyoniq-blue/5 rounded-full mr-4">
+                    <div className="p-3 bg-vyoniq-blue/5 dark:bg-vyoniq-green/10 rounded-full mr-4">
                       <service.icon className="h-8 w-8 text-vyoniq-green" />
                     </div>
-                    <h2 className="text-3xl md:text-4xl font-bold text-vyoniq-blue">{service.title}</h2>
+                    <h2 className="text-3xl md:text-4xl font-bold text-vyoniq-blue dark:text-white">{service.title}</h2>
                   </div>
 
-                  <p className="text-lg text-vyoniq-text mb-6 leading-relaxed">{service.description}</p>
+                  <p className="text-lg text-vyoniq-text dark:text-vyoniq-dark-text mb-6 leading-relaxed">
+                    {service.description}
+                  </p>
 
                   <div className="grid grid-cols-2 gap-3 mb-8">
                     {service.features.map((feature) => (
                       <div key={feature} className="flex items-center">
                         <ArrowRight className="h-4 w-4 text-vyoniq-green mr-2" />
-                        <span className="text-vyoniq-text">{feature}</span>
+                        <span className="text-vyoniq-text dark:text-vyoniq-dark-text">{feature}</span>
                       </div>
                     ))}
                   </div>

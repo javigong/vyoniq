@@ -26,24 +26,29 @@ const config: Config = {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#0F1729", // Dark blue-black (Vercel-inspired)
+          DEFAULT: "#0F1729",
           foreground: "#FFFFFF",
         },
         secondary: {
-          DEFAULT: "#00C7B7", // Teal/cyan (Modern tech)
+          DEFAULT: "#00C7B7",
           foreground: "#FFFFFF",
         },
         accent: {
-          DEFAULT: "#6E56CF", // Subtle purple (Modern accent)
+          DEFAULT: "#6E56CF",
           foreground: "#FFFFFF",
         },
         vyoniq: {
-          blue: "#0F1729", // Dark blue-black
-          green: "#00C7B7", // Teal/cyan
-          purple: "#6E56CF", // Subtle purple
-          slate: "#121212", // Near black (Apple-inspired)
-          gray: "#F5F5F7", // Light gray (Apple-inspired)
-          text: "#1D1D1F", // Dark text (Apple-inspired)
+          blue: "#0F1729",
+          green: "#00C7B7",
+          purple: "#6E56CF",
+          slate: "#121212",
+          gray: "#F5F5F7",
+          text: "#1D1D1F",
+          // Dark mode variants
+          "dark-bg": "#0A0A0A",
+          "dark-card": "#1A1A1A",
+          "dark-text": "#E5E5E7",
+          "dark-muted": "#8E8E93",
         },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",

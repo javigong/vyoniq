@@ -32,44 +32,59 @@ export function ContactForm() {
   }
 
   return (
-    <section id="contact" className="py-20 bg-white">
+    <section id="contact" className="py-20 bg-white dark:bg-vyoniq-dark-bg">
       <div className="container mx-auto px-4">
         <div className="max-w-2xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-vyoniq-blue mb-4">Get In Touch</h2>
-            <p className="text-lg text-vyoniq-text">Ready to transform your business with AI-powered solutions?</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-vyoniq-blue dark:text-white mb-4">Get In Touch</h2>
+            <p className="text-lg text-vyoniq-text dark:text-vyoniq-dark-text">
+              Ready to transform your business with AI-powered solutions?
+            </p>
           </div>
 
-          <Card className="border-0 shadow-xl">
+          <Card className="border-0 shadow-xl bg-white dark:bg-vyoniq-dark-card">
             <CardHeader>
-              <CardTitle className="text-2xl text-vyoniq-blue text-center">Submit Your Inquiry</CardTitle>
+              <CardTitle className="text-2xl text-vyoniq-blue dark:text-white text-center">
+                Submit Your Inquiry
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="name">Name *</Label>
-                    <Input id="name" name="name" required className="border-gray-300 focus:border-vyoniq-green" />
+                    <Label htmlFor="name" className="dark:text-vyoniq-dark-text">
+                      Name *
+                    </Label>
+                    <Input
+                      id="name"
+                      name="name"
+                      required
+                      className="border-gray-300 dark:border-gray-600 focus:border-vyoniq-green dark:bg-vyoniq-slate dark:text-white"
+                    />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email *</Label>
+                    <Label htmlFor="email" className="dark:text-vyoniq-dark-text">
+                      Email *
+                    </Label>
                     <Input
                       id="email"
                       name="email"
                       type="email"
                       required
-                      className="border-gray-300 focus:border-vyoniq-green"
+                      className="border-gray-300 dark:border-gray-600 focus:border-vyoniq-green dark:bg-vyoniq-slate dark:text-white"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="service">Service Type *</Label>
+                  <Label htmlFor="service" className="dark:text-vyoniq-dark-text">
+                    Service Type *
+                  </Label>
                   <Select name="service" required>
-                    <SelectTrigger className="border-gray-300 focus:border-vyoniq-green">
+                    <SelectTrigger className="border-gray-300 dark:border-gray-600 focus:border-vyoniq-green dark:bg-vyoniq-slate dark:text-white">
                       <SelectValue placeholder="Select a service" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="dark:bg-vyoniq-dark-card dark:border-gray-600">
                       <SelectItem value="web-mobile">Web & Mobile Development</SelectItem>
                       <SelectItem value="hosting">Hosting Services</SelectItem>
                       <SelectItem value="ai">AI Integrations</SelectItem>
@@ -79,13 +94,15 @@ export function ContactForm() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="message">Message *</Label>
+                  <Label htmlFor="message" className="dark:text-vyoniq-dark-text">
+                    Message *
+                  </Label>
                   <Textarea
                     id="message"
                     name="message"
                     required
                     rows={5}
-                    className="border-gray-300 focus:border-vyoniq-green"
+                    className="border-gray-300 dark:border-gray-600 focus:border-vyoniq-green dark:bg-vyoniq-slate dark:text-white"
                     placeholder="Tell us about your project..."
                   />
                 </div>
