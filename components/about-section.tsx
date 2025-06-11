@@ -24,7 +24,7 @@ export function AboutSection() {
           <Button
             asChild
             size="lg"
-            className="bg-vyoniq-green hover:bg-vyoniq-green/90 active:bg-vyoniq-green/80 text-white font-semibold px-8 py-4 min-h-[48px] transform hover:scale-105 active:scale-100 transition-all duration-200 touch-manipulation"
+            className="bg-secondary hover:bg-secondary/90 text-white font-semibold px-8 py-4 min-h-[48px] transform hover:scale-105 active:scale-100 transition-all duration-200 touch-manipulation"
           >
             <Link href="/about">Meet Javier Gongora →</Link>
           </Button>
