@@ -22,7 +22,7 @@ export function VyoniqTablesSection() {
             <Button
               asChild
               size="lg"
-              className="bg-vyoniq-green hover:bg-vyoniq-green/90 text-white font-semibold px-8 py-3 transform hover:scale-105 transition-all duration-200"
+              className="bg-vyoniq-green hover:bg-vyoniq-green/90 active:bg-vyoniq-green/80 text-white font-semibold px-8 py-4 min-h-[48px] transform hover:scale-105 active:scale-100 transition-all duration-200 touch-manipulation"
             >
               <Link href="/sign-up">Join the Waitlist</Link>
             </Button>
