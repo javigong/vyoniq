@@ -21,7 +21,11 @@ export function AboutSection() {
             efficiency. We combine deep expertise in Large Language Models, AI agents, and tools like Cursor with
             innovative approaches to create software that doesn't just meet your needs—it anticipates them.
           </p>
-          <Button asChild variant="link" className="text-vyoniq-green hover:text-vyoniq-purple font-semibold text-lg">
+          <Button
+            asChild
+            size="lg"
+            className="bg-secondary hover:bg-secondary/90 text-white font-semibold px-8 py-4 min-h-[48px] transform hover:scale-105 active:scale-100 transition-all duration-200 touch-manipulation"
+          >
             <Link href="/about">Meet Javier Gongora →</Link>
           </Button>
         </div>
