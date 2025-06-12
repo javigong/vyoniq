@@ -1,36 +1,44 @@
-import { Header } from "@/components/header"
-import { Footer } from "@/components/footer"
-import { BlogAuthor } from "@/components/blog/blog-author"
-import { BlogRelatedPosts } from "@/components/blog/blog-related-posts"
-import { BlogShareButtons } from "@/components/blog/blog-share-buttons"
-import { Badge } from "@/components/ui/badge"
-import { CalendarIcon, Clock } from "lucide-react"
-import { blogPosts } from "@/lib/blog-data"
-import Image from "next/image"
-import { notFound } from "next/navigation"
-import type { Metadata } from "next"
-import { StructuredData } from "@/components/structured-data"
+import { Header } from "@/components/header";
+import { Footer } from "@/components/footer";
+import { BlogAuthor } from "@/components/blog/blog-author";
+import { BlogRelatedPosts } from "@/components/blog/blog-related-posts";
+import { BlogShareButtons } from "@/components/blog/blog-share-buttons";
+import { Badge } from "@/components/ui/badge";
+import { CalendarIcon, Clock } from "lucide-react";
+import { blogPosts } from "@/lib/blog-data";
+import Image from "next/image";
+import { notFound } from "next/navigation";
+import type { Metadata } from "next";
+import { StructuredData } from "@/components/structured-data";
 
 interface BlogPostPageProps {
   params: {
-    slug: string
-  }
+    slug: string;
+  };
 }
 
-export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
-  const post = blogPosts.find((post) => post.slug === params.slug)
+export async function generateMetadata({
+  params,
+}: BlogPostPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const post = blogPosts.find((post) => post.slug === slug);
 
   if (!post) {
     return {
       title: "Post Not Found | Vyoniq Blog",
       description: "The requested blog post could not be found.",
-    }
+    };
   }
 
   return {
     title: `${post.title} | Vyoniq Blog`,
     description: post.excerpt,
-    keywords: [...post.categories, "Vyoniq blog", "AI insights", "software development blog"],
+    keywords: [
+      ...post.categories,
+      "Vyoniq blog",
+      "AI insights",
+      "software development blog",
+    ],
     openGraph: {
       title: post.title,
       description: post.excerpt,
@@ -59,26 +67,31 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
     alternates: {
       canonical: `https://vyoniq.com/blog/${post.slug}`,
     },
-  }
+  };
 }
 
 export async function generateStaticParams() {
   return blogPosts.map((post) => ({
     slug: post.slug,
-  }))
+  }));
 }
 
-export default function BlogPostPage({ params }: BlogPostPageProps) {
-  const post = blogPosts.find((post) => post.slug === params.slug)
+export default async function BlogPostPage({ params }: BlogPostPageProps) {
+  const { slug } = await params;
+  const post = blogPosts.find((post) => post.slug === slug);
 
   if (!post) {
-    notFound()
+    notFound();
   }
 
   // Get related posts based on categories
   const relatedPosts = blogPosts
-    .filter((p) => p.slug !== post.slug && p.categories.some((cat) => post.categories.includes(cat)))
-    .slice(0, 3)
+    .filter(
+      (p) =>
+        p.slug !== post.slug &&
+        p.categories.some((cat) => post.categories.includes(cat))
+    )
+    .slice(0, 3);
 
   return (
     <main className="min-h-screen">
@@ -115,12 +128,18 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
           <div className="max-w-4xl mx-auto">
             <div className="flex flex-wrap gap-2 mb-4">
               {post.categories.map((category) => (
-                <Badge key={category} variant="secondary" className="bg-white/10 text-white hover:bg-white/20">
+                <Badge
+                  key={category}
+                  variant="secondary"
+                  className="bg-white/10 text-white hover:bg-white/20"
+                >
                   {category}
                 </Badge>
               ))}
             </div>
-            <h1 className="text-3xl md:text-5xl font-bold mb-6">{post.title}</h1>
+            <h1 className="text-3xl md:text-5xl font-bold mb-6">
+              {post.title}
+            </h1>
             <div className="flex items-center gap-6 text-sm text-gray-200">
               <div className="flex items-center">
                 <CalendarIcon className="h-4 w-4 mr-1" />
@@ -156,42 +175,60 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
                   {post.content.split("\n").map((paragraph, index) => {
                     if (paragraph.startsWith("# ")) {
                       return (
-                        <h1 key={index} className="text-3xl font-bold mt-8 mb-4 text-vyoniq-blue dark:text-white">
+                        <h1
+                          key={index}
+                          className="text-3xl font-bold mt-8 mb-4 text-vyoniq-blue dark:text-white"
+                        >
                           {paragraph.substring(2)}
                         </h1>
-                      )
+                      );
                     } else if (paragraph.startsWith("## ")) {
                       return (
-                        <h2 key={index} className="text-2xl font-bold mt-6 mb-3 text-vyoniq-blue dark:text-white">
+                        <h2
+                          key={index}
+                          className="text-2xl font-bold mt-6 mb-3 text-vyoniq-blue dark:text-white"
+                        >
                           {paragraph.substring(3)}
                         </h2>
-                      )
+                      );
                     } else if (paragraph.startsWith("### ")) {
                       return (
-                        <h3 key={index} className="text-xl font-bold mt-5 mb-2 text-vyoniq-blue dark:text-white">
+                        <h3
+                          key={index}
+                          className="text-xl font-bold mt-5 mb-2 text-vyoniq-blue dark:text-white"
+                        >
                           {paragraph.substring(4)}
                         </h3>
-                      )
+                      );
                     } else if (paragraph.startsWith("- ")) {
                       return (
-                        <li key={index} className="ml-6 mb-1 text-vyoniq-text dark:text-vyoniq-dark-text">
+                        <li
+                          key={index}
+                          className="ml-6 mb-1 text-vyoniq-text dark:text-vyoniq-dark-text"
+                        >
                           {paragraph.substring(2)}
                         </li>
-                      )
+                      );
                     } else if (paragraph.startsWith("**")) {
                       return (
-                        <p key={index} className="font-bold mb-4 text-vyoniq-text dark:text-vyoniq-dark-text">
+                        <p
+                          key={index}
+                          className="font-bold mb-4 text-vyoniq-text dark:text-vyoniq-dark-text"
+                        >
                           {paragraph.replace(/\*\*/g, "")}
                         </p>
-                      )
+                      );
                     } else if (paragraph.trim() === "") {
-                      return null
+                      return null;
                     } else {
                       return (
-                        <p key={index} className="mb-4 text-vyoniq-text dark:text-vyoniq-dark-text">
+                        <p
+                          key={index}
+                          className="mb-4 text-vyoniq-text dark:text-vyoniq-dark-text"
+                        >
                           {paragraph}
                         </p>
-                      )
+                      );
                     }
                   })}
                 </div>
@@ -205,7 +242,9 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
                   <BlogAuthor author={post.author} />
 
                   <div className="p-6 bg-vyoniq-gray dark:bg-vyoniq-slate rounded-lg">
-                    <h3 className="text-xl font-bold text-vyoniq-blue dark:text-white mb-4">Subscribe</h3>
+                    <h3 className="text-xl font-bold text-vyoniq-blue dark:text-white mb-4">
+                      Subscribe
+                    </h3>
                     <p className="text-sm text-vyoniq-text dark:text-vyoniq-dark-text mb-4">
                       Get the latest insights delivered to your inbox
                     </p>
@@ -230,7 +269,9 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
             {/* Related Posts */}
             {relatedPosts.length > 0 && (
               <div className="mt-16">
-                <h2 className="text-2xl font-bold text-vyoniq-blue dark:text-white mb-6">Related Articles</h2>
+                <h2 className="text-2xl font-bold text-vyoniq-blue dark:text-white mb-6">
+                  Related Articles
+                </h2>
                 <BlogRelatedPosts posts={relatedPosts} />
               </div>
             )}
@@ -240,5 +281,5 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
 
       <Footer />
     </main>
-  )
+  );
 }

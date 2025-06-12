@@ -55,7 +55,7 @@ The Vyoniq SaaS landing page establishes Vyoniq as a leading Software Developmen
 - **Footer:**
   - **Links:** About, Services, Contact, Privacy Policy, Terms of Service.
   - **Social media icons:** (placeholders for LinkedIn, GitHub, etc.).
-  - **Copyright:** "© 2025 Vyoniq. All rights reserved."
+  - **Copyright:** "© 2025 Vyoniq Technologies. All rights reserved."
 
 #### Service Detail Pages
 

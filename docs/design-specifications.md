@@ -99,7 +99,7 @@ Vyoniq is an innovative, AI-driven Software Development company led by the Found
   - Background: #121212, text: #F5F5F7.
   - Links: “About,” “Services,” “Contact,” “Privacy Policy,” “Terms of Service” (grid layout, hover: #00C7B7).
   - Social Icons: LinkedIn, GitHub (Heroicons, #F5F5F7, hover: #00C7B7).
-  - Copyright: “© 2025 Vyoniq. All rights reserved.” (14px, #F5F5F7).
+  - Copyright: “© 2025 Vyoniq Technologies. All rights reserved.” (14px, #F5F5F7).
 
 ##### 2.2 Service Detail Pages
 - **Template** (for Web/Mobile, Hosting, AI Integrations):
