@@ -43,13 +43,13 @@ export function HeroSection() {
           </div>
 
           {/* Visual */}
-          <div className="flex-1 max-w-lg animate-slide-in -ml-16">
+          <div className="flex-1 max-w-lg animate-slide-in -ml-16 hidden lg:block">
             <Image
               src="/rocket-hero.png"
               alt="Stylized rocket launching, symbolizing innovation and speed"
               width={600}
               height={500}
-              className="w-full h-auto"
+              className="w-full h-auto animate-float transform rotate-45"
               priority
             />
           </div>
