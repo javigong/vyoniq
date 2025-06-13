@@ -166,6 +166,12 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 className="object-cover"
                 priority
               />
+              {post.tintColor && (
+                <div
+                  className="absolute inset-0"
+                  style={{ backgroundColor: post.tintColor }}
+                />
+              )}
             </div>
 
             <div className="flex flex-col md:flex-row gap-8">
