@@ -1,7 +1,51 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
+import { Linkedin } from "lucide-react";
+import { subscribeToNewsletter } from "@/lib/actions";
+import { useFormStatus } from "react-dom";
+import { useActionState, useEffect, useRef } from "react";
+import { toast } from "sonner";
+
+const initialState: {
+  error?: string | null;
+  success?: string | null;
+} = {
+  error: null,
+  success: null,
+};
+
+function SubmitButton() {
+  const { pending } = useFormStatus();
+  return (
+    <button
+      type="submit"
+      disabled={pending}
+      className="bg-vyoniq-green hover:bg-vyoniq-green/90 text-white font-semibold px-6 py-2 rounded-md transition-colors disabled:bg-gray-500 disabled:cursor-not-allowed"
+    >
+      {pending ? "Subscribing..." : "Subscribe"}
+    </button>
+  );
+}
 
 export function Footer() {
+  const [state, formAction] = useActionState(
+    subscribeToNewsletter,
+    initialState
+  );
+  const formRef = useRef<HTMLFormElement>(null);
+
+  useEffect(() => {
+    if (state?.success) {
+      toast.success(state.success);
+      formRef.current?.reset();
+    }
+    if (state?.error) {
+      toast.error(state.error);
+    }
+  }, [state]);
+
   return (
     <footer className="bg-vyoniq-slate dark:bg-vyoniq-dark-bg text-white py-16 border-t border-gray-200 dark:border-gray-800">
       <div className="container mx-auto px-4">
@@ -16,6 +60,24 @@ export function Footer() {
             <p className="text-gray-300 dark:text-vyoniq-dark-muted mb-4">
               AI-powered software solutions for the future of business.
             </p>
+            <div>
+              <h4 className="text-lg font-semibold mb-2">
+                Subscribe to our newsletter
+              </h4>
+              <p className="text-sm text-gray-400 mb-4">
+                Get the latest insights on AI and software development.
+              </p>
+              <form ref={formRef} action={formAction} className="flex gap-2">
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Your email address"
+                  className="flex-grow px-4 py-2 rounded-md bg-gray-800 border border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-vyoniq-green"
+                  required
+                />
+                <SubmitButton />
+              </form>
+            </div>
           </div>
 
           <div>
