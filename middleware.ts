@@ -7,6 +7,8 @@ export default clerkMiddleware((auth, req) => {
   if (isAdminRoute(req)) {
     auth.protect();
   }
+  // Set Authorized Parties to Vyoniq URL
+  authorizedParties: ["https://vyoniq.com"];
 });
 
 export const config = {
