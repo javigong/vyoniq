@@ -1,9 +1,9 @@
-import { Header } from "@/components/header"
-import { Footer } from "@/components/footer"
-import { Button } from "@/components/ui/button"
-import Image from "next/image"
-import Link from "next/link"
-import type { Metadata } from "next"
+import { Header } from "@/components/header";
+import { Footer } from "@/components/footer";
+import { Button } from "@/components/ui/button";
+import Image from "next/image";
+import Link from "next/link";
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "About Javier Gongora | Founder & Software Developer | Vyoniq",
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     siteName: "Vyoniq",
     images: [
       {
-        url: "/placeholder.svg?height=630&width=1200&text=Javier+Gongora+Vyoniq+Founder",
+        url: "/javier.jpeg",
         width: 1200,
         height: 630,
         alt: "Javier Gongora, Founder and Software Developer at Vyoniq",
@@ -41,8 +41,9 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "About Javier Gongora | Founder & Software Developer | Vyoniq",
-    description: "Meet Javier Gongora, founder and software developer behind Vyoniq's AI-powered solutions.",
-    images: ["/placeholder.svg?height=630&width=1200&text=Javier+Gongora+Vyoniq+Founder"],
+    description:
+      "Meet Javier Gongora, founder and software developer behind Vyoniq's AI-powered solutions.",
+    images: ["/javier.jpeg"],
   },
   alternates: {
     canonical: "https://vyoniq.com/about",
@@ -58,7 +59,7 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
-}
+};
 
 export default function AboutPage() {
   return (
@@ -73,14 +74,15 @@ export default function AboutPage() {
                 Meet Javier Gongora
               </h1>
               <p className="text-xl text-vyoniq-text dark:text-vyoniq-dark-text max-w-3xl mx-auto">
-                Founder & Software Developer driving innovation in AI-powered software development
+                Founder & Software Developer driving innovation in AI-powered
+                software development
               </p>
             </div>
 
             <div className="flex flex-col lg:flex-row items-center gap-12">
               <div className="flex-1">
                 <Image
-                  src="/placeholder.svg?height=400&width=400&text=Javier+Gongora"
+                  src="/javier.jpeg"
                   alt="Javier Gongora, Founder and Software Developer"
                   width={400}
                   height={400}
@@ -94,26 +96,35 @@ export default function AboutPage() {
                 </h2>
                 <div className="text-lg text-vyoniq-text dark:text-vyoniq-dark-text space-y-4 leading-relaxed">
                   <p>
-                    Javier Gongora is the visionary founder and lead software developer behind Vyoniq, bringing deep
-                    expertise in Large Language Models, AI agents, and cutting-edge development tools to transform how
-                    businesses leverage artificial intelligence.
+                    Javier Gongora is the visionary founder and lead software
+                    developer behind Vyoniq, bringing deep expertise in Large
+                    Language Models, AI agents, and cutting-edge development
+                    tools to transform how businesses leverage artificial
+                    intelligence.
                   </p>
                   <p>
-                    With a passion for innovation and a keen understanding of the rapidly evolving AI landscape, Javier
-                    specializes in LLM integration, AI agent development, and modern development environments like
-                    Cursor. His expertise extends to MCP (Model Context Protocol) servers, enabling seamless integration
-                    between AI systems and business applications.
+                    With a passion for innovation and a keen understanding of
+                    the rapidly evolving AI landscape, Javier specializes in LLM
+                    integration, AI agent development, and modern development
+                    environments like Cursor. His expertise extends to MCP
+                    (Model Context Protocol) servers, enabling seamless
+                    integration between AI systems and business applications.
                   </p>
                   <p>
-                    Under Javier's leadership, Vyoniq has established itself as a forward-thinking company that doesn't
-                    just follow AI trends but actively shapes the future of intelligent software development. His
-                    hands-on approach ensures that every project benefits from the latest advancements in AI technology
-                    while maintaining the highest standards of quality and innovation.
+                    Under Javier's leadership, Vyoniq has established itself as
+                    a forward-thinking company that doesn't just follow AI
+                    trends but actively shapes the future of intelligent
+                    software development. His hands-on approach ensures that
+                    every project benefits from the latest advancements in AI
+                    technology while maintaining the highest standards of
+                    quality and innovation.
                   </p>
                   <p>
-                    When he's not developing cutting-edge AI solutions, Javier shares his insights through Vyoniq's
-                    blog, contributing to the broader AI development community and helping businesses understand the
-                    transformative potential of modern AI technologies.
+                    When he's not developing cutting-edge AI solutions, Javier
+                    shares his insights through Vyoniq's blog, contributing to
+                    the broader AI development community and helping businesses
+                    understand the transformative potential of modern AI
+                    technologies.
                   </p>
                 </div>
 
@@ -132,5 +143,5 @@ export default function AboutPage() {
 
       <Footer />
     </main>
-  )
+  );
 }
