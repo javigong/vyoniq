@@ -51,7 +51,7 @@ The Vyoniq SaaS landing page establishes Vyoniq as a leading Software Developmen
   - Trust badges: "AI-Powered Innovation," "Secured by Clerk," "Built with Next.js."
 - **Contact Form:**
   - **Fields:** Name, Email, Service Type (dropdown: Web/Mobile, Hosting, AI, `Vyoniq Tables` Interest), Message.
-  - **CTA:** "Submit Inquiry" (stores data in `PostgreSQL`).
+  - **CTA:** "Submit Inquiry" (stores data in `PostgreSQL` and sends confirmation email via Resend).
 - **Footer:**
   - **Links:** About, Services, Contact, Privacy Policy, Terms of Service.
   - **Social media icons:** (placeholders for LinkedIn, GitHub, etc.).
@@ -82,7 +82,7 @@ The Vyoniq SaaS landing page establishes Vyoniq as a leading Software Developmen
 - **Sign-Up for Vyoniq Tables Waitlist:**
   - `Clerk`-powered form: Email, Password, Name.
   - Optional: Social login (Google, GitHub).
-  - Stores user data in `PostgreSQL` for waitlist management.
+  - A `user.created` webhook from Clerk triggers creating a user record in the local `PostgreSQL` database and sends a welcome email via `Resend`.
 - **User Dashboard (MVP scope: basic):**
   - Post-sign-up, displays waitlist status and profile info.
   - Message: "`Vyoniq Tables` is in development. Stay tuned for updates!"
@@ -101,9 +101,10 @@ The Vyoniq SaaS landing page establishes Vyoniq as a leading Software Developmen
 
 - **Database:** `PostgreSQL` for inquiries and waitlist data.
 - **Tables:**
-  - `inquiries`: id, name, email, service_type, message, created_at.
-  - `waitlist_users`: id, name, email, created_at.
-- **Authentication:** `Clerk` for secure sign-up, login, and social login.
+  - `inquiries`: `id`, `name`, `email`, `service_type`, `message`, `created_at`.
+  - `users`: `id` (from Clerk), `email`, `name`, `created_at`. This table stores application-specific user data and is kept in sync with Clerk via webhooks.
+- **Email Service:** `Resend` for transactional emails (waitlist confirmation, contact form submission).
+- **Authentication:** `Clerk` for secure sign-up and login. User data is synced to the local database via webhooks (`user.created`, `user.updated`, `user.deleted`).
 - **API Routes (`Next.js`):**
   - `POST /api/inquiry`: Handle contact form submissions.
   - `GET /api/waitlist/status`: Fetch waitlist status for authenticated users.
@@ -134,10 +135,11 @@ The Vyoniq SaaS landing page establishes Vyoniq as a leading Software Developmen
     - Views hero, services, `Vyoniq Tables` announcement, and About Vyoniq.
     - Clicks "Get a Quote" or "Join Waitlist."
 2.  **Contact Form:**
-    - Submits inquiry, stored in `PostgreSQL`, with confirmation.
+    - Submits inquiry, stored in `PostgreSQL`, and receives an email confirmation via Resend.
 3.  **Vyoniq Tables Waitlist:**
     - Signs up via `Clerk` (email or social login).
     - Redirected to dashboard with waitlist status and development update.
+    - Receives a welcome email confirming their spot on the waitlist.
 4.  **Service Exploration:**
     - Navigates to service or About pages.
     - Returns to contact form or waitlist sign-up.
@@ -182,6 +184,7 @@ The Vyoniq SaaS landing page establishes Vyoniq as a leading Software Developmen
 - **Clerk:** Authentication and user management.
 - **PostgreSQL:** Hosted on a custom VPS.
 - **Coolify:** Hosting and deployment orchestration.
+- **Resend:** Transactional email service.
 
 ### Packages
 
@@ -189,4 +192,5 @@ The Vyoniq SaaS landing page establishes Vyoniq as a leading Software Developmen
 - `shadcn/ui`
 - `Tailwind CSS`
 - `Clerk` SDK for `Next.js`
-- `Prisma` (optional) for `PostgreSQL` ORM.
+- `Prisma` for `PostgreSQL` ORM.
+- `resend`

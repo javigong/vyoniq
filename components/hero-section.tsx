@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import Image from "next/image"
-import Link from "next/link"
+import { Button } from "@/components/ui/button";
+import Image from "next/image";
+import Link from "next/link";
 
 export function HeroSection() {
   return (
@@ -15,10 +15,13 @@ export function HeroSection() {
           {/* Content */}
           <div className="flex-1 text-center lg:text-left animate-fade-in">
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">
-              Vyoniq: Innovate Faster with <span className="text-vyoniq-green">AI-Powered</span> Software Solutions
+              Vyoniq: Innovate Faster with{" "}
+              <span className="text-vyoniq-green">AI-Powered</span> Software
+              Solutions
             </h1>
             <p className="text-lg md:text-xl text-gray-100 dark:text-vyoniq-dark-muted mb-8 max-w-2xl">
-              Web & Mobile Apps, Hosting, AI Integrations, and Coming Soon: Vyoniq Tables for Smart Data Management
+              Web & Mobile Apps, Hosting, AI Integrations, and Coming Soon:
+              Vyoniq Tables for Smart Data Management
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <Button
@@ -40,18 +43,18 @@ export function HeroSection() {
           </div>
 
           {/* Visual */}
-          <div className="flex-1 max-w-lg animate-slide-in">
+          <div className="flex-1 max-w-sm animate-slide-in -ml-16 hidden lg:block">
             <Image
-              src="/placeholder.svg?height=500&width=600"
-              alt="AI-powered software development visualization"
-              width={600}
-              height={500}
-              className="w-full h-auto rounded-lg shadow-2xl"
+              src="/rocket-hero.png"
+              alt="Stylized rocket launching, symbolizing innovation and speed"
+              width={300}
+              height={250}
+              className="w-full h-auto animate-float transform rotate-45"
               priority
             />
           </div>
         </div>
       </div>
     </section>
-  )
+  );
 }
