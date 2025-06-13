@@ -1,25 +1,26 @@
 export interface BlogPost {
-  slug: string
-  title: string
-  excerpt: string
-  content: string
-  coverImage: string
-  publishDate: string
-  readTime: number
+  slug: string;
+  title: string;
+  excerpt: string;
+  content: string;
+  coverImage: string;
+  publishDate: string;
+  readTime: number;
   author: {
-    name: string
-    avatar: string
-    title: string
-  }
-  categories: string[]
-  featured: boolean
+    name: string;
+    avatar: string;
+    title: string;
+  };
+  categories: string[];
+  featured: boolean;
+  tintColor?: string;
 }
 
 const defaultAuthor = {
   name: "Javier Gongora",
   avatar: "", // Remove the placeholder URL
   title: "Founder & Software Developer",
-}
+};
 
 export const blogPosts: BlogPost[] = [
   {
@@ -117,12 +118,13 @@ Cursor represents just the beginning of AI-integrated development environments. 
 
 At Vyoniq, we're leveraging Cursor and similar AI development tools to deliver faster, higher-quality solutions for our clients while maintaining our focus on innovation and excellence.
     `,
-    coverImage: "/placeholder.svg?height=400&width=600&text=Cursor+AI+Development",
-    publishDate: "June 5, 2025",
-    readTime: 8,
+    coverImage: "/llms.jpeg",
+    publishDate: "June 1, 2025",
+    readTime: 7,
     author: defaultAuthor,
     categories: ["Cursor & AI IDEs", "AI Development Tools", "Industry Trends"],
     featured: true,
+    tintColor: "rgba(14, 165, 233, 0.4)",
   },
   {
     slug: "mcp-servers-llm-integration",
@@ -250,12 +252,13 @@ As MCP adoption grows, we're seeing exciting developments:
 
 At Vyoniq, we're at the forefront of MCP server development, helping organizations unlock the full potential of their data through intelligent LLM integration. Our expertise in both LLM technologies and enterprise architecture ensures secure, scalable, and effective MCP implementations.
     `,
-    coverImage: "/placeholder.svg?height=400&width=600&text=MCP+Servers+Integration",
+    coverImage: "/llms.jpeg",
     publishDate: "May 28, 2025",
     readTime: 7,
     author: defaultAuthor,
     categories: ["MCP Servers", "LLM Integration", "Enterprise Architecture"],
     featured: true,
+    tintColor: "rgba(168, 85, 247, 0.4)",
   },
   {
     slug: "ai-agents-business-automation",
@@ -427,12 +430,13 @@ Emerging trends in AI agent development:
 
 At Vyoniq, we specialize in designing and implementing AI agent solutions that transform business operations while maintaining human oversight and control. Our approach ensures that AI agents enhance rather than replace human capabilities, creating more efficient and effective business processes.
     `,
-    coverImage: "/placeholder.svg?height=400&width=600&text=AI+Agents+Business",
+    coverImage: "/llms.jpeg",
     publishDate: "May 15, 2025",
     readTime: 9,
     author: defaultAuthor,
     categories: ["AI Agents", "Business Automation", "LLM Integration"],
     featured: false,
+    tintColor: "rgba(34, 197, 94, 0.4)",
   },
   {
     slug: "llm-integration-enterprise-applications",
@@ -629,12 +633,13 @@ Asynchronous LLM processing for scalability:
 
 At Vyoniq, we bring deep expertise in enterprise LLM integration, helping organizations navigate the complexities of implementing AI at scale while maintaining security, compliance, and performance standards.
     `,
-    coverImage: "/placeholder.svg?height=400&width=600&text=Enterprise+LLM+Integration",
+    coverImage: "/llms.jpeg",
     publishDate: "May 3, 2025",
     readTime: 10,
     author: defaultAuthor,
-    categories: ["LLM Integration", "Enterprise Architecture", "Security"],
+    categories: ["LLM Integration", "Case Studies", "Industry Trends"],
     featured: false,
+    tintColor: "rgba(239, 68, 68, 0.4)",
   },
   {
     slug: "ai-development-tools-ecosystem",
@@ -880,11 +885,12 @@ The AI development tools landscape is evolving at breakneck speed, with new plat
 
 At Vyoniq, we stay at the forefront of the AI development tools ecosystem, helping our clients select and implement the most appropriate tools for their specific needs and objectives. Our expertise spans the entire toolchain, from development to deployment and monitoring.
     `,
-    coverImage: "/placeholder.svg?height=400&width=600&text=AI+Development+Tools",
+    coverImage: "/llms.jpeg",
     publishDate: "April 22, 2025",
     readTime: 8,
     author: defaultAuthor,
     categories: ["AI Development Tools", "Cursor & AI IDEs", "Industry Trends"],
     featured: true,
+    tintColor: "rgba(249, 115, 22, 0.4)",
   },
-]
+];
