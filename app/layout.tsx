@@ -13,11 +13,11 @@ export const metadata: Metadata = {
   ),
   title: "Vyoniq | AI-Powered Software Solutions",
   description:
-    "Innovative AI-driven software development company specializing in web & mobile apps, hosting services, and AI integrations. Join the waitlist for Vyoniq Tables.",
+    "Innovative AI-driven software development company specializing in web & mobile apps, hosting services, and AI integrations. Join the waitlist for Vyoniq Apps.",
   keywords: [
     "AI",
     "software development",
-    "Vyoniq Tables",
+    "Vyoniq Apps",
     "web development",
     "mobile apps",
     "hosting",
