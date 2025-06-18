@@ -13,7 +13,7 @@ export const WaitlistWelcomeEmail: React.FC<
     </h1>
     <p>
       Thank you for signing up. We're thrilled to have you on board as we
-      prepare to launch Vyoniq Tables.
+      prepare to launch Vyoniq Apps.
     </p>
     <p>
       We are hard at work building a revolutionary, AI-powered data management
