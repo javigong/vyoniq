@@ -14,9 +14,9 @@ This repository contains the source code for the official Vyoniq landing page.
   - **Web and Mobile App Development:** Scalable, custom applications built with AI-optimized workflows.
   - **Hosting Services:** Secure, high-performance, and reliable hosting solutions.
   - **AI Integrations:** Enhance your applications and business processes with intelligent features.
-- **Vyoniq Tables (Coming Soon):** Announcing our forthcoming subscription-based web application for smart data management and interaction, powered by MCP (Multi-Client Platform) servers.
+- **Vyoniq Apps (Coming Soon):** Announcing our forthcoming subscription-based web application for smart data management and interaction, powered by MCP (Multi-Client Platform) servers.
 - **Lead Generation:** A fully functional contact form to handle client inquiries and project requests.
-- **Waitlist Sign-Up:** A dedicated system for users to register their interest in the upcoming Vyoniq Tables application.
+- **Waitlist Sign-Up:** A dedicated system for users to register their interest in the upcoming Vyoniq Apps application.
 - **Modern Tech Stack:** A responsive, accessible, and performant landing page built for an excellent user experience.
 
 ## 🚀 Tech Stack
