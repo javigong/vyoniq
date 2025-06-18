@@ -18,7 +18,7 @@ export async function POST(request: Request) {
     const { data, error } = await resend.emails.send({
       from: "Vyoniq Waitlist <waitlist@vyoniq.com>",
       to: [email],
-      subject: "Welcome to the Vyoniq Tables Waitlist!",
+      subject: "Welcome to the Vyoniq Apps Waitlist!",
       react: WaitlistWelcomeEmail({
         name: name,
       }) as React.ReactElement,
