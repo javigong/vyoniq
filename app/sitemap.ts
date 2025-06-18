@@ -1,9 +1,9 @@
-import type { MetadataRoute } from "next"
-import { blogPosts } from "@/lib/blog-data"
+import type { MetadataRoute } from "next";
+import { blogPosts } from "@/lib/blog-data";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://vyoniq.com"
-  const currentDate = new Date().toISOString()
+  const baseUrl = "https://vyoniq.com";
+  const currentDate = new Date().toISOString();
 
   // Blog post entries
   const blogEntries = blogPosts.map((post) => ({
@@ -11,7 +11,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     lastModified: currentDate,
     changeFrequency: "monthly" as const,
     priority: 0.7,
-  }))
+  }));
 
   return [
     {
@@ -51,7 +51,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/vyoniq-tables`,
+      url: `${baseUrl}/vyoniq-apps`,
       lastModified: currentDate,
       changeFrequency: "weekly",
       priority: 0.9,
@@ -81,5 +81,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.5,
     },
     ...blogEntries,
-  ]
+  ];
 }
