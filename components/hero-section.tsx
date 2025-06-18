@@ -21,7 +21,7 @@ export function HeroSection() {
             </h1>
             <p className="text-lg md:text-xl text-gray-100 dark:text-vyoniq-dark-muted mb-8 max-w-2xl">
               Web & Mobile Apps, Hosting, AI Integrations, and Coming Soon:
-              Vyoniq Tables for Smart Data Management
+              Vyoniq Apps for Smart Data Management
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <Button
@@ -37,7 +37,7 @@ export function HeroSection() {
                 variant="outline"
                 className="border-2 border-white text-white hover:bg-white hover:text-primary font-semibold px-8 py-4 min-h-[48px] transform hover:scale-105 active:scale-100 transition-all duration-200 touch-manipulation backdrop-blur-sm"
               >
-                <Link href="/sign-up">Join Vyoniq Tables Waitlist</Link>
+                <Link href="/sign-up">Join Vyoniq Apps Waitlist</Link>
               </Button>
             </div>
           </div>
