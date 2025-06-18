@@ -61,7 +61,7 @@ async function AdminDashboard() {
         <div className="grid gap-8 md:grid-cols-1 lg:grid-cols-2">
           <Card>
             <CardHeader>
-              <CardTitle>Vyoniq Tables Waitlist</CardTitle>
+              <CardTitle>Vyoniq Apps Waitlist</CardTitle>
               <CardDescription>
                 Users who signed up for early access.
               </CardDescription>
