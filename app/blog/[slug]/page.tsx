@@ -6,6 +6,7 @@ import { BlogShareButtons } from "@/components/blog/blog-share-buttons";
 import { Badge } from "@/components/ui/badge";
 import { CalendarIcon, Clock } from "lucide-react";
 import { blogPosts } from "@/lib/blog-data";
+import { NewsletterFormBlog } from "@/components/newsletter-form-blog";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
@@ -247,27 +248,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 <div className="sticky top-24 space-y-8">
                   <BlogAuthor author={post.author} />
 
-                  <div className="p-6 bg-vyoniq-gray dark:bg-vyoniq-slate rounded-lg">
-                    <h3 className="text-xl font-bold text-vyoniq-blue dark:text-white mb-4">
-                      Subscribe
-                    </h3>
-                    <p className="text-sm text-vyoniq-text dark:text-vyoniq-dark-text mb-4">
-                      Get the latest insights delivered to your inbox
-                    </p>
-                    <form className="space-y-3">
-                      <input
-                        type="email"
-                        placeholder="Your email address"
-                        className="w-full px-4 py-2 rounded-md bg-white dark:bg-vyoniq-dark-bg border border-gray-200 dark:border-gray-700 text-vyoniq-text dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-vyoniq-green"
-                      />
-                      <button
-                        type="submit"
-                        className="w-full bg-vyoniq-green hover:bg-vyoniq-green/90 text-white font-semibold py-2 rounded-md transition-colors"
-                      >
-                        Subscribe
-                      </button>
-                    </form>
-                  </div>
+                  <NewsletterFormBlog />
                 </div>
               </div>
             </div>
