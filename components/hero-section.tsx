@@ -16,7 +16,7 @@ export function HeroSection() {
           <div className="flex-1 text-center lg:text-left animate-fade-in">
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">
               Vyoniq: Innovate Faster with{" "}
-              <span className="text-vyoniq-green">AI-Powered</span> Software
+              <span className="text-vyoniq-green whitespace-nowrap">AI-Powered</span> Software
               Solutions
             </h1>
             <p className="text-lg md:text-xl text-gray-100 dark:text-vyoniq-dark-muted mb-8 max-w-2xl">
