@@ -6,7 +6,7 @@ import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { BlogCard } from "@/components/blog/blog-card";
 import { BlogCategoryFilter } from "@/components/blog/blog-category-filter";
-import { blogPosts } from "@/lib/blog-data";
+import { BlogPost } from "@/lib/blog-data";
 import { subscribeToNewsletter } from "@/lib/actions";
 import { toast } from "sonner";
 
@@ -31,11 +31,37 @@ function NewsletterSubmitButton() {
 export default function BlogClientPage() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
+  const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
+  const [loading, setLoading] = useState(true);
   const [state, formAction] = useActionState(
     subscribeToNewsletter,
     initialState
   );
   const formRef = useRef<HTMLFormElement>(null);
+
+  // Fetch blog posts from API
+  useEffect(() => {
+    async function fetchBlogPosts() {
+      try {
+        setLoading(true);
+        const response = await fetch("/api/blog/posts");
+        if (response.ok) {
+          const posts = await response.json();
+          setBlogPosts(posts);
+        } else {
+          console.error("Failed to fetch blog posts");
+          toast.error("Failed to load blog posts");
+        }
+      } catch (error) {
+        console.error("Error fetching blog posts:", error);
+        toast.error("Failed to load blog posts");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchBlogPosts();
+  }, []);
 
   useEffect(() => {
     if (state?.success) {
@@ -70,7 +96,7 @@ export default function BlogClientPage() {
     }
 
     return filtered;
-  }, [activeCategory, searchQuery]);
+  }, [blogPosts, activeCategory, searchQuery]);
 
   return (
     <main className="min-h-screen">
@@ -141,7 +167,13 @@ export default function BlogClientPage() {
             {/* Main Content */}
             <div className="lg:w-3/4">
               <div className="grid md:grid-cols-2 gap-8">
-                {filteredPosts.length > 0 ? (
+                {loading ? (
+                  <div className="col-span-2 text-center py-12">
+                    <p className="text-lg text-vyoniq-text dark:text-vyoniq-dark-text">
+                      Loading blog posts...
+                    </p>
+                  </div>
+                ) : filteredPosts.length > 0 ? (
                   filteredPosts.map((post) => (
                     <BlogCard key={post.slug} post={post} />
                   ))
@@ -180,25 +212,31 @@ export default function BlogClientPage() {
                     Featured Posts
                   </h3>
                   <div className="space-y-4">
-                    {blogPosts
-                      .filter((post) => post.featured)
-                      .slice(0, 3)
-                      .map((post) => (
-                        <div
-                          key={post.slug}
-                          className="border-b border-gray-200 dark:border-gray-700 pb-4 last:border-0"
-                        >
-                          <a
-                            href={`/blog/${post.slug}`}
-                            className="text-vyoniq-blue dark:text-white hover:text-vyoniq-green transition-colors"
+                    {loading ? (
+                      <p className="text-sm text-vyoniq-text dark:text-vyoniq-dark-muted">
+                        Loading featured posts...
+                      </p>
+                    ) : (
+                      blogPosts
+                        .filter((post) => post.featured)
+                        .slice(0, 3)
+                        .map((post) => (
+                          <div
+                            key={post.slug}
+                            className="border-b border-gray-200 dark:border-gray-700 pb-4 last:border-0"
                           >
-                            {post.title}
-                          </a>
-                          <p className="text-sm text-vyoniq-text dark:text-vyoniq-dark-muted mt-1">
-                            {post.publishDate}
-                          </p>
-                        </div>
-                      ))}
+                            <a
+                              href={`/blog/${post.slug}`}
+                              className="text-vyoniq-blue dark:text-white hover:text-vyoniq-green transition-colors"
+                            >
+                              {post.title}
+                            </a>
+                            <p className="text-sm text-vyoniq-text dark:text-vyoniq-dark-muted mt-1">
+                              {post.publishDate}
+                            </p>
+                          </div>
+                        ))
+                    )}
                   </div>
                 </div>
 
