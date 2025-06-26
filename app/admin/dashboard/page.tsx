@@ -16,6 +16,7 @@ import {
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { AdminNewsletterSection } from "@/components/admin-newsletter-section";
+import { AdminBlogSection } from "@/components/admin-blog-section";
 import prisma from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { SignOutButton } from "@clerk/nextjs";
@@ -51,6 +52,18 @@ async function AdminDashboard() {
     orderBy: { createdAt: "desc" },
   });
 
+  // Fetch blog statistics
+  const totalBlogPosts = await prisma.blogPost.count();
+  const publishedBlogPosts = await prisma.blogPost.count({
+    where: { published: true },
+  });
+  const draftBlogPosts = await prisma.blogPost.count({
+    where: { published: false },
+  });
+  const featuredBlogPosts = await prisma.blogPost.count({
+    where: { featured: true },
+  });
+
   return (
     <div className="flex min-h-screen flex-col bg-vyoniq-gray dark:bg-vyoniq-dark-bg">
       <Header />
@@ -65,7 +78,7 @@ async function AdminDashboard() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
@@ -93,27 +106,54 @@ async function AdminDashboard() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
-                Draft Newsletters
+                Total Blog Posts
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-yellow-600">
-                {newsletters.filter((n) => n.isDraft).length}
+              <div className="text-2xl font-bold text-vyoniq-blue dark:text-white">
+                {totalBlogPosts}
               </div>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
-                Sent Newsletters
+                Published Posts
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-vyoniq-green">
+                {publishedBlogPosts}
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Draft Posts</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-yellow-600">
+                {draftBlogPosts}
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Featured Posts
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-purple-600">
-                {newsletters.filter((n) => !n.isDraft).length}
+                {featuredBlogPosts}
               </div>
             </CardContent>
           </Card>
+        </div>
+
+        {/* Blog Management Section */}
+        <div className="mb-8">
+          <AdminBlogSection />
         </div>
 
         {/* Newsletter Management Section */}
