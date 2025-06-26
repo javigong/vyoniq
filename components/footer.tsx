@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Linkedin } from "lucide-react";
 import { subscribeToNewsletter } from "@/lib/actions";
 import { useFormStatus } from "react-dom";
-import { useActionState, useEffect, useRef } from "react";
+import { useEffect, useRef, useActionState } from "react";
 import { toast } from "sonner";
 
 const initialState: {
