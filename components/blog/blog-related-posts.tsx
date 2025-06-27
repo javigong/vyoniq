@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import type { BlogPost } from "@/lib/blog-data";
+import type { BlogPost } from "@/lib/blog-utils";
 
 interface BlogRelatedPostsProps {
   posts: BlogPost[];
