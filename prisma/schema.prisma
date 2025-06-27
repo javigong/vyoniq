@@ -23,6 +23,24 @@ model User {
   isNewsletterSubscriber Boolean  @default(false)
   unsubscribeToken       String?  @unique
   createdAt              DateTime @default(now())
+  apiKeys                ApiKey[]
+}
+
+model ApiKey {
+  id         String    @id @default(cuid())
+  name       String
+  hashedKey  String    @unique
+  keyPreview String
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  scopes     String[]  @default(["blog:read", "blog:write"])
+  active     Boolean   @default(true)
+  lastUsedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([hashedKey])
+  @@index([userId])
 }
 
 model Inquiry {
