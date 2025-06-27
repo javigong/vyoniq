@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
@@ -17,7 +17,7 @@ interface UnsubscribeState {
   alreadyUnsubscribed: boolean;
 }
 
-export default function UnsubscribePage() {
+function UnsubscribeContent() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
 
@@ -242,5 +242,34 @@ export default function UnsubscribePage() {
 
       <Footer />
     </main>
+  );
+}
+
+export default function UnsubscribePage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="min-h-screen bg-white dark:bg-vyoniq-dark-bg">
+          <Header />
+          <section className="py-20">
+            <div className="container mx-auto px-4">
+              <div className="max-w-2xl mx-auto">
+                <Card>
+                  <CardContent className="text-center py-8">
+                    <div className="animate-spin w-8 h-8 border-4 border-vyoniq-green border-t-transparent rounded-full mx-auto mb-4"></div>
+                    <p className="text-vyoniq-text dark:text-vyoniq-dark-text">
+                      Loading...
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </section>
+          <Footer />
+        </main>
+      }
+    >
+      <UnsubscribeContent />
+    </Suspense>
   );
 }
