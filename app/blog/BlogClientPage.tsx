@@ -6,7 +6,7 @@ import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { BlogCard } from "@/components/blog/blog-card";
 import { BlogCategoryFilter } from "@/components/blog/blog-category-filter";
-import { BlogPost } from "@/lib/blog-data";
+import { BlogPost } from "@/lib/blog-utils";
 import { subscribeToNewsletter } from "@/lib/actions";
 import { toast } from "sonner";
 
