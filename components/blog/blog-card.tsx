@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CalendarIcon, Clock } from "lucide-react";
-import type { BlogPost } from "@/lib/blog-data";
+import type { BlogPost } from "@/lib/blog-utils";
 
 interface BlogCardProps {
   post: BlogPost;
