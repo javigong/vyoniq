@@ -17,6 +17,7 @@ import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { AdminNewsletterSection } from "@/components/admin-newsletter-section";
 import { AdminBlogSection } from "@/components/admin-blog-section";
+import { AdminMCPSection } from "@/components/admin-mcp-section";
 import prisma from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { SignOutButton } from "@clerk/nextjs";
@@ -149,6 +150,11 @@ async function AdminDashboard() {
               </div>
             </CardContent>
           </Card>
+        </div>
+
+        {/* MCP Server Management Section */}
+        <div className="mb-8">
+          <AdminMCPSection />
         </div>
 
         {/* Blog Management Section */}
