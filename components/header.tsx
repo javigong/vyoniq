@@ -1,42 +1,42 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import Link from "next/link"
-import { useRouter, usePathname } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { Menu } from "lucide-react"
-import { ThemeToggle } from "@/components/theme-toggle"
-import { scrollToContact } from "@/lib/scroll-utils"
+import { useState } from "react";
+import Link from "next/link";
+import { useRouter, usePathname } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Menu } from "lucide-react";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { scrollToContact } from "@/lib/scroll-utils";
 
 export function Header() {
-  const [isOpen, setIsOpen] = useState(false)
-  const router = useRouter()
-  const pathname = usePathname()
+  const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter();
+  const pathname = usePathname();
 
   const handleContactClick = (e: React.MouseEvent) => {
-    e.preventDefault()
-    setIsOpen(false) // Close mobile menu if open
+    e.preventDefault();
+    setIsOpen(false); // Close mobile menu if open
 
     if (pathname === "/") {
       // If we're on homepage, scroll to contact section
-      scrollToContact()
+      scrollToContact();
     } else {
       // If we're on another page, navigate to homepage with contact hash
-      router.push("/#contact")
+      router.push("/#contact");
     }
-  }
+  };
 
   const navItems = [
     { name: "Home", href: "/" },
     { name: "Services", href: "/services" },
-    { name: "Vyoniq Tables", href: "/vyoniq-tables" },
+    { name: "Apps", href: "/vyoniq-apps" },
     { name: "Blog", href: "/blog" },
     { name: "About", href: "/about" },
     { name: "Contact", href: "#contact", onClick: handleContactClick },
-  ]
+  ];
 
   return (
     <header className="sticky top-0 z-50 bg-vyoniq-slate dark:bg-vyoniq-dark-bg text-white shadow-lg border-b border-gray-200 dark:border-gray-800">
@@ -90,7 +90,10 @@ export function Header() {
                   <span className="sr-only">Toggle menu</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="bg-vyoniq-slate dark:bg-vyoniq-dark-bg text-white">
+              <SheetContent
+                side="right"
+                className="bg-vyoniq-slate dark:bg-vyoniq-dark-bg text-white"
+              >
                 <nav className="flex flex-col space-y-4 mt-8">
                   {navItems.map((item) => (
                     <div key={item.name}>
@@ -119,5 +122,5 @@ export function Header() {
         </div>
       </div>
     </header>
-  )
+  );
 }

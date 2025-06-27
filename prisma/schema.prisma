@@ -21,7 +21,26 @@ model User {
   isAdmin                Boolean  @default(false)
   isOnWaitlist           Boolean  @default(false)
   isNewsletterSubscriber Boolean  @default(false)
+  unsubscribeToken       String?  @unique
   createdAt              DateTime @default(now())
+  apiKeys                ApiKey[]
+}
+
+model ApiKey {
+  id         String    @id @default(cuid())
+  name       String
+  hashedKey  String    @unique
+  keyPreview String
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  scopes     String[]  @default(["blog:read", "blog:write"])
+  active     Boolean   @default(true)
+  lastUsedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([hashedKey])
+  @@index([userId])
 }
 
 model Inquiry {
@@ -31,4 +50,66 @@ model Inquiry {
   serviceType String
   message     String
   createdAt   DateTime @default(now())
+}
+
+model Newsletter {
+  id          String    @id @default(cuid())
+  subject     String
+  content     String // HTML content
+  previewText String?
+  isDraft     Boolean   @default(true)
+  sentAt      DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model BlogAuthor {
+  id        String     @id @default(cuid())
+  name      String
+  avatar    String?
+  title     String
+  bio       String?
+  blogPosts BlogPost[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model BlogCategory {
+  id        String             @id @default(cuid())
+  name      String             @unique
+  slug      String             @unique
+  blogPosts BlogPostCategory[]
+  createdAt DateTime           @default(now())
+}
+
+model BlogPost {
+  id          String             @id @default(cuid())
+  slug        String             @unique
+  title       String
+  excerpt     String
+  content     String             @db.Text
+  coverImage  String
+  publishDate DateTime
+  readTime    Int
+  featured    Boolean            @default(false)
+  tintColor   String?
+  published   Boolean            @default(true)
+  authorId    String
+  author      BlogAuthor         @relation(fields: [authorId], references: [id])
+  categories  BlogPostCategory[]
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  @@index([published])
+  @@index([publishDate])
+  @@index([slug])
+}
+
+model BlogPostCategory {
+  blogPostId String
+  categoryId String
+  blogPost   BlogPost     @relation(fields: [blogPostId], references: [id], onDelete: Cascade)
+  category   BlogCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([blogPostId, categoryId])
 }

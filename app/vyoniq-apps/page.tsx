@@ -1,18 +1,18 @@
-import { Header } from "@/components/header"
-import { Footer } from "@/components/footer"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Database, MessageSquare, Zap, Shield } from "lucide-react"
-import Image from "next/image"
-import Link from "next/link"
-import type { Metadata } from "next"
+import { Header } from "@/components/header";
+import { Footer } from "@/components/footer";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Database, MessageSquare, Zap, Shield } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Vyoniq Tables | AI-Powered Data Management Platform Coming Soon",
+  title: "Vyoniq Apps | AI-Powered Data Management Platform Coming Soon",
   description:
-    "Join the waitlist for Vyoniq Tables - the revolutionary AI-powered data management platform with smart data entry, chat interfaces, and MCP server integration. Coming soon!",
+    "Join the waitlist for Vyoniq Apps - the revolutionary AI-powered data management platform with smart data entry, chat interfaces, and MCP server integration. Coming soon!",
   keywords: [
-    "Vyoniq Tables",
+    "Vyoniq Apps",
     "AI data management",
     "smart data entry",
     "MCP server integration",
@@ -23,17 +23,17 @@ export const metadata: Metadata = {
     "waitlist",
   ],
   openGraph: {
-    title: "Vyoniq Tables | AI-Powered Data Management Platform Coming Soon",
+    title: "Vyoniq Apps | AI-Powered Data Management Platform Coming Soon",
     description:
       "Revolutionary AI-powered data management with smart data entry and chat interfaces. Join the exclusive waitlist for early access.",
-    url: "https://vyoniq.com/vyoniq-tables",
+    url: "https://vyoniq.com/vyoniq-apps",
     siteName: "Vyoniq",
     images: [
       {
-        url: "/placeholder.svg?height=630&width=1200&text=Vyoniq+Tables+Coming+Soon",
+        url: "/placeholder.svg?height=630&width=1200&text=Vyoniq+Apps+Coming+Soon",
         width: 1200,
         height: 630,
-        alt: "Vyoniq Tables AI-powered data management platform",
+        alt: "Vyoniq Apps AI-powered data management platform",
       },
     ],
     locale: "en_US",
@@ -41,13 +41,15 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Vyoniq Tables | AI-Powered Data Management Platform Coming Soon",
+    title: "Vyoniq Apps | AI-Powered Data Management Platform Coming Soon",
     description:
       "Revolutionary AI-powered data management with smart data entry and chat interfaces. Join the waitlist!",
-    images: ["/placeholder.svg?height=630&width=1200&text=Vyoniq+Tables+Coming+Soon"],
+    images: [
+      "/placeholder.svg?height=630&width=1200&text=Vyoniq+Apps+Coming+Soon",
+    ],
   },
   alternates: {
-    canonical: "https://vyoniq.com/vyoniq-tables",
+    canonical: "https://vyoniq.com/vyoniq-apps",
   },
   robots: {
     index: true,
@@ -60,32 +62,36 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
-}
+};
 
 const features = [
   {
     icon: Database,
     title: "Smart Data Entry",
-    description: "AI-powered data entry that learns from your patterns and automates repetitive tasks.",
+    description:
+      "AI-powered data entry that learns from your patterns and automates repetitive tasks.",
   },
   {
     icon: MessageSquare,
     title: "Chat Interface",
-    description: "Natural language interactions with your data through MCP server integration.",
+    description:
+      "Natural language interactions with your data through MCP server integration.",
   },
   {
     icon: Zap,
     title: "Real-time Processing",
-    description: "Lightning-fast data processing and analysis with instant insights.",
+    description:
+      "Lightning-fast data processing and analysis with instant insights.",
   },
   {
     icon: Shield,
     title: "Enterprise Security",
-    description: "Bank-level security with end-to-end encryption and compliance standards.",
+    description:
+      "Bank-level security with end-to-end encryption and compliance standards.",
   },
-]
+];
 
-export default function VyoniqTablesPage() {
+export default function VyoniqAppsPage() {
   return (
     <main className="min-h-screen">
       <Header />
@@ -94,7 +100,9 @@ export default function VyoniqTablesPage() {
       <section className="py-20 bg-gradient-to-br from-vyoniq-blue via-black to-vyoniq-green dark:from-vyoniq-dark-bg dark:via-vyoniq-slate dark:to-vyoniq-blue text-white">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">Vyoniq Tables: Coming Soon</h1>
+            <h1 className="text-4xl md:text-6xl font-bold mb-6">
+              Vyoniq Apps: Coming Soon
+            </h1>
             <p className="text-xl md:text-2xl mb-8 text-gray-100">
               The future of intelligent data management is almost here
             </p>
@@ -117,7 +125,8 @@ export default function VyoniqTablesPage() {
               Revolutionary Features
             </h2>
             <p className="text-lg text-vyoniq-text dark:text-vyoniq-dark-text max-w-2xl mx-auto">
-              Experience the next generation of data management with AI-powered capabilities
+              Experience the next generation of data management with AI-powered
+              capabilities
             </p>
           </div>
 
@@ -131,10 +140,14 @@ export default function VyoniqTablesPage() {
                   <div className="mx-auto mb-4 p-3 bg-vyoniq-blue/5 dark:bg-vyoniq-green/10 rounded-full w-fit">
                     <feature.icon className="h-8 w-8 text-vyoniq-green" />
                   </div>
-                  <CardTitle className="text-xl text-vyoniq-blue dark:text-white">{feature.title}</CardTitle>
+                  <CardTitle className="text-xl text-vyoniq-blue dark:text-white">
+                    {feature.title}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-vyoniq-text dark:text-vyoniq-dark-text">{feature.description}</p>
+                  <p className="text-vyoniq-text dark:text-vyoniq-dark-text">
+                    {feature.description}
+                  </p>
                 </CardContent>
               </Card>
             ))}
@@ -145,7 +158,7 @@ export default function VyoniqTablesPage() {
             <div className="relative">
               <Image
                 src="/placeholder.svg?height=500&width=800"
-                alt="Vyoniq Tables interface preview"
+                alt="Vyoniq Apps interface preview"
                 width={800}
                 height={500}
                 className="w-full h-auto rounded-lg shadow-2xl"
@@ -153,7 +166,9 @@ export default function VyoniqTablesPage() {
               {/* Work in Progress Watermark */}
               <div className="absolute inset-0 bg-black/30 rounded-lg flex items-center justify-center">
                 <div className="bg-white/95 px-8 py-4 rounded-lg transform -rotate-12 shadow-xl">
-                  <span className="text-vyoniq-blue font-bold text-2xl">Work in Progress</span>
+                  <span className="text-vyoniq-blue font-bold text-2xl">
+                    Work in Progress
+                  </span>
                 </div>
               </div>
             </div>
@@ -166,11 +181,11 @@ export default function VyoniqTablesPage() {
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-3xl md:text-4xl font-bold text-vyoniq-blue dark:text-white mb-6">
-              Be Among the First to Experience Vyoniq Tables
+              Be Among the First to Experience Vyoniq Apps
             </h2>
             <p className="text-lg text-vyoniq-text dark:text-vyoniq-dark-text mb-8">
-              Join our exclusive waitlist and get early access to the most advanced data management platform ever
-              created.
+              Join our exclusive waitlist and get early access to the most
+              advanced data management platform ever created.
             </p>
             <Button
               asChild
@@ -185,5 +200,5 @@ export default function VyoniqTablesPage() {
 
       <Footer />
     </main>
-  )
+  );
 }
