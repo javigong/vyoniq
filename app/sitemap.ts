@@ -1,11 +1,12 @@
 import type { MetadataRoute } from "next";
-import { blogPosts } from "@/lib/blog-data";
+import { getBlogPosts } from "@/lib/blog-utils";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://vyoniq.com";
   const currentDate = new Date().toISOString();
 
   // Blog post entries
+  const blogPosts = await getBlogPosts();
   const blogEntries = blogPosts.map((post) => ({
     url: `${baseUrl}/blog/${post.slug}`,
     lastModified: currentDate,
