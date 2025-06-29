@@ -25,16 +25,47 @@ export function ContactForm() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    try {
+      const formData = new FormData(e.currentTarget);
+      const data = {
+        name: formData.get("name") as string,
+        email: formData.get("email") as string,
+        serviceType: formData.get("service") as string,
+        message: formData.get("message") as string,
+      };
 
-    toast({
-      title: "Inquiry submitted!",
-      description: "We'll get back to you within 24 hours.",
-    });
+      const response = await fetch("/api/inquiries", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
 
-    setIsSubmitting(false);
-    (e.target as HTMLFormElement).reset();
+      if (!response.ok) {
+        throw new Error("Failed to submit inquiry");
+      }
+
+      const result = await response.json();
+
+      toast({
+        title: "Inquiry submitted successfully!",
+        description:
+          "We've sent you a confirmation email with next steps. Check your inbox for details on creating your Vyoniq account to track your inquiry.",
+      });
+
+      (e.target as HTMLFormElement).reset();
+    } catch (error) {
+      console.error("Error submitting inquiry:", error);
+      toast({
+        title: "Error",
+        description:
+          "Failed to submit inquiry. Please try again or contact us directly.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (

@@ -7,14 +7,16 @@ import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu } from "lucide-react";
+import { Menu, User, LogIn } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { scrollToContact } from "@/lib/scroll-utils";
+import { useUser, SignInButton } from "@clerk/nextjs";
 
 export function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
+  const { isSignedIn, user } = useUser();
 
   const handleContactClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -77,6 +79,24 @@ export function Header() {
                 )}
               </div>
             ))}
+
+            {/* Authentication Buttons */}
+            {isSignedIn ? (
+              <Button asChild variant="secondary" size="sm">
+                <Link href="/dashboard">
+                  <User className="w-4 h-4 mr-2" />
+                  Dashboard
+                </Link>
+              </Button>
+            ) : (
+              <SignInButton mode="modal">
+                <Button variant="secondary" size="sm">
+                  <LogIn className="w-4 h-4 mr-2" />
+                  Sign In
+                </Button>
+              </SignInButton>
+            )}
+
             <ThemeToggle />
           </nav>
 
@@ -115,6 +135,32 @@ export function Header() {
                       )}
                     </div>
                   ))}
+
+                  {/* Mobile Authentication Buttons */}
+                  <div className="pt-4 border-t border-gray-600">
+                    {isSignedIn ? (
+                      <Button asChild variant="secondary" className="w-full">
+                        <Link
+                          href="/dashboard"
+                          onClick={() => setIsOpen(false)}
+                        >
+                          <User className="w-4 h-4 mr-2" />
+                          Dashboard
+                        </Link>
+                      </Button>
+                    ) : (
+                      <SignInButton mode="modal">
+                        <Button
+                          variant="secondary"
+                          className="w-full"
+                          onClick={() => setIsOpen(false)}
+                        >
+                          <LogIn className="w-4 h-4 mr-2" />
+                          Sign In
+                        </Button>
+                      </SignInButton>
+                    )}
+                  </div>
                 </nav>
               </SheetContent>
             </Sheet>

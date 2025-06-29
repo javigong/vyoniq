@@ -18,11 +18,13 @@ import { Footer } from "@/components/footer";
 import { AdminNewsletterSection } from "@/components/admin-newsletter-section";
 import { AdminBlogSection } from "@/components/admin-blog-section";
 import { AdminMCPSection } from "@/components/admin-mcp-section";
+import { AdminInquirySection } from "@/components/admin-inquiry-section";
 import prisma from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { SignOutButton } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 async function AdminDashboard() {
   const { userId } = await auth();
@@ -65,6 +67,18 @@ async function AdminDashboard() {
     where: { featured: true },
   });
 
+  // Fetch inquiry statistics
+  const totalInquiries = await prisma.inquiry.count();
+  const pendingInquiries = await prisma.inquiry.count({
+    where: { status: "PENDING" },
+  });
+  const inProgressInquiries = await prisma.inquiry.count({
+    where: { status: "IN_PROGRESS" },
+  });
+  const resolvedInquiries = await prisma.inquiry.count({
+    where: { status: "RESOLVED" },
+  });
+
   return (
     <div className="flex min-h-screen flex-col bg-vyoniq-gray dark:bg-vyoniq-dark-bg">
       <Header />
@@ -73,13 +87,18 @@ async function AdminDashboard() {
           <h1 className="text-3xl font-bold tracking-tight text-vyoniq-blue dark:text-white">
             Admin Dashboard
           </h1>
-          <SignOutButton>
-            <Button variant="outline">Log Out</Button>
-          </SignOutButton>
+          <div className="flex items-center gap-2">
+            <Button asChild variant="secondary">
+              <Link href="/dashboard">User Dashboard</Link>
+            </Button>
+            <SignOutButton>
+              <Button variant="outline">Log Out</Button>
+            </SignOutButton>
+          </div>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 mb-8">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
@@ -150,6 +169,35 @@ async function AdminDashboard() {
               </div>
             </CardContent>
           </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Total Inquiries
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-vyoniq-blue dark:text-white">
+                {totalInquiries}
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Pending Inquiries
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-orange-600">
+                {pendingInquiries}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Inquiry Management Section */}
+        <div className="mb-8">
+          <AdminInquirySection />
         </div>
 
         {/* MCP Server Management Section */}
