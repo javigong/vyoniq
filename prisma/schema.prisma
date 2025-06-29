@@ -15,15 +15,16 @@ datasource db {
 }
 
 model User {
-  id                     String   @id
-  email                  String   @unique
+  id                     String    @id
+  email                  String    @unique
   name                   String?
-  isAdmin                Boolean  @default(false)
-  isOnWaitlist           Boolean  @default(false)
-  isNewsletterSubscriber Boolean  @default(false)
-  unsubscribeToken       String?  @unique
-  createdAt              DateTime @default(now())
+  isAdmin                Boolean   @default(false)
+  isOnWaitlist           Boolean   @default(false)
+  isNewsletterSubscriber Boolean   @default(false)
+  unsubscribeToken       String?   @unique
+  createdAt              DateTime  @default(now())
   apiKeys                ApiKey[]
+  inquiries              Inquiry[]
 }
 
 model ApiKey {
@@ -44,12 +45,41 @@ model ApiKey {
 }
 
 model Inquiry {
-  id          String   @id @default(cuid())
+  id          String           @id @default(cuid())
   name        String
   email       String
   serviceType String
   message     String
+  status      InquiryStatus    @default(PENDING)
+  userId      String? // Link to user if they sign up
+  user        User?            @relation(fields: [userId], references: [id])
+  messages    InquiryMessage[]
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@index([status])
+  @@index([email])
+  @@index([createdAt])
+}
+
+model InquiryMessage {
+  id          String   @id @default(cuid())
+  inquiryId   String
+  inquiry     Inquiry  @relation(fields: [inquiryId], references: [id], onDelete: Cascade)
+  message     String   @db.Text
+  isFromAdmin Boolean  @default(false)
+  authorId    String? // User ID if from user, null if from admin
   createdAt   DateTime @default(now())
+
+  @@index([inquiryId])
+  @@index([createdAt])
+}
+
+enum InquiryStatus {
+  PENDING
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
 }
 
 model Newsletter {
