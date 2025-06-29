@@ -19,6 +19,7 @@ import { AdminNewsletterSection } from "@/components/admin-newsletter-section";
 import { AdminBlogSection } from "@/components/admin-blog-section";
 import { AdminMCPSection } from "@/components/admin-mcp-section";
 import { AdminInquirySection } from "@/components/admin-inquiry-section";
+import { AdminBudgetSection } from "@/components/admin-budget-section";
 import prisma from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { SignOutButton } from "@clerk/nextjs";
@@ -79,6 +80,18 @@ async function AdminDashboard() {
     where: { status: "RESOLVED" },
   });
 
+  // Fetch budget statistics
+  const totalBudgets = await prisma.budget.count();
+  const sentBudgets = await prisma.budget.count({
+    where: { status: "SENT" },
+  });
+  const approvedBudgets = await prisma.budget.count({
+    where: { status: "APPROVED" },
+  });
+  const paidBudgets = await prisma.budget.count({
+    where: { status: "PAID" },
+  });
+
   return (
     <div className="flex min-h-screen flex-col bg-vyoniq-gray dark:bg-vyoniq-dark-bg">
       <Header />
@@ -98,7 +111,7 @@ async function AdminDashboard() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8 mb-8">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-12 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
@@ -193,11 +206,64 @@ async function AdminDashboard() {
               </div>
             </CardContent>
           </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Total Budgets
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-vyoniq-blue dark:text-white">
+                {totalBudgets}
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Sent Budgets
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-blue-600">
+                {sentBudgets}
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Approved Budgets
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-vyoniq-green">
+                {approvedBudgets}
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Paid Budgets
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-emerald-600">
+                {paidBudgets}
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Inquiry Management Section */}
         <div className="mb-8">
           <AdminInquirySection />
+        </div>
+
+        {/* Budget Management Section */}
+        <div className="mb-8">
+          <AdminBudgetSection />
         </div>
 
         {/* MCP Server Management Section */}

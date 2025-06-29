@@ -54,6 +54,7 @@ model Inquiry {
   userId      String? // Link to user if they sign up
   user        User?            @relation(fields: [userId], references: [id])
   messages    InquiryMessage[]
+  budgets     Budget[]
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
 
@@ -142,4 +143,109 @@ model BlogPostCategory {
   category   BlogCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
   @@id([blogPostId, categoryId])
+}
+
+// Budget and Payment Models
+model ServicePricing {
+  id               String   @id @default(cuid())
+  serviceType      String   // "web-mobile", "hosting", "ai", "vyoniq-apps"
+  name             String   // "Basic Web App", "E-commerce Platform", etc.
+  description      String   @db.Text
+  basePrice        Decimal  @db.Decimal(10, 2)
+  currency         String   @default("USD")
+  billingType      String   // "one-time", "monthly", "yearly"
+  features         Json     // Array of features included
+  isActive         Boolean  @default(true)
+  customizable     Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  budgetItems      BudgetItem[]
+
+  @@index([serviceType])
+  @@index([isActive])
+}
+
+model Budget {
+  id               String       @id @default(cuid())
+  inquiryId        String
+  inquiry          Inquiry      @relation(fields: [inquiryId], references: [id], onDelete: Cascade)
+  title            String
+  description      String?      @db.Text
+  totalAmount      Decimal      @db.Decimal(10, 2)
+  currency         String       @default("USD")
+  status           BudgetStatus @default(DRAFT)
+  validUntil       DateTime?
+  adminNotes       String?      @db.Text
+  clientNotes      String?      @db.Text
+  createdById      String       // Admin who created the budget
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  items            BudgetItem[]
+  payments         Payment[]
+
+  @@index([inquiryId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model BudgetItem {
+  id               String         @id @default(cuid())
+  budgetId         String
+  budget           Budget         @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  servicePricingId String?
+  servicePricing   ServicePricing? @relation(fields: [servicePricingId], references: [id])
+  name             String
+  description      String?        @db.Text
+  quantity         Int            @default(1)
+  unitPrice        Decimal        @db.Decimal(10, 2)
+  totalPrice       Decimal        @db.Decimal(10, 2)
+  isCustom         Boolean        @default(false)
+  category         String?        // "development", "hosting", "maintenance", etc.
+  createdAt        DateTime       @default(now())
+
+  @@index([budgetId])
+}
+
+model Payment {
+  id                 String        @id @default(cuid())
+  budgetId           String
+  budget             Budget        @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  stripePaymentId    String?       @unique
+  stripeSessionId    String?       @unique
+  amount             Decimal       @db.Decimal(10, 2)
+  currency           String        @default("USD")
+  status             PaymentStatus @default(PENDING)
+  paymentMethod      String?       // "card", "bank_transfer", etc.
+  paidAt             DateTime?
+  refundedAt         DateTime?
+  failedAt           DateTime?
+  failureReason      String?
+  stripeClientSecret String?
+  metadata           Json?         // Additional Stripe metadata
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  @@index([budgetId])
+  @@index([status])
+  @@index([stripePaymentId])
+  @@index([stripeSessionId])
+}
+
+enum BudgetStatus {
+  DRAFT
+  SENT
+  APPROVED
+  REJECTED
+  EXPIRED
+  PAID
+  COMPLETED
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  SUCCEEDED
+  FAILED
+  CANCELLED
+  REFUNDED
 }
