@@ -23,6 +23,24 @@ import {
 // Import blog resources
 import { createBlogPostResources, resolveBlogResource } from "./resources/blog";
 
+// Import inquiry tools
+import {
+  listInquiriesTool,
+  listInquiriesHandler,
+  getInquiryTool,
+  getInquiryHandler,
+  updateInquiryStatusTool,
+  updateInquiryStatusHandler,
+  respondToInquiryTool,
+  respondToInquiryHandler,
+  createInquiryTool,
+  createInquiryHandler,
+  getInquiryStatsTool,
+  getInquiryStatsHandler,
+  deleteUserAccountTool,
+  deleteUserAccountHandler,
+} from "./tools/inquiry";
+
 // Initialize the MCP server with all tools and resources
 export function initializeMCPServer() {
   console.log("Initializing Vyoniq MCP Server...");
@@ -36,6 +54,15 @@ export function initializeMCPServer() {
   mcpServer.addTool(listBlogPostsTool, listBlogPostsHandler);
   mcpServer.addTool(listCategoriesTool, listCategoriesHandler);
   mcpServer.addTool(getBlogPostTool, getBlogPostHandler);
+
+  // Register inquiry management tools
+  mcpServer.addTool(listInquiriesTool, listInquiriesHandler);
+  mcpServer.addTool(getInquiryTool, getInquiryHandler);
+  mcpServer.addTool(updateInquiryStatusTool, updateInquiryStatusHandler);
+  mcpServer.addTool(respondToInquiryTool, respondToInquiryHandler);
+  mcpServer.addTool(createInquiryTool, createInquiryHandler);
+  mcpServer.addTool(getInquiryStatsTool, getInquiryStatsHandler);
+  mcpServer.addTool(deleteUserAccountTool, deleteUserAccountHandler);
 
   // Register blog resource templates
   const blogResourceTemplates = createBlogPostResources();
@@ -114,6 +141,47 @@ export function initializeMCPServer() {
             description:
               "Get the full content and details of a specific blog post",
             category: "Blog Management",
+          },
+          {
+            name: "list_inquiries",
+            description:
+              "List customer inquiries with optional status filtering",
+            category: "Inquiry Management",
+          },
+          {
+            name: "get_inquiry",
+            description:
+              "Get detailed information about a specific inquiry including full conversation",
+            category: "Inquiry Management",
+          },
+          {
+            name: "update_inquiry_status",
+            description:
+              "Update the status of an inquiry (PENDING, IN_PROGRESS, RESOLVED, CLOSED)",
+            category: "Inquiry Management",
+          },
+          {
+            name: "respond_to_inquiry",
+            description:
+              "Send a response message to an inquiry (emails the customer automatically)",
+            category: "Inquiry Management",
+          },
+          {
+            name: "create_inquiry",
+            description: "Create a new customer inquiry (for testing purposes)",
+            category: "Inquiry Management",
+          },
+          {
+            name: "get_inquiry_stats",
+            description:
+              "Get statistics about inquiries across different statuses",
+            category: "Inquiry Management",
+          },
+          {
+            name: "delete_user_account",
+            description:
+              "Delete a user account and all associated data (ADMIN ONLY - USE WITH EXTREME CAUTION)",
+            category: "User Management",
           },
         ],
         resources: [
