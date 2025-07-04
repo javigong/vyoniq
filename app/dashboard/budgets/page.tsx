@@ -35,10 +35,7 @@ export default async function BudgetsPage() {
   const budgets = await prisma.budget.findMany({
     where: {
       inquiry: {
-        OR: [
-          { userId: userId },
-          { email: user.email },
-        ],
+        OR: [{ userId: userId }, { email: user.email }],
       },
     },
     include: {
@@ -70,10 +67,15 @@ export default async function BudgetsPage() {
 
   // Calculate summary statistics
   const totalBudgets = budgets.length;
-  const pendingBudgets = budgets.filter(b => b.status === "SENT").length;
-  const approvedBudgets = budgets.filter(b => b.status === "APPROVED").length;
-  const paidBudgets = budgets.filter(b => b.status === "PAID" || b.status === "COMPLETED").length;
-  const totalValue = budgets.reduce((sum, budget) => sum + Number(budget.totalAmount), 0);
+  const pendingBudgets = budgets.filter((b) => b.status === "SENT").length;
+  const approvedBudgets = budgets.filter((b) => b.status === "APPROVED").length;
+  const paidBudgets = budgets.filter(
+    (b) => b.status === "PAID" || b.status === "COMPLETED"
+  ).length;
+  const totalValue = budgets.reduce(
+    (sum, budget) => sum + Number(budget.totalAmount),
+    0
+  );
 
   return (
     <div className="min-h-screen bg-vyoniq-gray dark:bg-vyoniq-dark-bg">
@@ -100,7 +102,9 @@ export default async function BudgetsPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Budgets</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Total Budgets
+              </CardTitle>
               <FileText className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -112,7 +116,9 @@ export default async function BudgetsPage() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Pending Review</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Pending Review
+              </CardTitle>
               <Clock className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -124,7 +130,9 @@ export default async function BudgetsPage() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Ready for Payment</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Ready for Payment
+              </CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -136,7 +144,9 @@ export default async function BudgetsPage() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Paid Projects</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Paid Projects
+              </CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -169,13 +179,25 @@ export default async function BudgetsPage() {
           <h2 className="text-2xl font-semibold text-vyoniq-blue dark:text-white">
             All Budgets
           </h2>
-          
+
           {budgets.length > 0 ? (
             <div className="space-y-6">
               {budgets.map((budget) => (
-                <BudgetCard 
-                  key={budget.id} 
-                  budget={budget as any}
+                <BudgetCard
+                  key={budget.id}
+                  budget={{
+                    ...budget,
+                    totalAmount: Number(budget.totalAmount),
+                    items: budget.items.map((item) => ({
+                      ...item,
+                      unitPrice: Number(item.unitPrice),
+                      totalPrice: Number(item.totalPrice),
+                    })),
+                    payments: budget.payments.map((payment) => ({
+                      ...payment,
+                      amount: Number(payment.amount),
+                    })),
+                  }}
                   onStatusUpdate={() => {
                     // Refresh the page to show updated data
                     window.location.reload();
@@ -190,7 +212,8 @@ export default async function BudgetsPage() {
                   <FileText className="w-16 h-16 mx-auto mb-4 opacity-50" />
                   <h3 className="text-lg font-medium mb-2">No Budgets Yet</h3>
                   <p className="text-sm mb-6">
-                    You don't have any budgets yet. Submit an inquiry to get started with your first project quote.
+                    You don't have any budgets yet. Submit an inquiry to get
+                    started with your first project quote.
                   </p>
                   <Button asChild>
                     <Link href="/#contact">Submit New Inquiry</Link>
@@ -233,8 +256,8 @@ export default async function BudgetsPage() {
             <div className="mt-4 pt-4 border-t">
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 Questions? Contact us at{" "}
-                <a 
-                  href="mailto:support@vyoniq.com" 
+                <a
+                  href="mailto:support@vyoniq.com"
                   className="text-vyoniq-blue hover:underline"
                 >
                   support@vyoniq.com
