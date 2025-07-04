@@ -95,7 +95,7 @@ async function AdminDashboard() {
   return (
     <div className="flex min-h-screen flex-col bg-vyoniq-gray dark:bg-vyoniq-dark-bg">
       <Header />
-      <main className="flex-1 p-4 md:p-8">
+      <main className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl font-bold tracking-tight text-vyoniq-blue dark:text-white">
             Admin Dashboard
