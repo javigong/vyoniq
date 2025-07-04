@@ -9,7 +9,15 @@ interface RouteParams {
 
 // Schema for updating budget status
 const UpdateBudgetStatusSchema = z.object({
-  status: z.enum(["DRAFT", "SENT", "APPROVED", "REJECTED", "EXPIRED", "PAID", "COMPLETED"]),
+  status: z.enum([
+    "DRAFT",
+    "SENT",
+    "APPROVED",
+    "REJECTED",
+    "EXPIRED",
+    "PAID",
+    "COMPLETED",
+  ]),
   clientNotes: z.string().optional(),
 });
 
@@ -19,19 +27,35 @@ const UpdateBudgetSchema = z.object({
   description: z.string().optional(),
   validUntil: z.string().optional(), // ISO date string
   adminNotes: z.string().optional(),
-  status: z.enum(["DRAFT", "SENT", "APPROVED", "REJECTED", "EXPIRED", "PAID", "COMPLETED"]).optional(),
-  items: z.array(
-    z.object({
-      id: z.string().optional(), // For existing items
-      name: z.string().min(1, "Item name is required"),
-      description: z.string().optional(),
-      quantity: z.number().int().min(1, "Quantity must be at least 1").default(1),
-      unitPrice: z.number().min(0, "Unit price must be non-negative"),
-      category: z.string().optional(),
-      servicePricingId: z.string().optional(),
-      isCustom: z.boolean().default(false),
-    })
-  ).optional(),
+  status: z
+    .enum([
+      "DRAFT",
+      "SENT",
+      "APPROVED",
+      "REJECTED",
+      "EXPIRED",
+      "PAID",
+      "COMPLETED",
+    ])
+    .optional(),
+  items: z
+    .array(
+      z.object({
+        id: z.string().optional(), // For existing items
+        name: z.string().min(1, "Item name is required"),
+        description: z.string().optional(),
+        quantity: z
+          .number()
+          .int()
+          .min(1, "Quantity must be at least 1")
+          .default(1),
+        unitPrice: z.number().min(0, "Unit price must be non-negative"),
+        category: z.string().optional(),
+        servicePricingId: z.string().optional(),
+        isCustom: z.boolean().default(false),
+      })
+    )
+    .optional(),
 });
 
 // GET - Fetch a specific budget
@@ -87,15 +111,31 @@ export async function GET(
     }
 
     // Check if user has access to this budget
-    const hasAccess = user.isAdmin || 
-                     budget.inquiry.userId === userId || 
-                     budget.inquiry.email === user.email;
+    const hasAccess =
+      user.isAdmin ||
+      budget.inquiry.userId === userId ||
+      budget.inquiry.email === user.email;
 
     if (!hasAccess) {
       return NextResponse.json({ error: "Access denied" }, { status: 403 });
     }
 
-    return NextResponse.json({ budget });
+    // Serialize Decimal fields to numbers for client components
+    const serializedBudget = {
+      ...budget,
+      totalAmount: Number(budget.totalAmount),
+      items: budget.items.map((item) => ({
+        ...item,
+        unitPrice: Number(item.unitPrice),
+        totalPrice: Number(item.totalPrice),
+      })),
+      payments: budget.payments.map((payment) => ({
+        ...payment,
+        amount: Number(payment.amount),
+      })),
+    };
+
+    return NextResponse.json({ budget: serializedBudget });
   } catch (error) {
     console.error("Error fetching budget:", error);
     return NextResponse.json(
@@ -125,11 +165,14 @@ export async function PUT(
     });
 
     if (!user || !user.isAdmin) {
-      return NextResponse.json({ error: "Admin access required" }, { status: 403 });
+      return NextResponse.json(
+        { error: "Admin access required" },
+        { status: 403 }
+      );
     }
 
     const body = await request.json();
-    const { title, description, validUntil, adminNotes, status, items } = 
+    const { title, description, validUntil, adminNotes, status, items } =
       UpdateBudgetSchema.parse(body);
 
     // Check if budget exists
@@ -146,7 +189,7 @@ export async function PUT(
     let totalAmount = existingBudget.totalAmount;
     if (items) {
       const newTotal = items.reduce((sum, item) => {
-        return sum + (item.unitPrice * item.quantity);
+        return sum + item.unitPrice * item.quantity;
       }, 0);
       totalAmount = newTotal;
     }
@@ -160,11 +203,11 @@ export async function PUT(
         ...(validUntil && { validUntil: new Date(validUntil) }),
         ...(adminNotes !== undefined && { adminNotes }),
         ...(status && { status }),
-        ...(items && { 
+        ...(items && {
           totalAmount: totalAmount,
           items: {
             deleteMany: {}, // Remove all existing items
-            create: items.map(item => ({
+            create: items.map((item) => ({
               name: item.name,
               description: item.description,
               quantity: item.quantity,
@@ -190,14 +233,25 @@ export async function PUT(
       },
     });
 
+    // Serialize Decimal fields to numbers for client components
+    const serializedBudget = {
+      ...updatedBudget,
+      totalAmount: Number(updatedBudget.totalAmount),
+      items: updatedBudget.items.map((item) => ({
+        ...item,
+        unitPrice: Number(item.unitPrice),
+        totalPrice: Number(item.totalPrice),
+      })),
+    };
+
     return NextResponse.json({
       success: true,
-      budget: updatedBudget,
+      budget: serializedBudget,
       message: "Budget updated successfully",
     });
   } catch (error) {
     console.error("Error updating budget:", error);
-    
+
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation error", details: error.errors },
@@ -256,9 +310,10 @@ export async function PATCH(
     }
 
     // Check access permissions
-    const hasAccess = user.isAdmin || 
-                     budget.inquiry.userId === userId || 
-                     budget.inquiry.email === user.email;
+    const hasAccess =
+      user.isAdmin ||
+      budget.inquiry.userId === userId ||
+      budget.inquiry.email === user.email;
 
     if (!hasAccess) {
       return NextResponse.json({ error: "Access denied" }, { status: 403 });
@@ -266,9 +321,12 @@ export async function PATCH(
 
     // Non-admin users can only approve or reject budgets
     if (!user.isAdmin && !["APPROVED", "REJECTED"].includes(status)) {
-      return NextResponse.json({ 
-        error: "Clients can only approve or reject budgets" 
-      }, { status: 403 });
+      return NextResponse.json(
+        {
+          error: "Clients can only approve or reject budgets",
+        },
+        { status: 403 }
+      );
     }
 
     // Update budget status
@@ -284,14 +342,25 @@ export async function PATCH(
       },
     });
 
+    // Serialize Decimal fields to numbers for client components
+    const serializedBudget = {
+      ...updatedBudget,
+      totalAmount: Number(updatedBudget.totalAmount),
+      items: updatedBudget.items.map((item) => ({
+        ...item,
+        unitPrice: Number(item.unitPrice),
+        totalPrice: Number(item.totalPrice),
+      })),
+    };
+
     return NextResponse.json({
       success: true,
-      budget: updatedBudget,
+      budget: serializedBudget,
       message: `Budget ${status.toLowerCase()} successfully`,
     });
   } catch (error) {
     console.error("Error updating budget status:", error);
-    
+
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation error", details: error.errors },
@@ -326,7 +395,10 @@ export async function DELETE(
     });
 
     if (!user || !user.isAdmin) {
-      return NextResponse.json({ error: "Admin access required" }, { status: 403 });
+      return NextResponse.json(
+        { error: "Admin access required" },
+        { status: 403 }
+      );
     }
 
     // Check if budget exists
@@ -343,13 +415,16 @@ export async function DELETE(
 
     // Don't allow deletion if there are successful payments
     const hasSuccessfulPayments = budget.payments.some(
-      payment => payment.status === "SUCCEEDED"
+      (payment) => payment.status === "SUCCEEDED"
     );
 
     if (hasSuccessfulPayments) {
-      return NextResponse.json({ 
-        error: "Cannot delete budget with successful payments" 
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          error: "Cannot delete budget with successful payments",
+        },
+        { status: 400 }
+      );
     }
 
     // Delete the budget (items will be deleted due to cascade)
