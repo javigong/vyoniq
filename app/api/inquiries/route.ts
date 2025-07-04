@@ -146,7 +146,13 @@ export async function GET(request: NextRequest) {
 
     const where: any = {};
     if (status && status !== "ALL") {
-      where.status = status;
+      // Handle comma-separated status values
+      if (status.includes(",")) {
+        const statusArray = status.split(",").map((s) => s.trim());
+        where.status = { in: statusArray };
+      } else {
+        where.status = status;
+      }
     }
 
     const inquiries = await prisma.inquiry.findMany({
