@@ -1,0 +1,251 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_URL")
+}
+
+model User {
+  id                     String    @id
+  email                  String    @unique
+  name                   String?
+  isAdmin                Boolean   @default(false)
+  isOnWaitlist           Boolean   @default(false)
+  isNewsletterSubscriber Boolean   @default(false)
+  unsubscribeToken       String?   @unique
+  createdAt              DateTime  @default(now())
+  apiKeys                ApiKey[]
+  inquiries              Inquiry[]
+}
+
+model ApiKey {
+  id         String    @id @default(cuid())
+  name       String
+  hashedKey  String    @unique
+  keyPreview String
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  scopes     String[]  @default(["blog:read", "blog:write"])
+  active     Boolean   @default(true)
+  lastUsedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([hashedKey])
+  @@index([userId])
+}
+
+model Inquiry {
+  id          String           @id @default(cuid())
+  name        String
+  email       String
+  serviceType String
+  message     String
+  status      InquiryStatus    @default(PENDING)
+  userId      String? // Link to user if they sign up
+  user        User?            @relation(fields: [userId], references: [id])
+  messages    InquiryMessage[]
+  budgets     Budget[]
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@index([status])
+  @@index([email])
+  @@index([createdAt])
+}
+
+model InquiryMessage {
+  id          String   @id @default(cuid())
+  inquiryId   String
+  inquiry     Inquiry  @relation(fields: [inquiryId], references: [id], onDelete: Cascade)
+  message     String   @db.Text
+  isFromAdmin Boolean  @default(false)
+  authorId    String? // User ID if from user, null if from admin
+  createdAt   DateTime @default(now())
+
+  @@index([inquiryId])
+  @@index([createdAt])
+}
+
+enum InquiryStatus {
+  PENDING
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+model Newsletter {
+  id          String    @id @default(cuid())
+  subject     String
+  content     String // HTML content
+  previewText String?
+  isDraft     Boolean   @default(true)
+  sentAt      DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model BlogAuthor {
+  id        String     @id @default(cuid())
+  name      String
+  avatar    String?
+  title     String
+  bio       String?
+  blogPosts BlogPost[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model BlogCategory {
+  id        String             @id @default(cuid())
+  name      String             @unique
+  slug      String             @unique
+  blogPosts BlogPostCategory[]
+  createdAt DateTime           @default(now())
+}
+
+model BlogPost {
+  id          String             @id @default(cuid())
+  slug        String             @unique
+  title       String
+  excerpt     String
+  content     String             @db.Text
+  coverImage  String
+  publishDate DateTime
+  readTime    Int
+  featured    Boolean            @default(false)
+  tintColor   String?
+  published   Boolean            @default(true)
+  authorId    String
+  author      BlogAuthor         @relation(fields: [authorId], references: [id])
+  categories  BlogPostCategory[]
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  @@index([published])
+  @@index([publishDate])
+  @@index([slug])
+}
+
+model BlogPostCategory {
+  blogPostId String
+  categoryId String
+  blogPost   BlogPost     @relation(fields: [blogPostId], references: [id], onDelete: Cascade)
+  category   BlogCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([blogPostId, categoryId])
+}
+
+// Budget and Payment Models
+model ServicePricing {
+  id               String   @id @default(cuid())
+  serviceType      String   // "web-mobile", "hosting", "ai", "vyoniq-apps"
+  name             String   // "Basic Web App", "E-commerce Platform", etc.
+  description      String   @db.Text
+  basePrice        Decimal  @db.Decimal(10, 2)
+  currency         String   @default("USD")
+  billingType      String   // "one-time", "monthly", "yearly"
+  features         Json     // Array of features included
+  isActive         Boolean  @default(true)
+  customizable     Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  budgetItems      BudgetItem[]
+
+  @@index([serviceType])
+  @@index([isActive])
+}
+
+model Budget {
+  id               String       @id @default(cuid())
+  inquiryId        String
+  inquiry          Inquiry      @relation(fields: [inquiryId], references: [id], onDelete: Cascade)
+  title            String
+  description      String?      @db.Text
+  totalAmount      Decimal      @db.Decimal(10, 2)
+  currency         String       @default("USD")
+  status           BudgetStatus @default(DRAFT)
+  validUntil       DateTime?
+  adminNotes       String?      @db.Text
+  clientNotes      String?      @db.Text
+  createdById      String       // Admin who created the budget
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  items            BudgetItem[]
+  payments         Payment[]
+
+  @@index([inquiryId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model BudgetItem {
+  id               String         @id @default(cuid())
+  budgetId         String
+  budget           Budget         @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  servicePricingId String?
+  servicePricing   ServicePricing? @relation(fields: [servicePricingId], references: [id])
+  name             String
+  description      String?        @db.Text
+  quantity         Int            @default(1)
+  unitPrice        Decimal        @db.Decimal(10, 2)
+  totalPrice       Decimal        @db.Decimal(10, 2)
+  isCustom         Boolean        @default(false)
+  category         String?        // "development", "hosting", "maintenance", etc.
+  createdAt        DateTime       @default(now())
+
+  @@index([budgetId])
+}
+
+model Payment {
+  id                 String        @id @default(cuid())
+  budgetId           String
+  budget             Budget        @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  stripePaymentId    String?       @unique
+  stripeSessionId    String?       @unique
+  amount             Decimal       @db.Decimal(10, 2)
+  currency           String        @default("USD")
+  status             PaymentStatus @default(PENDING)
+  paymentMethod      String?       // "card", "bank_transfer", etc.
+  paidAt             DateTime?
+  refundedAt         DateTime?
+  failedAt           DateTime?
+  failureReason      String?
+  stripeClientSecret String?
+  metadata           Json?         // Additional Stripe metadata
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  @@index([budgetId])
+  @@index([status])
+  @@index([stripePaymentId])
+  @@index([stripeSessionId])
+}
+
+enum BudgetStatus {
+  DRAFT
+  SENT
+  APPROVED
+  REJECTED
+  EXPIRED
+  PAID
+  COMPLETED
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  SUCCEEDED
+  FAILED
+  CANCELLED
+  REFUNDED
+}
