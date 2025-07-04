@@ -10,17 +10,23 @@ const CreateBudgetSchema = z.object({
   description: z.string().optional(),
   validUntil: z.string().optional(), // ISO date string
   adminNotes: z.string().optional(),
-  items: z.array(
-    z.object({
-      name: z.string().min(1, "Item name is required"),
-      description: z.string().optional(),
-      quantity: z.number().int().min(1, "Quantity must be at least 1").default(1),
-      unitPrice: z.number().min(0, "Unit price must be non-negative"),
-      category: z.string().optional(),
-      servicePricingId: z.string().optional(),
-      isCustom: z.boolean().default(false),
-    })
-  ).min(1, "At least one budget item is required"),
+  items: z
+    .array(
+      z.object({
+        name: z.string().min(1, "Item name is required"),
+        description: z.string().optional(),
+        quantity: z
+          .number()
+          .int()
+          .min(1, "Quantity must be at least 1")
+          .default(1),
+        unitPrice: z.number().min(0, "Unit price must be non-negative"),
+        category: z.string().optional(),
+        servicePricingId: z.string().optional(),
+        isCustom: z.boolean().default(false),
+      })
+    )
+    .min(1, "At least one budget item is required"),
 });
 
 // POST - Create a new budget (Admin only)
@@ -38,11 +44,14 @@ export async function POST(request: NextRequest) {
     });
 
     if (!user || !user.isAdmin) {
-      return NextResponse.json({ error: "Admin access required" }, { status: 403 });
+      return NextResponse.json(
+        { error: "Admin access required" },
+        { status: 403 }
+      );
     }
 
     const body = await request.json();
-    const { inquiryId, title, description, validUntil, adminNotes, items } = 
+    const { inquiryId, title, description, validUntil, adminNotes, items } =
       CreateBudgetSchema.parse(body);
 
     // Verify the inquiry exists
@@ -56,7 +65,7 @@ export async function POST(request: NextRequest) {
 
     // Calculate total amount
     const totalAmount = items.reduce((sum, item) => {
-      return sum + (item.unitPrice * item.quantity);
+      return sum + item.unitPrice * item.quantity;
     }, 0);
 
     // Create the budget with items
@@ -70,7 +79,7 @@ export async function POST(request: NextRequest) {
         adminNotes,
         createdById: userId,
         items: {
-          create: items.map(item => ({
+          create: items.map((item) => ({
             name: item.name,
             description: item.description,
             quantity: item.quantity,
@@ -95,14 +104,25 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    // Serialize Decimal fields to numbers for client components
+    const serializedBudget = {
+      ...budget,
+      totalAmount: Number(budget.totalAmount),
+      items: budget.items.map((item) => ({
+        ...item,
+        unitPrice: Number(item.unitPrice),
+        totalPrice: Number(item.totalPrice),
+      })),
+    };
+
     return NextResponse.json({
       success: true,
-      budget,
+      budget: serializedBudget,
       message: "Budget created successfully",
     });
   } catch (error) {
     console.error("Error creating budget:", error);
-    
+
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation error", details: error.errors },
@@ -147,16 +167,13 @@ export async function GET(request: NextRequest) {
     if (!user.isAdmin) {
       const userInquiryIds = await prisma.inquiry.findMany({
         where: {
-          OR: [
-            { userId: userId },
-            { email: user.email },
-          ],
+          OR: [{ userId: userId }, { email: user.email }],
         },
         select: { id: true },
       });
 
       where.inquiryId = {
-        in: userInquiryIds.map(inquiry => inquiry.id),
+        in: userInquiryIds.map((inquiry) => inquiry.id),
       };
     }
 
@@ -205,8 +222,23 @@ export async function GET(request: NextRequest) {
 
     const totalCount = await prisma.budget.count({ where });
 
+    // Serialize Decimal fields to numbers for client components
+    const serializedBudgets = budgets.map((budget) => ({
+      ...budget,
+      totalAmount: Number(budget.totalAmount),
+      items: budget.items.map((item) => ({
+        ...item,
+        unitPrice: Number(item.unitPrice),
+        totalPrice: Number(item.totalPrice),
+      })),
+      payments: budget.payments.map((payment) => ({
+        ...payment,
+        amount: Number(payment.amount),
+      })),
+    }));
+
     return NextResponse.json({
-      budgets,
+      budgets: serializedBudgets,
       totalCount,
       hasMore: totalCount > offset + limit,
     });
