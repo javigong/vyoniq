@@ -31,12 +31,24 @@ export async function POST(request: NextRequest) {
     });
 
     if (!user || !user.isAdmin) {
-      return NextResponse.json({ error: "Admin access required" }, { status: 403 });
+      return NextResponse.json(
+        { error: "Admin access required" },
+        { status: 403 }
+      );
     }
 
     const body = await request.json();
-    const { serviceType, name, description, basePrice, currency, billingType, features, isActive, customizable } = 
-      CreateServicePricingSchema.parse(body);
+    const {
+      serviceType,
+      name,
+      description,
+      basePrice,
+      currency,
+      billingType,
+      features,
+      isActive,
+      customizable,
+    } = CreateServicePricingSchema.parse(body);
 
     const servicePricing = await prisma.servicePricing.create({
       data: {
@@ -52,14 +64,20 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    // Serialize Decimal fields to numbers for client components
+    const serializedServicePricing = {
+      ...servicePricing,
+      basePrice: Number(servicePricing.basePrice),
+    };
+
     return NextResponse.json({
       success: true,
-      servicePricing,
+      servicePricing: serializedServicePricing,
       message: "Service pricing created successfully",
     });
   } catch (error) {
     console.error("Error creating service pricing:", error);
-    
+
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation error", details: error.errors },
@@ -95,18 +113,21 @@ export async function GET(request: NextRequest) {
 
     const servicePricing = await prisma.servicePricing.findMany({
       where,
-      orderBy: [
-        { serviceType: "asc" },
-        { basePrice: "asc" },
-      ],
+      orderBy: [{ serviceType: "asc" }, { basePrice: "asc" }],
       take: limit,
       skip: offset,
     });
 
     const totalCount = await prisma.servicePricing.count({ where });
 
+    // Serialize Decimal fields to numbers for client components
+    const serializedServicePricing = servicePricing.map((item) => ({
+      ...item,
+      basePrice: Number(item.basePrice),
+    }));
+
     return NextResponse.json({
-      servicePricing,
+      servicePricing: serializedServicePricing,
       totalCount,
       hasMore: totalCount > offset + limit,
     });
