@@ -2,7 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
-import { BudgetCard } from "@/components/budget-card";
+import { BudgetListClient } from "@/components/budget-list-client";
 import {
   Card,
   CardContent,
@@ -181,30 +181,21 @@ export default async function BudgetsPage() {
           </h2>
 
           {budgets.length > 0 ? (
-            <div className="space-y-6">
-              {budgets.map((budget) => (
-                <BudgetCard
-                  key={budget.id}
-                  budget={{
-                    ...budget,
-                    totalAmount: Number(budget.totalAmount),
-                    items: budget.items.map((item) => ({
-                      ...item,
-                      unitPrice: Number(item.unitPrice),
-                      totalPrice: Number(item.totalPrice),
-                    })),
-                    payments: budget.payments.map((payment) => ({
-                      ...payment,
-                      amount: Number(payment.amount),
-                    })),
-                  }}
-                  onStatusUpdate={() => {
-                    // Refresh the page to show updated data
-                    window.location.reload();
-                  }}
-                />
-              ))}
-            </div>
+            <BudgetListClient
+              budgets={budgets.map((budget) => ({
+                ...budget,
+                totalAmount: Number(budget.totalAmount),
+                items: budget.items.map((item) => ({
+                  ...item,
+                  unitPrice: Number(item.unitPrice),
+                  totalPrice: Number(item.totalPrice),
+                })),
+                payments: budget.payments.map((payment) => ({
+                  ...payment,
+                  amount: Number(payment.amount),
+                })),
+              }))}
+            />
           ) : (
             <Card>
               <CardContent className="text-center py-12">
