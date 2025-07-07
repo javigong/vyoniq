@@ -2,15 +2,43 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { DollarSign, Clock, CheckCircle, XCircle, CreditCard, Calendar, FileText } from "lucide-react";
-import { getStripe } from "@/lib/stripe";
+import {
+  DollarSign,
+  Clock,
+  CheckCircle,
+  XCircle,
+  CreditCard,
+  Calendar,
+  FileText,
+} from "lucide-react";
+import { getStripe, isStripeConfiguredClient } from "@/lib/stripe";
 
 interface BudgetItem {
   id: string;
@@ -52,9 +80,11 @@ const statusColors = {
   SENT: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
   APPROVED: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
   REJECTED: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",
-  EXPIRED: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300",
+  EXPIRED:
+    "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300",
   PAID: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300",
-  COMPLETED: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300",
+  COMPLETED:
+    "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300",
 };
 
 const statusIcons = {
@@ -91,7 +121,10 @@ export function BudgetCard({ budget, onStatusUpdate }: BudgetCardProps) {
     );
   };
 
-  const updateBudgetStatus = async (status: "APPROVED" | "REJECTED", notes?: string) => {
+  const updateBudgetStatus = async (
+    status: "APPROVED" | "REJECTED",
+    notes?: string
+  ) => {
     setIsLoading(true);
 
     try {
@@ -124,7 +157,10 @@ export function BudgetCard({ budget, onStatusUpdate }: BudgetCardProps) {
       console.error("Error updating budget status:", error);
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to update budget status",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Failed to update budget status",
         variant: "destructive",
       });
     } finally {
@@ -133,6 +169,17 @@ export function BudgetCard({ budget, onStatusUpdate }: BudgetCardProps) {
   };
 
   const handlePayment = async () => {
+    // Check if Stripe is configured
+    if (!isStripeConfiguredClient()) {
+      toast({
+        title: "Payment Unavailable",
+        description:
+          "Payment processing is currently unavailable. Please contact support.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsPaymentLoading(true);
 
     try {
@@ -155,7 +202,9 @@ export function BudgetCard({ budget, onStatusUpdate }: BudgetCardProps) {
       const stripe = await getStripe();
 
       if (!stripe) {
-        throw new Error("Stripe failed to load");
+        throw new Error(
+          "Stripe failed to load. Please try again or contact support."
+        );
       }
 
       // Redirect to Stripe Checkout
@@ -168,7 +217,8 @@ export function BudgetCard({ budget, onStatusUpdate }: BudgetCardProps) {
       console.error("Error processing payment:", error);
       toast({
         title: "Payment Error",
-        description: error instanceof Error ? error.message : "Failed to process payment",
+        description:
+          error instanceof Error ? error.message : "Failed to process payment",
         variant: "destructive",
       });
     } finally {
@@ -176,10 +226,11 @@ export function BudgetCard({ budget, onStatusUpdate }: BudgetCardProps) {
     }
   };
 
-  const isExpired = budget.validUntil && new Date() > new Date(budget.validUntil);
+  const isExpired =
+    budget.validUntil && new Date() > new Date(budget.validUntil);
   const canApprove = budget.status === "SENT" && !isExpired;
   const canPay = budget.status === "APPROVED" && !isExpired;
-  const hasPaidPayment = budget.payments.some(p => p.status === "SUCCEEDED");
+  const hasPaidPayment = budget.payments.some((p) => p.status === "SUCCEEDED");
 
   return (
     <Card className="mb-6">
@@ -198,7 +249,7 @@ export function BudgetCard({ budget, onStatusUpdate }: BudgetCardProps) {
             </div>
           </div>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 pt-4 border-t">
           <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
             <Calendar className="w-4 h-4 mr-2" />
@@ -208,7 +259,9 @@ export function BudgetCard({ budget, onStatusUpdate }: BudgetCardProps) {
             <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
               <Clock className="w-4 h-4 mr-2" />
               Valid until: {new Date(budget.validUntil).toLocaleDateString()}
-              {isExpired && <span className="ml-2 text-red-500">(Expired)</span>}
+              {isExpired && (
+                <span className="ml-2 text-red-500">(Expired)</span>
+              )}
             </div>
           )}
           <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
@@ -239,7 +292,9 @@ export function BudgetCard({ budget, onStatusUpdate }: BudgetCardProps) {
                     <div>
                       <div className="font-medium">{item.name}</div>
                       {item.description && (
-                        <div className="text-sm text-gray-500">{item.description}</div>
+                        <div className="text-sm text-gray-500">
+                          {item.description}
+                        </div>
                       )}
                     </div>
                   </TableCell>
@@ -251,7 +306,9 @@ export function BudgetCard({ budget, onStatusUpdate }: BudgetCardProps) {
                     )}
                   </TableCell>
                   <TableCell className="text-center">{item.quantity}</TableCell>
-                  <TableCell className="text-right">${Number(item.unitPrice).toFixed(2)}</TableCell>
+                  <TableCell className="text-right">
+                    ${Number(item.unitPrice).toFixed(2)}
+                  </TableCell>
                   <TableCell className="text-right font-medium">
                     ${Number(item.totalPrice).toFixed(2)}
                   </TableCell>
@@ -290,8 +347,12 @@ export function BudgetCard({ budget, onStatusUpdate }: BudgetCardProps) {
               Payment Information
             </h5>
             {budget.payments.map((payment) => (
-              <div key={payment.id} className="text-sm text-green-800 dark:text-green-300">
-                Payment of ${Number(payment.amount).toFixed(2)} - {payment.status}
+              <div
+                key={payment.id}
+                className="text-sm text-green-800 dark:text-green-300"
+              >
+                Payment of ${Number(payment.amount).toFixed(2)} -{" "}
+                {payment.status}
                 {payment.paidAt && (
                   <span className="ml-2">
                     on {new Date(payment.paidAt).toLocaleDateString()}
@@ -306,7 +367,10 @@ export function BudgetCard({ budget, onStatusUpdate }: BudgetCardProps) {
         <div className="flex flex-wrap gap-3">
           {canApprove && (
             <>
-              <Dialog open={isApproveDialogOpen} onOpenChange={setIsApproveDialogOpen}>
+              <Dialog
+                open={isApproveDialogOpen}
+                onOpenChange={setIsApproveDialogOpen}
+              >
                 <DialogTrigger asChild>
                   <Button className="bg-vyoniq-green hover:bg-vyoniq-green/90">
                     <CheckCircle className="w-4 h-4 mr-2" />
@@ -317,12 +381,15 @@ export function BudgetCard({ budget, onStatusUpdate }: BudgetCardProps) {
                   <DialogHeader>
                     <DialogTitle>Approve Budget</DialogTitle>
                     <DialogDescription>
-                      You're about to approve this budget. Once approved, you can proceed with payment.
+                      You're about to approve this budget. Once approved, you
+                      can proceed with payment.
                     </DialogDescription>
                   </DialogHeader>
                   <div className="space-y-4">
                     <div>
-                      <Label htmlFor="approve-notes">Additional Notes (Optional)</Label>
+                      <Label htmlFor="approve-notes">
+                        Additional Notes (Optional)
+                      </Label>
                       <Textarea
                         id="approve-notes"
                         value={clientNotes}
@@ -339,7 +406,9 @@ export function BudgetCard({ budget, onStatusUpdate }: BudgetCardProps) {
                         Cancel
                       </Button>
                       <Button
-                        onClick={() => updateBudgetStatus("APPROVED", clientNotes)}
+                        onClick={() =>
+                          updateBudgetStatus("APPROVED", clientNotes)
+                        }
                         disabled={isLoading}
                         className="bg-vyoniq-green hover:bg-vyoniq-green/90"
                       >
@@ -350,9 +419,15 @@ export function BudgetCard({ budget, onStatusUpdate }: BudgetCardProps) {
                 </DialogContent>
               </Dialog>
 
-              <Dialog open={isRejectDialogOpen} onOpenChange={setIsRejectDialogOpen}>
+              <Dialog
+                open={isRejectDialogOpen}
+                onOpenChange={setIsRejectDialogOpen}
+              >
                 <DialogTrigger asChild>
-                  <Button variant="outline" className="border-red-300 text-red-600 hover:bg-red-50">
+                  <Button
+                    variant="outline"
+                    className="border-red-300 text-red-600 hover:bg-red-50"
+                  >
                     <XCircle className="w-4 h-4 mr-2" />
                     Request Changes
                   </Button>
@@ -366,7 +441,9 @@ export function BudgetCard({ budget, onStatusUpdate }: BudgetCardProps) {
                   </DialogHeader>
                   <div className="space-y-4">
                     <div>
-                      <Label htmlFor="reject-notes">Feedback and Change Requests *</Label>
+                      <Label htmlFor="reject-notes">
+                        Feedback and Change Requests *
+                      </Label>
                       <Textarea
                         id="reject-notes"
                         value={clientNotes}
@@ -384,7 +461,9 @@ export function BudgetCard({ budget, onStatusUpdate }: BudgetCardProps) {
                         Cancel
                       </Button>
                       <Button
-                        onClick={() => updateBudgetStatus("REJECTED", clientNotes)}
+                        onClick={() =>
+                          updateBudgetStatus("REJECTED", clientNotes)
+                        }
                         disabled={isLoading || !clientNotes.trim()}
                         variant="outline"
                         className="border-red-300 text-red-600 hover:bg-red-50"
@@ -399,31 +478,38 @@ export function BudgetCard({ budget, onStatusUpdate }: BudgetCardProps) {
           )}
 
           {canPay && !hasPaidPayment && (
-            <Button 
+            <Button
               onClick={handlePayment}
-              disabled={isPaymentLoading}
+              disabled={isPaymentLoading || !isStripeConfiguredClient()}
               className="bg-vyoniq-purple hover:bg-vyoniq-purple/90"
             >
               <CreditCard className="w-4 h-4 mr-2" />
-              {isPaymentLoading ? "Processing..." : "Proceed to Payment"}
+              {isPaymentLoading
+                ? "Processing..."
+                : !isStripeConfiguredClient()
+                ? "Payment Unavailable"
+                : "Proceed to Payment"}
             </Button>
           )}
 
           {budget.status === "REJECTED" && (
             <div className="text-sm text-orange-600 bg-orange-50 dark:bg-orange-900/20 px-3 py-2 rounded-lg">
-              <strong>Waiting for Updates:</strong> We're working on the changes you requested.
+              <strong>Waiting for Updates:</strong> We're working on the changes
+              you requested.
             </div>
           )}
 
           {isExpired && budget.status === "SENT" && (
             <div className="text-sm text-red-600 bg-red-50 dark:bg-red-900/20 px-3 py-2 rounded-lg">
-              <strong>Expired:</strong> This budget has expired. Please contact us for an updated quote.
+              <strong>Expired:</strong> This budget has expired. Please contact
+              us for an updated quote.
             </div>
           )}
 
           {budget.status === "PAID" && (
             <div className="text-sm text-green-600 bg-green-50 dark:bg-green-900/20 px-3 py-2 rounded-lg">
-              <strong>Payment Confirmed:</strong> Your project will begin shortly!
+              <strong>Payment Confirmed:</strong> Your project will begin
+              shortly!
             </div>
           )}
 
