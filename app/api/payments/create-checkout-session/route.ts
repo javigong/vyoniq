@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
-import { stripe, formatAmountForStripe } from "@/lib/stripe";
+import { stripe, formatAmountForStripe, isStripeConfigured } from "@/lib/stripe";
 import { z } from "zod";
 
 const CreateCheckoutSessionSchema = z.object({
@@ -10,6 +10,13 @@ const CreateCheckoutSessionSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    // Check if Stripe is configured
+    if (!isStripeConfigured() || !stripe) {
+      return NextResponse.json({ 
+        error: "Payment processing is currently unavailable. Please contact support." 
+      }, { status: 503 });
+    }
+
     const { userId } = await auth();
 
     if (!userId) {
