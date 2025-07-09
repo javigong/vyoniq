@@ -1,3 +1,35 @@
+-- ============================================================================
+-- BASELINE MIGRATION: Reset and Create Complete Database Schema
+-- WARNING: This will DELETE ALL existing data and schemas
+-- ============================================================================
+
+-- Drop all existing tables in correct order (respecting foreign key constraints)
+DROP TABLE IF EXISTS "Payment" CASCADE;
+DROP TABLE IF EXISTS "BudgetItem" CASCADE;
+DROP TABLE IF EXISTS "Budget" CASCADE;
+DROP TABLE IF EXISTS "ServicePricing" CASCADE;
+DROP TABLE IF EXISTS "BlogPostCategory" CASCADE;
+DROP TABLE IF EXISTS "BlogPost" CASCADE;
+DROP TABLE IF EXISTS "BlogCategory" CASCADE;
+DROP TABLE IF EXISTS "BlogAuthor" CASCADE;
+DROP TABLE IF EXISTS "Newsletter" CASCADE;
+DROP TABLE IF EXISTS "InquiryMessage" CASCADE;
+DROP TABLE IF EXISTS "Inquiry" CASCADE;
+DROP TABLE IF EXISTS "ApiKey" CASCADE;
+DROP TABLE IF EXISTS "User" CASCADE;
+
+-- Drop Prisma migration history (will be recreated)
+DROP TABLE IF EXISTS "_prisma_migrations" CASCADE;
+
+-- Drop custom types/enums
+DROP TYPE IF EXISTS "PaymentStatus" CASCADE;
+DROP TYPE IF EXISTS "BudgetStatus" CASCADE;
+DROP TYPE IF EXISTS "InquiryStatus" CASCADE;
+
+-- ============================================================================
+-- CREATE NEW SCHEMA
+-- ============================================================================
+
 -- CreateEnum
 CREATE TYPE "InquiryStatus" AS ENUM ('PENDING', 'IN_PROGRESS', 'RESOLVED', 'CLOSED');
 
@@ -319,3 +351,59 @@ ALTER TABLE "BudgetItem" ADD CONSTRAINT "BudgetItem_servicePricingId_fkey" FOREI
 -- AddForeignKey
 ALTER TABLE "Payment" ADD CONSTRAINT "Payment_budgetId_fkey" FOREIGN KEY ("budgetId") REFERENCES "Budget"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
+INSERT INTO public."User" VALUES ('user_2yQbLBJukarNLRkMZ4okDc84wLh', 'jgongora@gmail.com', 'Javier Gongora', true, true, true, '2025-06-13 04:40:45.139', NULL);
+INSERT INTO public."User" VALUES ('user_2zAYZ1Gsg3WQyGTJx6oLYzPSHNP', '', '', false, false, false, '2025-06-29 05:36:56.832', NULL);
+INSERT INTO public."ApiKey" VALUES ('cmce1m4sa0001rqpln6tmlyy7', 'Test API Key', '$2b$12$w.wd75kAfKA/bRCdRLw/eO1BxWk/5y5eFQoHP9orXOAvHK2hiRzN.', 'vyoniq_sk_3b***', 'user_2yQbLBJukarNLRkMZ4okDc84wLh', '{blog:read,blog:write}', true, NULL, '2025-06-26 23:57:16.859', '2025-06-26 23:57:16.859');
+INSERT INTO public."ApiKey" VALUES ('cmce2uhln0001rq59al00hrm6', 'Test API Key', '$2b$12$pSKu1ckDtd64R342OJUQn.dlHShOYXFswmRaqSShn2h6Ye8XowZgG', 'vyoniq_sk_65***', 'user_2yQbLBJukarNLRkMZ4okDc84wLh', '{blog:read,blog:write}', true, '2025-06-27 03:26:32.386', '2025-06-27 00:31:46.328', '2025-06-27 03:26:32.386');
+INSERT INTO public."BlogAuthor" VALUES ('cmcdwvy800000rq02usmp8q8l', 'Javier Gongora', '/javier.jpeg', 'Founder & Software Developer', 'Founder and lead developer at Vyoniq, specializing in AI-powered applications and enterprise software solutions.', '2025-06-26 21:44:56.833', '2025-06-26 21:44:56.833');
+INSERT INTO public."BlogCategory" VALUES ('cmcdwvyc30001rq02dh0ctac3', 'Cursor & AI IDEs', 'cursor--ai-ides', '2025-06-26 21:44:56.98');
+INSERT INTO public."BlogCategory" VALUES ('cmcdwvysh0002rq028vyzi2dk', 'AI Development Tools', 'ai-development-tools', '2025-06-26 21:44:57.569');
+INSERT INTO public."BlogCategory" VALUES ('cmcdwvz2c0003rq02nagpr1hf', 'Industry Trends', 'industry-trends', '2025-06-26 21:44:57.924');
+INSERT INTO public."BlogCategory" VALUES ('cmcdwvzde0004rq02ihx2aqrx', 'MCP Servers', 'mcp-servers', '2025-06-26 21:44:58.322');
+INSERT INTO public."BlogCategory" VALUES ('cmcdwvzoa0005rq02hi0fx3vs', 'LLM Integration', 'llm-integration', '2025-06-26 21:44:58.714');
+INSERT INTO public."BlogCategory" VALUES ('cmcdwvzy50006rq02osjux56m', 'Enterprise Architecture', 'enterprise-architecture', '2025-06-26 21:44:59.069');
+INSERT INTO public."BlogCategory" VALUES ('cmcdww08h0007rq023w6eydu7', 'AI Agents', 'ai-agents', '2025-06-26 21:44:59.442');
+INSERT INTO public."BlogCategory" VALUES ('cmcdww0ig0008rq02qawnmxwx', 'Business Automation', 'business-automation', '2025-06-26 21:44:59.801');
+INSERT INTO public."BlogCategory" VALUES ('cmcdww0sd0009rq025hasoq3c', 'Case Studies', 'case-studies', '2025-06-26 21:45:00.158');
+INSERT INTO public."BlogPost" VALUES ('cmcdww12x000brq028ueh8yut', 'cursor-ai-development-revolution', 'How Cursor is Revolutionizing AI-Powered Development', 'Explore how Cursor''s AI-first approach is transforming the development experience with intelligent code completion, chat-driven programming, and seamless LLM integration.', '
+INSERT INTO public."BlogPost" VALUES ('cmcdww1p6000drq02w55ae3ni', 'mcp-servers-llm-integration', 'MCP Servers: The Future of LLM Integration', 'Discover how Model Context Protocol (MCP) servers are revolutionizing LLM integration, enabling seamless data access and intelligent automation across applications.', '
+INSERT INTO public."BlogPost" VALUES ('cmcdww21s000frq02cwt2kvml', 'ai-agents-business-automation', 'AI Agents: Transforming Business Process Automation', 'Learn how AI agents powered by LLMs are revolutionizing business automation, from customer service to complex workflow orchestration.', '
+INSERT INTO public."BlogPost" VALUES ('cmcdww2dg000hrq021e3na4b6', 'llm-integration-enterprise-applications', 'Best Practices for LLM Integration in Enterprise Applications', 'A comprehensive guide to integrating Large Language Models into enterprise applications, covering security, scalability, and performance considerations.', '
+INSERT INTO public."BlogPost" VALUES ('cmcdww2nl000jrq027bc748ok', 'ai-development-tools-ecosystem', 'The Modern AI Development Tools Ecosystem', 'Explore the rapidly evolving landscape of AI development tools, from code editors to deployment platforms, and how they''re shaping the future of software development.', '
+INSERT INTO public."BlogPost" VALUES ('cmce9396n0001rq4h5xh0eyt0', 'building-a-production-ready-mcp-server-with-nextjs-a-complete-implementation-guide', 'Building a Production-Ready MCP Server with Next.js: A Complete Implementation Guide', 'Learn how to build a robust Model Context Protocol (MCP) server using Next.js without Vercel deployment. This comprehensive guide covers everything from schema design to authentication, based on real-world implementation experience with the Vyoniq MCP server.', '# Building a Production-Ready MCP Server with Next.js: A Complete Implementation Guide
+INSERT INTO public."BlogPostCategory" VALUES ('cmcdww12x000brq028ueh8yut', 'cmcdwvyc30001rq02dh0ctac3');
+INSERT INTO public."BlogPostCategory" VALUES ('cmcdww12x000brq028ueh8yut', 'cmcdwvysh0002rq028vyzi2dk');
+INSERT INTO public."BlogPostCategory" VALUES ('cmcdww12x000brq028ueh8yut', 'cmcdwvz2c0003rq02nagpr1hf');
+INSERT INTO public."BlogPostCategory" VALUES ('cmcdww1p6000drq02w55ae3ni', 'cmcdwvzde0004rq02ihx2aqrx');
+INSERT INTO public."BlogPostCategory" VALUES ('cmcdww1p6000drq02w55ae3ni', 'cmcdwvzoa0005rq02hi0fx3vs');
+INSERT INTO public."BlogPostCategory" VALUES ('cmcdww1p6000drq02w55ae3ni', 'cmcdwvzy50006rq02osjux56m');
+INSERT INTO public."BlogPostCategory" VALUES ('cmcdww21s000frq02cwt2kvml', 'cmcdww08h0007rq023w6eydu7');
+INSERT INTO public."BlogPostCategory" VALUES ('cmcdww21s000frq02cwt2kvml', 'cmcdww0ig0008rq02qawnmxwx');
+INSERT INTO public."BlogPostCategory" VALUES ('cmcdww21s000frq02cwt2kvml', 'cmcdwvzoa0005rq02hi0fx3vs');
+INSERT INTO public."BlogPostCategory" VALUES ('cmcdww2dg000hrq021e3na4b6', 'cmcdwvzoa0005rq02hi0fx3vs');
+INSERT INTO public."BlogPostCategory" VALUES ('cmcdww2dg000hrq021e3na4b6', 'cmcdww0sd0009rq025hasoq3c');
+INSERT INTO public."BlogPostCategory" VALUES ('cmcdww2dg000hrq021e3na4b6', 'cmcdwvz2c0003rq02nagpr1hf');
+INSERT INTO public."BlogPostCategory" VALUES ('cmcdww2nl000jrq027bc748ok', 'cmcdwvysh0002rq028vyzi2dk');
+INSERT INTO public."BlogPostCategory" VALUES ('cmcdww2nl000jrq027bc748ok', 'cmcdwvyc30001rq02dh0ctac3');
+INSERT INTO public."BlogPostCategory" VALUES ('cmcdww2nl000jrq027bc748ok', 'cmcdwvz2c0003rq02nagpr1hf');
+INSERT INTO public."Inquiry" VALUES ('cmch73df00000rqnmat45gp4n', 'Test User', 'javier@vyoniq.com', 'Web & Mobile App Development', 'This is a test inquiry to check the email system.', '2025-06-29 04:53:57.804', 'IN_PROGRESS', '2025-06-29 04:57:27.857', NULL);
+INSERT INTO public."Inquiry" VALUES ('cmch7k62s0000rqm51t2p3m1w', 'Test User 3', 'javier@vyoniq.com', 'AI Integrations', 'Testing inquiry system after fixing the params issue.', '2025-06-29 05:07:01.443', 'PENDING', '2025-06-29 05:07:01.443', NULL);
+INSERT INTO public."Inquiry" VALUES ('cmch7ss850003rqm5ybup2ogb', 'Debug Test', 'javier@vyoniq.com', 'Web & Mobile App Development', 'Testing with detailed logging to debug email issue.', '2025-06-29 05:13:42.629', 'PENDING', '2025-06-29 05:13:42.629', NULL);
+INSERT INTO public."Inquiry" VALUES ('cmch7tk1l0000rqxke8ua2mpq', 'Debug Test 2', 'javier@vyoniq.com', 'AI Integrations', 'Testing again with fresh server logs.', '2025-06-29 05:14:19.45', 'PENDING', '2025-06-29 05:14:19.45', NULL);
+INSERT INTO public."Inquiry" VALUES ('cmch7ui5l0003rqxk46n7h4ci', 'Final Test', 'javier@vyoniq.com', 'Hosting Services', 'Testing with verified Resend domain to ensure email delivery.', '2025-06-29 05:15:03.584', 'PENDING', '2025-06-29 05:15:03.584', NULL);
+INSERT INTO public."Inquiry" VALUES ('cmch7zb1e0006rqxkdg41tgde', 'JavierTesting', 'jgongora@gmail.com', 'hosting', 'I want hosting sercvices.', '2025-06-29 05:18:47.645', 'PENDING', '2025-06-29 06:00:26.861', 'user_2yQbLBJukarNLRkMZ4okDc84wLh');
+INSERT INTO public."Inquiry" VALUES ('cmch86qqo0009rqxkdgv7tj4m', 'AnotherUserText', 'jgongora@gmail.com', 'vyoniq-apps', 'I want more info about vyoniq apps.', '2025-06-29 05:24:34.083', 'IN_PROGRESS', '2025-07-04 03:47:34.624', 'user_2yQbLBJukarNLRkMZ4okDc84wLh');
+INSERT INTO public."Budget" VALUES ('cmco6hc430001rqzlfgm25ezp', 'cmch86qqo0009rqxkdgv7tj4m', 'Vyoniq App Budget Test', 'Vyoniq App Budget Test', 550.00, 'USD', 'PAID', '2025-07-31 00:00:00', '', '', 'user_2yQbLBJukarNLRkMZ4okDc84wLh', '2025-07-04 02:11:12.915', '2025-07-04 03:47:33.88');
+INSERT INTO public."BudgetItem" VALUES ('cmco6hc430002rqzldmy0ix21', 'cmco6hc430001rqzlfgm25ezp', NULL, 'Website', '', 1, 550.00, 550.00, true, 'development', '2025-07-04 02:11:12.915');
+INSERT INTO public."InquiryMessage" VALUES ('cmch73djo0002rqnml21vnead', 'cmch73df00000rqnmat45gp4n', 'This is a test inquiry to check the email system.', false, NULL, '2025-06-29 04:53:57.972');
+INSERT INTO public."InquiryMessage" VALUES ('cmch77vcb0001rqjjx3ohnt5n', 'cmch73df00000rqnmat45gp4n', 'Test response from Vyoniq platform.', true, 'user_2yQbLBJukarNLRkMZ4okDc84wLh', '2025-06-29 04:57:27.659');
+INSERT INTO public."InquiryMessage" VALUES ('cmch7k69t0002rqm56rvkabcb', 'cmch7k62s0000rqm51t2p3m1w', 'Testing inquiry system after fixing the params issue.', false, NULL, '2025-06-29 05:07:01.696');
+INSERT INTO public."InquiryMessage" VALUES ('cmch7ssdg0005rqm54umkuzzx', 'cmch7ss850003rqm5ybup2ogb', 'Testing with detailed logging to debug email issue.', false, NULL, '2025-06-29 05:13:43.588');
+INSERT INTO public."InquiryMessage" VALUES ('cmch7tk5s0002rqxkghw4rjl1', 'cmch7tk1l0000rqxke8ua2mpq', 'Testing again with fresh server logs.', false, NULL, '2025-06-29 05:14:19.6');
+INSERT INTO public."InquiryMessage" VALUES ('cmch7ui7k0005rqxk38aa80tq', 'cmch7ui5l0003rqxk46n7h4ci', 'Testing with verified Resend domain to ensure email delivery.', false, NULL, '2025-06-29 05:15:03.728');
+INSERT INTO public."InquiryMessage" VALUES ('cmch7zb3d0008rqxkurncai4w', 'cmch7zb1e0006rqxkdg41tgde', 'I want hosting sercvices.', false, NULL, '2025-06-29 05:18:47.785');
+INSERT INTO public."InquiryMessage" VALUES ('cmch86qur000brqxk9yzwl7y0', 'cmch86qqo0009rqxkdgv7tj4m', 'I want more info about vyoniq apps.', false, NULL, '2025-06-29 05:24:34.803');
+INSERT INTO public."InquiryMessage" VALUES ('cmch9ihcm0001rqvcx9een8p0', 'cmch86qqo0009rqxkdgv7tj4m', 'Hi, I will provide more info about vyoniq apps.', true, 'user_2yQbLBJukarNLRkMZ4okDc84wLh', '2025-06-29 06:01:41.974');
+INSERT INTO public."Payment" VALUES ('cmco892u60001rq035paw3son', 'cmco6hc430001rqzlfgm25ezp', NULL, 'cs_test_a1NEJf1YG7YWgiWtEdtFQpqaQKGTDyLDSbyUycXvQPodmE0le2diCnYWJ9', 550.00, 'USD', 'PENDING', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-07-04 03:00:46.877', '2025-07-04 03:00:46.877');
+INSERT INTO public."Payment" VALUES ('cmco9wej30001rq95fzesgizq', 'cmco6hc430001rqzlfgm25ezp', 'pi_3Rh0b1PeTGX8Odpe0O03tgn0', 'cs_test_a1udo8HeovLwnEzE68fQxcq0OhxMor2XJV8OEKTxjZ8SECwEdBGdAiU2FS', 550.00, 'USD', 'SUCCEEDED', 'card', '2025-07-04 03:47:33.217', NULL, NULL, NULL, NULL, '{"id": "cs_test_a1udo8HeovLwnEzE68fQxcq0OhxMor2XJV8OEKTxjZ8SECwEdBGdAiU2FS", "url": null, "mode": "payment", "locale": null, "object": "checkout.session", "status": "complete", "consent": null, "created": 1751600814, "invoice": null, "ui_mode": "hosted", "currency": "usd", "customer": null, "livemode": false, "metadata": {"userId": "user_2yQbLBJukarNLRkMZ4okDc84wLh", "budgetId": "cmco6hc430001rqzlfgm25ezp", "inquiryId": "cmch86qqo0009rqxkdgv7tj4m"}, "discounts": [], "cancel_url": "http://localhost:3000/dashboard/budgets/cmco6hc430001rqzlfgm25ezp", "expires_at": 1751687214, "custom_text": {"submit": null, "after_submit": null, "shipping_address": null, "terms_of_service_acceptance": null}, "permissions": null, "submit_type": null, "success_url": "http://localhost:3000/dashboard/payments/success?session_id={CHECKOUT_SESSION_ID}", "amount_total": 55000, "payment_link": null, "setup_intent": null, "subscription": null, "automatic_tax": {"status": null, "enabled": false, "provider": null, "liability": null}, "client_secret": null, "custom_fields": [], "shipping_cost": null, "total_details": {"amount_tax": 0, "amount_discount": 0, "amount_shipping": 0}, "customer_email": "jgongora@gmail.com", "origin_context": null, "payment_intent": "pi_3Rh0b1PeTGX8Odpe0O03tgn0", "payment_status": "paid", "recovered_from": null, "wallet_options": null, "amount_subtotal": 55000, "adaptive_pricing": {"enabled": true}, "after_expiration": null, "customer_details": {"name": "424242424242", "email": "jgongora@gmail.com", "phone": null, "address": {"city": "424242", "line1": "424242", "line2": "424242422", "state": "KY", "country": "US", "postal_code": "42424"}, "tax_ids": [], "tax_exempt": "none"}, "invoice_creation": {"enabled": false, "invoice_data": {"footer": null, "issuer": null, "metadata": {}, "description": null, "custom_fields": null, "account_tax_ids": null, "rendering_options": null}}, "shipping_options": [], "customer_creation": "if_required", "consent_collection": null, "client_reference_id": null, "currency_conversion": null, "payment_method_types": ["card"], "allow_promotion_codes": null, "collected_information": {"shipping_details": {"name": "424242424242", "address": {"city": "424242", "line1": "424242", "line2": "424242422", "state": "KY", "country": "US", "postal_code": "42424"}}}, "payment_method_options": {"card": {"request_three_d_secure": "automatic"}}, "phone_number_collection": {"enabled": false}, "payment_method_collection": "if_required", "billing_address_collection": "required", "shipping_address_collection": {"allowed_countries": ["US", "CA", "GB", "AU", "DE", "FR", "ES", "IT"]}, "saved_payment_method_options": null, "payment_method_configuration_details": null}', '2025-07-04 03:46:54.734', '2025-07-04 03:47:33.219');
+INSERT INTO public._prisma_migrations VALUES ('75a24d4d-9133-4cd5-a732-23aa1fe92748', '71ff0f569f6301bd654a86512548eab34452e7f9026b2382e9fe3154fa005011', '2025-07-04 02:35:01.263795+00', '20250703193433_baseline', '', NULL, '2025-07-04 02:35:01.263795+00', 0);
