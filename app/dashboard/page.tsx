@@ -260,23 +260,43 @@ export default async function UserDashboard() {
           </CardContent>
         </Card>
 
-        {/* Future Services Section */}
+        {/* Services & Budgets Section */}
         <Card className="mb-8">
           <CardHeader>
-            <CardTitle>Your Services</CardTitle>
+            <CardTitle>Your Services & Budgets</CardTitle>
             <CardDescription>
-              Manage your purchased services and applications.
+              Manage your budgets, payments, and purchased services.
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-center py-12">
-              <p className="text-vyoniq-text dark:text-vyoniq-dark-text mb-4">
-                No services purchased yet. This section will display your
-                purchased services and applications in the future.
-              </p>
-              <Button asChild variant="outline">
-                <Link href="/services">Explore Our Services</Link>
-              </Button>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="text-center p-6 border rounded-lg">
+                <h3 className="font-semibold text-vyoniq-blue dark:text-white mb-2">
+                  Project Budgets
+                </h3>
+                <p className="text-sm text-vyoniq-text dark:text-vyoniq-dark-text mb-4">
+                  View and manage budgets for your projects, approve quotes, and make payments.
+                </p>
+                <Button asChild>
+                  <Link href="/dashboard/budgets">
+                    View Budgets
+                  </Link>
+                </Button>
+              </div>
+              
+              <div className="text-center p-6 border rounded-lg">
+                <h3 className="font-semibold text-vyoniq-blue dark:text-white mb-2">
+                  Our Services
+                </h3>
+                <p className="text-sm text-vyoniq-text dark:text-vyoniq-dark-text mb-4">
+                  Explore our full range of AI-powered development and hosting services.
+                </p>
+                <Button asChild variant="outline">
+                  <Link href="/services">
+                    Explore Services
+                  </Link>
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
