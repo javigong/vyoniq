@@ -5,9 +5,30 @@ import { MCPTool, MCPToolResult, MCPAuthContext } from "../types";
 
 // Schemas
 const ListInquiriesSchema = z.object({
-  status: z.enum(["PENDING", "IN_PROGRESS", "RESOLVED", "CLOSED"]).optional(),
-  limit: z.number().min(1).max(100).default(20),
-  offset: z.number().min(0).default(0),
+  status: z
+    .enum(["PENDING", "IN_PROGRESS", "RESOLVED", "CLOSED"])
+    .optional()
+    .describe("Filter by inquiry status"),
+  serviceType: z.string().optional().describe("Filter by service type"),
+  hasAccount: z
+    .boolean()
+    .optional()
+    .describe("Filter by whether the inquiry has an associated user account"),
+  limit: z
+    .number()
+    .int()
+    .positive()
+    .max(100)
+    .optional()
+    .default(50)
+    .describe("Maximum number of inquiries to return"),
+  offset: z
+    .number()
+    .int()
+    .min(0)
+    .optional()
+    .default(0)
+    .describe("Number of inquiries to skip"),
 });
 
 const GetInquirySchema = z.object({
@@ -72,6 +93,49 @@ export const listInquiriesTool: MCPTool = {
   zodSchema: ListInquiriesSchema,
 };
 
+interface InquiryWithIncludes {
+  id: string;
+  name: string;
+  email: string;
+  serviceType: string;
+  message: string;
+  status: string;
+  createdAt: Date;
+  updatedAt: Date;
+  userId: string | null;
+  user?: {
+    id: string;
+    name: string;
+    email: string;
+  } | null;
+  _count: {
+    messages: number;
+  };
+}
+
+interface InquiryWithMessages {
+  id: string;
+  name: string;
+  email: string;
+  serviceType: string;
+  message: string;
+  status: string;
+  createdAt: Date;
+  updatedAt: Date;
+  userId: string | null;
+  user?: {
+    id: string;
+    name: string;
+    email: string;
+  } | null;
+  messages: Array<{
+    id: string;
+    message: string;
+    isFromAdmin: boolean;
+    createdAt: Date;
+  }>;
+}
+
 export async function listInquiriesHandler(
   args: unknown,
   auth: MCPAuthContext
@@ -81,16 +145,16 @@ export async function listInquiriesHandler(
       return createErrorResponse("Unauthorized: Admin access required");
     }
 
-    const validatedArgs = ListInquiriesSchema.parse(args || {});
-    const { status, limit, offset } = validatedArgs;
+    const filters = ListInquiriesSchema.parse(args);
 
-    const where: any = {};
-    if (status) {
-      where.status = status;
-    }
-
-    const inquiries = await prisma.inquiry.findMany({
-      where,
+    const inquiries = (await prisma.inquiry.findMany({
+      where: {
+        ...(filters.status && { status: filters.status }),
+        ...(filters.serviceType && { serviceType: filters.serviceType }),
+        ...(filters.hasAccount !== undefined && {
+          userId: filters.hasAccount ? { not: null } : null,
+        }),
+      },
       include: {
         user: {
           select: {
@@ -108,30 +172,24 @@ export async function listInquiriesHandler(
       orderBy: {
         createdAt: "desc",
       },
-      take: limit,
-      skip: offset,
+      take: filters.limit,
+      skip: filters.offset,
+    })) as InquiryWithIncludes[];
+
+    const inquiryList = inquiries.map((inquiry) => {
+      const hasAccount = inquiry.user ? " (Has Account)" : "";
+      return `${inquiry.id} - ${inquiry.name} (${
+        inquiry.email
+      }${hasAccount}) - ${inquiry.serviceType} - Status: ${
+        inquiry.status
+      } - Messages: ${
+        inquiry._count.messages
+      } - Created: ${inquiry.createdAt.toLocaleDateString()}`;
     });
 
-    const totalCount = await prisma.inquiry.count({ where });
-
-    const inquiryList = inquiries
-      .map((inquiry) => {
-        const hasAccount = inquiry.user ? " (Has Account)" : "";
-        return `${inquiry.id}: "${inquiry.name}" <${
-          inquiry.email
-        }>${hasAccount} - ${inquiry.serviceType} - Status: ${
-          inquiry.status
-        } - Messages: ${inquiry._count.messages} - Created: ${
-          inquiry.createdAt.toISOString().split("T")[0]
-        }`;
-      })
-      .join("\n");
-
-    const summary = `Found ${inquiries.length} inquiries (${totalCount} total)${
-      status ? ` with status: ${status}` : ""
-    }\n\n${inquiryList}`;
-
-    return createSuccessResponse(summary);
+    return createSuccessResponse(
+      `Found ${inquiries.length} inquiries:\n\n${inquiryList.join("\n")}`
+    );
   } catch (error) {
     console.error("Error listing inquiries:", error);
     return createErrorResponse(
@@ -162,7 +220,7 @@ export async function getInquiryHandler(
 
     const data = GetInquirySchema.parse(args);
 
-    const inquiry = await prisma.inquiry.findUnique({
+    const inquiry = (await prisma.inquiry.findUnique({
       where: { id: data.id },
       include: {
         user: {
@@ -178,7 +236,7 @@ export async function getInquiryHandler(
           },
         },
       },
-    });
+    })) as InquiryWithMessages | null;
 
     if (!inquiry) {
       return createErrorResponse(`Inquiry with ID '${data.id}' not found`);
@@ -186,37 +244,36 @@ export async function getInquiryHandler(
 
     const hasAccount = inquiry.user
       ? `\n**User Account:** ${inquiry.user.name} (${inquiry.user.id})`
-      : "\n**User Account:** No account linked";
+      : "";
 
     const conversationHistory = inquiry.messages
       .map((msg) => {
-        const author = msg.isFromAdmin ? "Admin" : inquiry.name;
-        const timestamp = msg.createdAt.toISOString();
-        return `[${timestamp}] ${author}: ${msg.message}`;
+        const sender = msg.isFromAdmin ? "Admin" : "User";
+        const timestamp = new Date(msg.createdAt).toLocaleString();
+        return `**${sender}** (${timestamp}):\n${msg.message}\n`;
       })
       .join("\n");
 
-    const inquiryDetails = `# Inquiry Details
+    const response = `
+**Inquiry Details:**
+- **ID:** ${inquiry.id}
+- **Name:** ${inquiry.name}
+- **Email:** ${inquiry.email}
+- **Service Type:** ${inquiry.serviceType}
+- **Status:** ${inquiry.status}
+- **Created:** ${inquiry.createdAt.toLocaleString()}
+- **Updated:** ${inquiry.updatedAt.toLocaleString()}${hasAccount}
 
-**ID:** ${inquiry.id}
-**Customer:** ${inquiry.name}
-**Email:** ${inquiry.email}${hasAccount}
-**Service Type:** ${inquiry.serviceType}
-**Status:** ${inquiry.status}
-**Created:** ${inquiry.createdAt.toISOString()}
-**Last Updated:** ${inquiry.updatedAt.toISOString()}
-**Total Messages:** ${inquiry.messages.length}
-
-## Original Message
+**Original Message:**
 ${inquiry.message}
 
-## Conversation History
-${conversationHistory || "No additional messages"}
+**Total Messages:** ${inquiry.messages.length}
 
----
-**Last Updated:** ${new Date().toISOString()}`;
+**Conversation History:**
+${conversationHistory || "No messages yet."}
+    `.trim();
 
-    return createSuccessResponse(inquiryDetails);
+    return createSuccessResponse(response);
   } catch (error) {
     console.error("Error getting inquiry:", error);
     return createErrorResponse(
@@ -514,8 +571,6 @@ export async function deleteUserAccountHandler(
         _count: {
           select: {
             inquiries: true,
-            inquiryMessages: true,
-            blogPosts: true,
           },
         },
       },
@@ -553,8 +608,6 @@ export async function deleteUserAccountHandler(
 **Deleted data:**
 - User profile
 - ${user._count.inquiries} inquiries
-- ${user._count.inquiryMessages} inquiry messages  
-- ${user._count.blogPosts} blog posts
 
 **Note:** The user's Clerk account still exists and would need to be deleted separately if required.`;
 
