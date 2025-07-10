@@ -25,216 +25,247 @@ export default async function DebugAuth() {
 
   return (
     <div className="min-h-screen bg-gray-100 py-12 px-4">
-      <div className="max-w-2xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8">Authentication Debug</h1>
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-3xl font-bold mb-8">🔍 Authentication Debug</h1>
 
+        {/* Runtime URL Check */}
         <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-xl font-semibold mb-4">Environment Detection</h2>
-          <div className="space-y-2">
-            <p>
-              <strong>NODE_ENV:</strong> {process.env.NODE_ENV || "undefined"}
-            </p>
-            <p>
-              <strong>VERCEL_ENV:</strong>{" "}
-              {process.env.VERCEL_ENV || "undefined"}
-            </p>
-            <p>
-              <strong>NEXT_PUBLIC_VERCEL_ENV:</strong>{" "}
-              {process.env.NEXT_PUBLIC_VERCEL_ENV || "undefined"}
-            </p>
-            <p>
-              <strong>Is Production Detected:</strong>{" "}
-              <span
-                className={
-                  isProduction
-                    ? "text-green-600 font-bold"
-                    : "text-red-600 font-bold"
-                }
-              >
-                {isProduction ? "YES" : "NO"}
-              </span>
-            </p>
-            <p>
-              <strong>NEXT_PUBLIC_BASE_URL:</strong>{" "}
-              {process.env.NEXT_PUBLIC_BASE_URL || "undefined"}
-            </p>
-          </div>
-        </div>
+          <h2 className="text-xl font-semibold mb-4">🚨 Runtime URL Check</h2>
+          <div className="space-y-3">
+            <div className="p-4 bg-blue-50 rounded">
+              <p className="font-semibold text-blue-800">
+                Current Runtime URLs:
+              </p>
+              <div className="mt-2 space-y-1 text-sm">
+                <div>
+                  getBaseUrl():{" "}
+                  <span className="font-mono bg-gray-100 px-2 py-1 rounded">
+                    {getBaseUrl()}
+                  </span>
+                </div>
+                <div>
+                  getClerkBaseUrl():{" "}
+                  <span className="font-mono bg-gray-100 px-2 py-1 rounded">
+                    {getClerkBaseUrl()}
+                  </span>
+                </div>
+              </div>
+            </div>
 
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-xl font-semibold mb-4">URL Function Results</h2>
-          <div className="space-y-2">
-            <p>
-              <strong>getBaseUrl():</strong>{" "}
-              <span
-                className={
-                  getBaseUrl().includes("localhost")
-                    ? "text-red-600 font-bold"
-                    : "text-green-600"
-                }
-              >
-                {getBaseUrl()}
-              </span>
-            </p>
-            <p>
-              <strong>getClerkBaseUrl():</strong>{" "}
-              <span
-                className={
-                  getClerkBaseUrl().includes("localhost")
-                    ? "text-red-600 font-bold"
-                    : "text-green-600"
-                }
-              >
-                {getClerkBaseUrl()}
-              </span>
-            </p>
+            <div className="p-4 bg-yellow-50 rounded">
+              <p className="font-semibold text-yellow-800">
+                Expected Production URLs:
+              </p>
+              <div className="mt-2 space-y-1 text-sm">
+                <div>
+                  Should be:{" "}
+                  <span className="font-mono bg-gray-100 px-2 py-1 rounded">
+                    https://vyoniq.com
+                  </span>
+                </div>
+                <div>
+                  Redirect should be:{" "}
+                  <span className="font-mono bg-gray-100 px-2 py-1 rounded">
+                    https://vyoniq.com/dashboard
+                  </span>
+                </div>
+              </div>
+            </div>
+
             {(getBaseUrl().includes("localhost") ||
               getClerkBaseUrl().includes("localhost")) && (
-              <div className="bg-red-50 border border-red-200 rounded p-4 mt-4">
-                <p className="text-red-800 font-semibold">🚨 PROBLEM FOUND!</p>
-                <p className="text-red-700">
-                  URL functions are returning localhost URLs. This is likely the
-                  source of your redirect issue.
+              <div className="p-4 bg-red-50 border border-red-200 rounded">
+                <p className="font-semibold text-red-800">
+                  ❌ LOCALHOST DETECTED IN PRODUCTION!
                 </p>
-                <ul className="list-disc ml-6 mt-2 text-red-700">
-                  <li>
-                    Set NEXT_PUBLIC_BASE_URL=https://vyoniq.com in production
-                  </li>
-                  <li>Set NODE_ENV=production in production environment</li>
-                  <li>
-                    Verify production environment variables are properly set
-                  </li>
-                </ul>
+                <p className="text-red-700 mt-2">
+                  This is the source of your redirect issue. The URL functions
+                  are returning localhost URLs in production.
+                </p>
               </div>
             )}
           </div>
         </div>
 
+        {/* Environment Detection */}
         <div className="bg-white rounded-lg shadow p-6 mb-6">
           <h2 className="text-xl font-semibold mb-4">
-            Clerk Environment Variables
+            📋 Environment Detection
           </h2>
-          <div className="space-y-2">
-            <p>
-              <strong>NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY:</strong>{" "}
-              {process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
-                ? `${process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY.substring(
-                    0,
-                    20
-                  )}...`
-                : "undefined"}
-            </p>
-            <p>
-              <strong>CLERK_SECRET_KEY:</strong>{" "}
-              {process.env.CLERK_SECRET_KEY ? "Set (hidden)" : "undefined"}
-            </p>
-            <p>
-              <strong>Environment:</strong>{" "}
-              {process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.includes("_test_")
-                ? "Development/Test"
-                : process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.includes(
-                    "_live_"
-                  )
-                ? "Production/Live"
-                : "Unknown"}
-            </p>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-xl font-semibold mb-4">Clerk Auth Status</h2>
-          <div className="space-y-2">
-            <p>
-              <strong>User ID:</strong> {userId || "Not authenticated"}
-            </p>
-            <p>
-              <strong>Has User Record:</strong> {user ? "Yes" : "No"}
-            </p>
-            {user && (
-              <>
-                <p>
-                  <strong>Email:</strong> {user.email}
-                </p>
-                <p>
-                  <strong>Is Admin:</strong> {user.isAdmin ? "Yes" : "No"}
-                </p>
-                <p>
-                  <strong>Is On Waitlist:</strong>{" "}
-                  {user.isOnWaitlist ? "Yes" : "No"}
-                </p>
-              </>
-            )}
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-xl font-semibold mb-4">
-            Expected vs Actual Redirect URLs
-          </h2>
-          <div className="space-y-2">
-            <p>
-              <strong>Expected Production URLs:</strong>
-            </p>
-            <ul className="list-disc ml-6 text-green-600">
-              <li>Sign-in redirect: https://vyoniq.com/dashboard</li>
-              <li>Sign-up redirect: https://vyoniq.com/dashboard</li>
-              <li>Base URL: https://vyoniq.com</li>
-            </ul>
-            <p className="mt-4">
-              <strong>Current Clerk Redirects:</strong>
-            </p>
-            <ul className="list-disc ml-6">
-              <li>
-                <span
-                  className={
-                    getClerkBaseUrl().includes("localhost")
-                      ? "text-red-600 font-bold"
-                      : "text-green-600"
-                  }
-                >
-                  {getClerkBaseUrl()}/dashboard
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <p>
+                <strong>NODE_ENV:</strong>{" "}
+                <span className="font-mono bg-gray-100 px-2 py-1 rounded">
+                  {process.env.NODE_ENV || "undefined"}
                 </span>
-              </li>
-            </ul>
+              </p>
+              <p>
+                <strong>VERCEL_ENV:</strong>{" "}
+                <span className="font-mono bg-gray-100 px-2 py-1 rounded">
+                  {process.env.VERCEL_ENV || "undefined"}
+                </span>
+              </p>
+              <p>
+                <strong>NEXT_PUBLIC_VERCEL_ENV:</strong>{" "}
+                <span className="font-mono bg-gray-100 px-2 py-1 rounded">
+                  {process.env.NEXT_PUBLIC_VERCEL_ENV || "undefined"}
+                </span>
+              </p>
+            </div>
+            <div className="space-y-2">
+              <p>
+                <strong>Production Detected:</strong>{" "}
+                <span
+                  className={`font-mono px-2 py-1 rounded ${
+                    isProduction
+                      ? "bg-green-100 text-green-800"
+                      : "bg-red-100 text-red-800"
+                  }`}
+                >
+                  {isProduction ? "YES" : "NO"}
+                </span>
+              </p>
+              <p>
+                <strong>NEXT_PUBLIC_BASE_URL:</strong>{" "}
+                <span className="font-mono bg-gray-100 px-2 py-1 rounded">
+                  {process.env.NEXT_PUBLIC_BASE_URL || "undefined"}
+                </span>
+              </p>
+            </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">Fix Instructions</h2>
+        {/* Authentication Status */}
+        <div className="bg-white rounded-lg shadow p-6 mb-6">
+          <h2 className="text-xl font-semibold mb-4">
+            👤 Authentication Status
+          </h2>
           <div className="space-y-2">
-            <h3 className="font-semibold text-lg">
-              1. Set Production Environment Variables:
-            </h3>
-            <div className="bg-gray-100 p-3 rounded font-mono text-sm space-y-1">
-              <div>NODE_ENV=production</div>
-              <div>NEXT_PUBLIC_BASE_URL=https://vyoniq.com</div>
+            <p>
+              <strong>User ID:</strong>{" "}
+              <span className="font-mono bg-gray-100 px-2 py-1 rounded">
+                {userId || "Not authenticated"}
+              </span>
+            </p>
+            <p>
+              <strong>Database User:</strong>{" "}
+              <span className="font-mono bg-gray-100 px-2 py-1 rounded">
+                {user ? `${user.email} (Admin: ${user.isAdmin})` : "Not found"}
+              </span>
+            </p>
+          </div>
+        </div>
+
+        {/* Clerk Environment Variables */}
+        <div className="bg-white rounded-lg shadow p-6 mb-6">
+          <h2 className="text-xl font-semibold mb-4">🔑 Clerk Configuration</h2>
+          <div className="space-y-2">
+            <p>
+              <strong>Publishable Key:</strong>{" "}
+              <span className="font-mono bg-gray-100 px-2 py-1 rounded">
+                {process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.slice(0, 20) +
+                  "..." || "Not set"}
+              </span>
+            </p>
+            <p>
+              <strong>Secret Key:</strong>{" "}
+              <span className="font-mono bg-gray-100 px-2 py-1 rounded">
+                {process.env.CLERK_SECRET_KEY
+                  ? "***" + process.env.CLERK_SECRET_KEY.slice(-10)
+                  : "Not set"}
+              </span>
+            </p>
+            <p>
+              <strong>Key Environment:</strong>{" "}
+              <span className="font-mono bg-gray-100 px-2 py-1 rounded">
+                {process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.includes(
+                  "_test_"
+                )
+                  ? "TEST"
+                  : process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.includes(
+                      "_live_"
+                    )
+                  ? "LIVE"
+                  : "UNKNOWN"}
+              </span>
+            </p>
+          </div>
+        </div>
+
+        {/* Clerk Dashboard Issues */}
+        <div className="bg-white rounded-lg shadow p-6 mb-6">
+          <h2 className="text-xl font-semibold mb-4">
+            🚨 Possible Issues & Solutions
+          </h2>
+          <div className="space-y-4">
+            <div className="p-4 bg-red-50 border border-red-200 rounded">
+              <h3 className="font-semibold text-red-800 mb-2">
+                1. Browser/Session Cache Issue
+              </h3>
+              <p className="text-red-700 mb-2">
+                Clerk might be caching old redirect URLs in browser storage.
+              </p>
+              <div className="bg-red-100 p-3 rounded text-sm">
+                <p className="font-semibold">Fix:</p>
+                <ul className="list-disc ml-4 mt-1">
+                  <li>Clear all browser data for your site</li>
+                  <li>Try incognito/private browsing mode</li>
+                  <li>Clear localStorage and sessionStorage</li>
+                </ul>
+              </div>
             </div>
 
-            <h3 className="font-semibold text-lg mt-4">
-              2. Clerk Dashboard Configuration:
-            </h3>
-            <ul className="list-disc ml-6">
-              <li>Go to Clerk Dashboard → Configure → Restrictions</li>
-              <li>Add to "Allowed redirect origins": https://vyoniq.com</li>
-              <li>Remove any localhost entries from production</li>
-            </ul>
+            <div className="p-4 bg-yellow-50 border border-yellow-200 rounded">
+              <h3 className="font-semibold text-yellow-800 mb-2">
+                2. Clerk Dashboard Configuration
+              </h3>
+              <p className="text-yellow-700 mb-2">
+                Check your Clerk Dashboard settings:
+              </p>
+              <div className="bg-yellow-100 p-3 rounded text-sm">
+                <p className="font-semibold">
+                  Go to Clerk Dashboard → Configure → Restrictions:
+                </p>
+                <ul className="list-disc ml-4 mt-1">
+                  <li>
+                    Allowed redirect origins: <code>https://vyoniq.com</code>
+                  </li>
+                  <li>Remove any localhost entries from production</li>
+                  <li>Check "Paths" section for any localhost URLs</li>
+                </ul>
+              </div>
+            </div>
 
-            <h3 className="font-semibold text-lg mt-4">
-              3. Verify Domain Settings:
-            </h3>
-            <ul className="list-disc ml-6">
-              <li>Authorized domains: vyoniq.com</li>
-              <li>After sign-in URL: /dashboard</li>
-              <li>After sign-up URL: /dashboard</li>
-            </ul>
+            <div className="p-4 bg-blue-50 border border-blue-200 rounded">
+              <h3 className="font-semibold text-blue-800 mb-2">
+                3. Environment Variables
+              </h3>
+              <p className="text-blue-700 mb-2">
+                Ensure production environment has:
+              </p>
+              <div className="bg-blue-100 p-3 rounded text-sm font-mono">
+                <div>NODE_ENV=production</div>
+                <div>NEXT_PUBLIC_BASE_URL=https://vyoniq.com</div>
+                <div>NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_live_...</div>
+                <div>CLERK_SECRET_KEY=sk_live_...</div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-            <h3 className="font-semibold text-lg mt-4">4. Recent Updates:</h3>
-            <ul className="list-disc ml-6 text-blue-600">
-              <li>✅ Updated URL functions to handle client/server contexts</li>
-              <li>✅ Added absolute URLs for Clerk redirects</li>
-              <li>✅ Improved production environment detection</li>
-              <li>✅ Enhanced middleware configuration</li>
-            </ul>
+        {/* Client-Side Debug */}
+        <div className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-xl font-semibold mb-4">
+            🔍 Client-Side Debug Test
+          </h2>
+          <div className="p-4 bg-gray-50 rounded">
+            <p className="text-sm mb-2">Open browser console and run:</p>
+            <code className="block bg-gray-800 text-green-400 p-3 rounded text-sm">
+              {`console.log('window.location.origin:', window.location.origin);
+console.log('localStorage:', localStorage);
+console.log('sessionStorage:', sessionStorage);`}
+            </code>
           </div>
         </div>
       </div>
