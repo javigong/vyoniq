@@ -1,6 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
+import type { BlogCategory } from "@/lib/generated/prisma";
+
+type BlogCategoryWithCount = BlogCategory & {
+  _count: {
+    blogPosts: number;
+  };
+};
 
 // Helper function to check admin access
 async function checkAdminAccess() {
@@ -32,7 +39,7 @@ export async function GET() {
       );
     }
 
-    const categories = await prisma.blogCategory.findMany({
+    const categories = (await prisma.blogCategory.findMany({
       include: {
         _count: {
           select: {
@@ -43,7 +50,7 @@ export async function GET() {
       orderBy: {
         name: "asc",
       },
-    });
+    })) as BlogCategoryWithCount[];
 
     const transformedCategories = categories.map((category) => ({
       id: category.id,
@@ -116,7 +123,7 @@ export async function POST(request: NextRequest) {
           },
         },
       },
-    });
+    }) as BlogCategoryWithCount;
 
     const transformedCategory = {
       id: newCategory.id,
