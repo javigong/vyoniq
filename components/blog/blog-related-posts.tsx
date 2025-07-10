@@ -1,9 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
-import type { BlogPost } from "@/lib/blog-utils";
+import type { BlogPostFormatted } from "@/lib/blog-utils";
 
 interface BlogRelatedPostsProps {
-  posts: BlogPost[];
+  posts: BlogPostFormatted[];
 }
 
 export function BlogRelatedPosts({ posts }: BlogRelatedPostsProps) {
