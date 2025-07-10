@@ -1,9 +1,9 @@
 import { SignUp } from "@clerk/nextjs";
 import { Suspense } from "react";
-import { getClerkBaseUrl } from "@/lib/utils";
+import { getBaseUrl } from "@/lib/utils";
 
 function SignUpContent() {
-  const baseUrl = getClerkBaseUrl();
+  const baseUrl = getBaseUrl();
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50">
