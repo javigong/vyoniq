@@ -1,5 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import type {
+  BlogPost,
+  BlogAuthor,
+  BlogCategory,
+  BlogPostCategory,
+} from "@/lib/generated/prisma";
+
+type BlogPostWithIncludes = BlogPost & {
+  author: BlogAuthor;
+  categories: (BlogPostCategory & {
+    category: BlogCategory;
+  })[];
+};
 
 export async function GET(request: NextRequest) {
   try {
@@ -38,7 +51,7 @@ export async function GET(request: NextRequest) {
       where.featured = true;
     }
 
-    const posts = await prisma.blogPost.findMany({
+    const posts = (await prisma.blogPost.findMany({
       where,
       include: {
         author: true,
@@ -51,7 +64,7 @@ export async function GET(request: NextRequest) {
       orderBy: {
         publishDate: "desc",
       },
-    });
+    })) as BlogPostWithIncludes[];
 
     // Transform the data to match the frontend format
     const transformedPosts = posts.map((post) => ({
