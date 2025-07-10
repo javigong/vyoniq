@@ -5,7 +5,11 @@ import { BlogRelatedPosts } from "@/components/blog/blog-related-posts";
 import { BlogShareButtons } from "@/components/blog/blog-share-buttons";
 import { Badge } from "@/components/ui/badge";
 import { CalendarIcon, Clock } from "lucide-react";
-import { getBlogPosts, getBlogPostBySlug, BlogPost } from "@/lib/blog-utils";
+import {
+  getBlogPosts,
+  getBlogPostBySlug,
+  BlogPostFormatted,
+} from "@/lib/blog-utils";
 import { NewsletterFormBlog } from "@/components/newsletter-form-blog";
 import Image from "next/image";
 import { notFound } from "next/navigation";
