@@ -32,11 +32,7 @@ interface AdminNewsletterSectionProps {
   newsletters: Newsletter[];
 }
 
-const initialState = {
-  error: null,
-  success: null,
-  newsletterId: null,
-};
+const initialState: { error?: string; success?: string; newsletterId?: string } = {};
 
 function CreateNewsletterButton() {
   const { pending } = useFormStatus();
