@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { Resend } from "resend";
+import { getBaseUrl } from "@/lib/utils";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -85,9 +86,9 @@ export async function POST(request: NextRequest) {
               </ul>
               
               <div style="text-align: center; margin: 30px 0;">
-                <a href="${
-                  process.env.NEXT_PUBLIC_BASE_URL || "https://vyoniq.com"
-                }/sign-up?email=${encodeURIComponent(email)}" 
+                <a href="${getBaseUrl()}/sign-up?email=${encodeURIComponent(
+          email
+        )}" 
                    style="background: #10B981; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block; transition: background 0.3s;">
                   Create Your Account
                 </a>
