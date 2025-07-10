@@ -34,7 +34,8 @@ export async function DELETE(request: NextRequest) {
     });
 
     // Delete the user from Clerk
-    await clerkClient().users.deleteUser(userId);
+    const clerk = await clerkClient();
+    await clerk.users.deleteUser(userId);
 
     return NextResponse.json({
       success: true,
