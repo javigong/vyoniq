@@ -6,14 +6,11 @@ import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { BlogCard } from "@/components/blog/blog-card";
 import { BlogCategoryFilter } from "@/components/blog/blog-category-filter";
-import { BlogPost } from "@/lib/blog-utils";
+import { BlogPostFormatted } from "@/lib/blog-utils";
 import { subscribeToNewsletter } from "@/lib/actions";
 import { toast } from "sonner";
 
-const initialState = {
-  error: null,
-  success: null,
-};
+const initialState: { error?: string; success?: string } = {};
 
 function NewsletterSubmitButton() {
   const { pending } = useFormStatus();
@@ -31,7 +28,7 @@ function NewsletterSubmitButton() {
 export default function BlogClientPage() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
-  const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
+  const [blogPosts, setBlogPosts] = useState<BlogPostFormatted[]>([]);
   const [loading, setLoading] = useState(true);
   const [state, formAction] = useActionState(
     subscribeToNewsletter,
