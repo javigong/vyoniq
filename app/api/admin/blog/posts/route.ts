@@ -1,6 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
+import type {
+  BlogPost,
+  BlogAuthor,
+  BlogCategory,
+  BlogPostCategory,
+} from "@/lib/generated/prisma";
+
+type BlogPostWithIncludes = BlogPost & {
+  author: BlogAuthor;
+  categories: (BlogPostCategory & {
+    category: BlogCategory;
+  })[];
+};
 
 // Helper function to check admin access
 async function checkAdminAccess() {
@@ -32,7 +45,7 @@ export async function GET() {
       );
     }
 
-    const posts = await prisma.blogPost.findMany({
+    const posts = (await prisma.blogPost.findMany({
       include: {
         author: true,
         categories: {
@@ -44,7 +57,7 @@ export async function GET() {
       orderBy: {
         createdAt: "desc",
       },
-    });
+    })) as BlogPostWithIncludes[];
 
     const transformedPosts = posts.map((post) => ({
       id: post.id,
