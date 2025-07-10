@@ -59,7 +59,25 @@ Visit `https://vyoniq.com/debug-auth` to see:
    - After sign-up URL: `/dashboard`
 3. Set `NEXT_PUBLIC_BASE_URL` to your production domain
 
-### Issue 3: Middleware Authorization Issues
+### Issue 3: Allowed Redirect Origins Configuration
+
+**Symptoms:**
+
+- Console warning: "Redirect URL ... is not on one of the allowedRedirectOrigins"
+- Redirects falling back to default URL
+- Authentication flow redirecting to wrong pages
+
+**Solution:**
+
+1. In Clerk Dashboard, go to **Configure** → **Restrictions**
+2. Under **Allowed redirect origins**, add:
+   - `http://localhost:3000` (for development)
+   - `https://vyoniq.com` (for production)
+   - `https://www.vyoniq.com` (if using www subdomain)
+3. Save the configuration
+4. Test authentication flow again
+
+### Issue 4: Middleware Authorization Issues
 
 **Symptoms:**
 
@@ -73,7 +91,7 @@ Visit `https://vyoniq.com/debug-auth` to see:
 2. Check if middleware is properly protecting routes
 3. Ensure production domain is in `authorizedParties` array
 
-### Issue 4: Cookie and Session Issues
+### Issue 5: Cookie and Session Issues
 
 **Symptoms:**
 
@@ -88,7 +106,7 @@ Visit `https://vyoniq.com/debug-auth` to see:
 3. Check session lifetime settings
 4. Ensure proper cookie domain configuration
 
-### Issue 5: Webhook Configuration Issues
+### Issue 6: Webhook Configuration Issues
 
 **Symptoms:**
 
@@ -103,6 +121,23 @@ Visit `https://vyoniq.com/debug-auth` to see:
 3. Ensure `CLERK_WEBHOOK_SECRET` is correctly set
 4. Test webhook endpoints manually
 
+### Issue 7: Deprecated Props Warnings
+
+**Symptoms:**
+
+- Console warnings about deprecated `afterSignInUrl` and `afterSignUpUrl`
+- Warnings about prop priorities
+
+**Solution:**
+
+1. Replace deprecated props with new ones:
+   - `afterSignInUrl` → `forceRedirectUrl`
+   - `afterSignUpUrl` → `forceRedirectUrl`
+   - `signInFallbackRedirectUrl` → `signInForceRedirectUrl`
+   - `signUpFallbackRedirectUrl` → `signUpForceRedirectUrl`
+2. Remove conflicting props from ClerkProvider
+3. Use `forceRedirectUrl` for consistent redirects
+
 ## Production Checklist
 
 ### Environment Variables
@@ -115,6 +150,10 @@ Visit `https://vyoniq.com/debug-auth` to see:
 ### Clerk Dashboard Configuration
 
 - [ ] Authorized domains include production domain
+- [ ] **Allowed redirect origins** configured:
+  - [ ] `http://localhost:3000` (development)
+  - [ ] `https://vyoniq.com` (production)
+  - [ ] `https://www.vyoniq.com` (if using www)
 - [ ] Sign-in URL: `/sign-in`
 - [ ] Sign-up URL: `/sign-up`
 - [ ] After sign-in URL: `/dashboard`
@@ -127,8 +166,8 @@ Visit `https://vyoniq.com/debug-auth` to see:
 ### Code Configuration
 
 - [ ] `authorizedParties` in middleware includes production domain
-- [ ] `ClerkProvider` has proper configuration
-- [ ] Sign-in/Sign-up pages have correct routing
+- [ ] `ClerkProvider` has proper configuration (no deprecated props)
+- [ ] Sign-in/Sign-up pages use `forceRedirectUrl`
 - [ ] Protected routes are properly configured in middleware
 
 ## Testing Steps
@@ -204,6 +243,7 @@ Common error patterns:
 - `ClerkJS: Invalid publishable key` - Key configuration issue
 - `CORS policy` - Domain configuration issue
 - `Failed to fetch` - Network connectivity issue
+- `Redirect URL ... is not on one of the allowedRedirectOrigins` - Redirect origins configuration issue
 
 ### Clerk Dashboard Logs
 
