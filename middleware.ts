@@ -12,6 +12,12 @@ const isProtectedRoute = createRouteMatcher([
   "/api/mcp(.*)",
 ]);
 
+// Check if we're in production environment
+const isProduction =
+  process.env.NODE_ENV === "production" ||
+  process.env.VERCEL_ENV === "production" ||
+  process.env.NEXT_PUBLIC_VERCEL_ENV === "production";
+
 export default clerkMiddleware(
   async (auth, req) => {
     // Handle problematic Clerk handshake requests
@@ -46,10 +52,11 @@ export default clerkMiddleware(
   },
   {
     // Configure authorizedParties for production
-    authorizedParties:
-      process.env.NODE_ENV === "production"
-        ? ["vyoniq.com", "www.vyoniq.com"]
-        : [],
+    // This ensures Clerk recognizes your production domain
+    authorizedParties: isProduction ? ["vyoniq.com", "www.vyoniq.com"] : [],
+
+    // Enable debug mode in development for better error messages
+    debug: !isProduction,
   }
 );
 

@@ -1,5 +1,5 @@
 import { auth } from "@clerk/nextjs/server";
-import { getBaseUrl } from "@/lib/utils";
+import { getBaseUrl, getClerkBaseUrl } from "@/lib/utils";
 import prisma from "@/lib/prisma";
 
 export default async function DebugAuth() {
@@ -17,29 +17,96 @@ export default async function DebugAuth() {
     }
   }
 
+  // Check production environment detection
+  const isProduction =
+    process.env.NODE_ENV === "production" ||
+    process.env.VERCEL_ENV === "production" ||
+    process.env.NEXT_PUBLIC_VERCEL_ENV === "production";
+
   return (
     <div className="min-h-screen bg-gray-100 py-12 px-4">
       <div className="max-w-2xl mx-auto">
         <h1 className="text-3xl font-bold mb-8">Authentication Debug</h1>
 
         <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-xl font-semibold mb-4">Environment</h2>
+          <h2 className="text-xl font-semibold mb-4">Environment Detection</h2>
           <div className="space-y-2">
             <p>
               <strong>NODE_ENV:</strong> {process.env.NODE_ENV || "undefined"}
             </p>
             <p>
+              <strong>VERCEL_ENV:</strong>{" "}
+              {process.env.VERCEL_ENV || "undefined"}
+            </p>
+            <p>
+              <strong>NEXT_PUBLIC_VERCEL_ENV:</strong>{" "}
+              {process.env.NEXT_PUBLIC_VERCEL_ENV || "undefined"}
+            </p>
+            <p>
+              <strong>Is Production Detected:</strong>{" "}
+              <span
+                className={
+                  isProduction
+                    ? "text-green-600 font-bold"
+                    : "text-red-600 font-bold"
+                }
+              >
+                {isProduction ? "YES" : "NO"}
+              </span>
+            </p>
+            <p>
               <strong>NEXT_PUBLIC_BASE_URL:</strong>{" "}
               {process.env.NEXT_PUBLIC_BASE_URL || "undefined"}
             </p>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow p-6 mb-6">
+          <h2 className="text-xl font-semibold mb-4">URL Function Results</h2>
+          <div className="space-y-2">
             <p>
-              <strong>getBaseUrl():</strong> {getBaseUrl()}
+              <strong>getBaseUrl():</strong>{" "}
+              <span
+                className={
+                  getBaseUrl().includes("localhost")
+                    ? "text-red-600 font-bold"
+                    : "text-green-600"
+                }
+              >
+                {getBaseUrl()}
+              </span>
             </p>
-            <p className="text-red-600">
-              <strong>⚠️ Issue:</strong> If getBaseUrl() shows localhost in
-              production, set NEXT_PUBLIC_BASE_URL=https://vyoniq.com in your
-              production environment
+            <p>
+              <strong>getClerkBaseUrl():</strong>{" "}
+              <span
+                className={
+                  getClerkBaseUrl().includes("localhost")
+                    ? "text-red-600 font-bold"
+                    : "text-green-600"
+                }
+              >
+                {getClerkBaseUrl()}
+              </span>
             </p>
+            {(getBaseUrl().includes("localhost") ||
+              getClerkBaseUrl().includes("localhost")) && (
+              <div className="bg-red-50 border border-red-200 rounded p-4 mt-4">
+                <p className="text-red-800 font-semibold">🚨 PROBLEM FOUND!</p>
+                <p className="text-red-700">
+                  URL functions are returning localhost URLs. This is likely the
+                  source of your redirect issue.
+                </p>
+                <ul className="list-disc ml-6 mt-2 text-red-700">
+                  <li>
+                    Set NEXT_PUBLIC_BASE_URL=https://vyoniq.com in production
+                  </li>
+                  <li>Set NODE_ENV=production in production environment</li>
+                  <li>
+                    Verify production environment variables are properly set
+                  </li>
+                </ul>
+              </div>
+            )}
           </div>
         </div>
 
@@ -114,27 +181,21 @@ export default async function DebugAuth() {
               <li>Base URL: https://vyoniq.com</li>
             </ul>
             <p className="mt-4">
-              <strong>Current getBaseUrl():</strong>
-              <span
-                className={
-                  getBaseUrl().includes("localhost")
-                    ? "text-red-600 font-bold"
-                    : "text-green-600"
-                }
-              >
-                {getBaseUrl()}
-              </span>
+              <strong>Current Clerk Redirects:</strong>
             </p>
-            {getBaseUrl().includes("localhost") && (
-              <div className="bg-red-50 border border-red-200 rounded p-4 mt-4">
-                <p className="text-red-800 font-semibold">🚨 PROBLEM FOUND!</p>
-                <p className="text-red-700">
-                  Your production environment is using localhost URLs. Set
-                  NEXT_PUBLIC_BASE_URL=https://vyoniq.com in your production
-                  environment.
-                </p>
-              </div>
-            )}
+            <ul className="list-disc ml-6">
+              <li>
+                <span
+                  className={
+                    getClerkBaseUrl().includes("localhost")
+                      ? "text-red-600 font-bold"
+                      : "text-green-600"
+                  }
+                >
+                  {getClerkBaseUrl()}/dashboard
+                </span>
+              </li>
+            </ul>
           </div>
         </div>
 
@@ -142,10 +203,11 @@ export default async function DebugAuth() {
           <h2 className="text-xl font-semibold mb-4">Fix Instructions</h2>
           <div className="space-y-2">
             <h3 className="font-semibold text-lg">
-              1. Set Production Environment Variable:
+              1. Set Production Environment Variables:
             </h3>
-            <div className="bg-gray-100 p-3 rounded font-mono text-sm">
-              NEXT_PUBLIC_BASE_URL=https://vyoniq.com
+            <div className="bg-gray-100 p-3 rounded font-mono text-sm space-y-1">
+              <div>NODE_ENV=production</div>
+              <div>NEXT_PUBLIC_BASE_URL=https://vyoniq.com</div>
             </div>
 
             <h3 className="font-semibold text-lg mt-4">
@@ -164,6 +226,14 @@ export default async function DebugAuth() {
               <li>Authorized domains: vyoniq.com</li>
               <li>After sign-in URL: /dashboard</li>
               <li>After sign-up URL: /dashboard</li>
+            </ul>
+
+            <h3 className="font-semibold text-lg mt-4">4. Recent Updates:</h3>
+            <ul className="list-disc ml-6 text-blue-600">
+              <li>✅ Updated URL functions to handle client/server contexts</li>
+              <li>✅ Added absolute URLs for Clerk redirects</li>
+              <li>✅ Improved production environment detection</li>
+              <li>✅ Enhanced middleware configuration</li>
             </ul>
           </div>
         </div>

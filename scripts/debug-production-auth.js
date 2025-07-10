@@ -11,8 +11,25 @@ console.log("=".repeat(50));
 // Check Node.js environment
 console.log("\n📋 ENVIRONMENT CHECK:");
 console.log(`NODE_ENV: ${process.env.NODE_ENV || "undefined"}`);
+console.log(`VERCEL_ENV: ${process.env.VERCEL_ENV || "undefined"}`);
+console.log(
+  `NEXT_PUBLIC_VERCEL_ENV: ${process.env.NEXT_PUBLIC_VERCEL_ENV || "undefined"}`
+);
 console.log(`Platform: ${process.platform}`);
 console.log(`Node Version: ${process.version}`);
+
+// Check production environment detection
+console.log("\n🎯 PRODUCTION DETECTION:");
+const isProduction =
+  process.env.NODE_ENV === "production" ||
+  process.env.VERCEL_ENV === "production" ||
+  process.env.NEXT_PUBLIC_VERCEL_ENV === "production";
+
+console.log(`Is Production Detected: ${isProduction ? "YES" : "NO"}`);
+if (!isProduction && process.env.NODE_ENV !== "development") {
+  console.log(`⚠️  Production not detected - this might be the issue!`);
+  console.log(`   Set NODE_ENV=production in your production environment`);
+}
 
 // Check essential environment variables
 console.log("\n🔑 ENVIRONMENT VARIABLES:");
@@ -76,26 +93,55 @@ if (!baseUrl) {
   console.log(`   📝 Expected: https://vyoniq.com`);
 }
 
-// Simulate getBaseUrl function
-console.log("\n🔍 SIMULATED getBaseUrl() FUNCTION:");
+// Simulate both URL functions
+console.log("\n🔍 SIMULATED URL FUNCTIONS:");
+
+// getBaseUrl function
 function simulateGetBaseUrl() {
   if (process.env.NEXT_PUBLIC_BASE_URL) {
     return process.env.NEXT_PUBLIC_BASE_URL;
   }
-  return process.env.NODE_ENV === "production"
-    ? "https://vyoniq.com"
-    : "http://localhost:3000";
+
+  const isProduction =
+    process.env.NODE_ENV === "production" ||
+    process.env.VERCEL_ENV === "production" ||
+    process.env.NEXT_PUBLIC_VERCEL_ENV === "production";
+
+  return isProduction ? "https://vyoniq.com" : "http://localhost:3000";
+}
+
+// getClerkBaseUrl function
+function simulateGetClerkBaseUrl() {
+  if (
+    process.env.NODE_ENV === "production" ||
+    process.env.VERCEL_ENV === "production" ||
+    process.env.NEXT_PUBLIC_VERCEL_ENV === "production"
+  ) {
+    return "https://vyoniq.com";
+  }
+
+  return "http://localhost:3000";
 }
 
 const simulatedBaseUrl = simulateGetBaseUrl();
-console.log(`Result: ${simulatedBaseUrl}`);
-if (
-  simulatedBaseUrl.includes("localhost") &&
-  process.env.NODE_ENV === "production"
-) {
+const simulatedClerkBaseUrl = simulateGetClerkBaseUrl();
+
+console.log(`getBaseUrl(): ${simulatedBaseUrl}`);
+console.log(`getClerkBaseUrl(): ${simulatedClerkBaseUrl}`);
+
+if (simulatedBaseUrl.includes("localhost") && isProduction) {
   console.log(`❌ CRITICAL: getBaseUrl() returns localhost in production!`);
-} else {
-  console.log(`✅ getBaseUrl() returns correct URL`);
+}
+if (simulatedClerkBaseUrl.includes("localhost") && isProduction) {
+  console.log(
+    `❌ CRITICAL: getClerkBaseUrl() returns localhost in production!`
+  );
+}
+if (
+  !simulatedBaseUrl.includes("localhost") &&
+  !simulatedClerkBaseUrl.includes("localhost")
+) {
+  console.log(`✅ Both URL functions return correct production URLs`);
 }
 
 // Check Clerk configuration
@@ -114,6 +160,11 @@ if (missingVars.length > 0) {
   console.log(`❌ Missing environment variables: ${missingVars.join(", ")}`);
 }
 
+if (!isProduction && process.env.NODE_ENV !== "development") {
+  console.log(`❌ Production environment not detected!`);
+  console.log(`   🔧 Set NODE_ENV=production in your production environment`);
+}
+
 if (!process.env.NEXT_PUBLIC_BASE_URL) {
   console.log(`❌ NEXT_PUBLIC_BASE_URL not set - this is likely your issue!`);
   console.log(
@@ -130,10 +181,11 @@ console.log("\n📊 SUMMARY:");
 if (
   missingVars.length === 0 &&
   !hasClerkIssues &&
+  isProduction &&
   process.env.NEXT_PUBLIC_BASE_URL === "https://vyoniq.com"
 ) {
   console.log("✅ All configuration looks correct!");
-  console.log("   The issue might be in the Clerk Dashboard configuration.");
+  console.log("   If issues persist, check Clerk Dashboard configuration.");
   console.log(
     "   Check: https://dashboard.clerk.com → Configure → Restrictions"
   );
@@ -142,11 +194,18 @@ if (
 }
 
 console.log("\n🎯 IMMEDIATE ACTION ITEMS:");
-console.log("1. Set NEXT_PUBLIC_BASE_URL=https://vyoniq.com in production");
-console.log("2. Visit https://dashboard.clerk.com → Configure → Restrictions");
-console.log("3. Add https://vyoniq.com to 'Allowed redirect origins'");
-console.log("4. Remove any localhost entries from production Clerk config");
-console.log("5. Verify you're using LIVE Clerk keys (not TEST keys)");
+console.log("1. Set NODE_ENV=production in production environment");
+console.log("2. Set NEXT_PUBLIC_BASE_URL=https://vyoniq.com in production");
+console.log("3. Visit https://dashboard.clerk.com → Configure → Restrictions");
+console.log("4. Add https://vyoniq.com to 'Allowed redirect origins'");
+console.log("5. Remove any localhost entries from production Clerk config");
+console.log("6. Verify you're using LIVE Clerk keys (not TEST keys)");
+
+console.log("\n🚀 NEW IMPROVEMENTS:");
+console.log("✅ Updated URL functions to handle client/server contexts");
+console.log("✅ Added absolute URLs for Clerk redirects");
+console.log("✅ Improved production environment detection");
+console.log("✅ Enhanced debug information");
 
 console.log("\n" + "=".repeat(50));
 console.log("Debug complete! 🚀");
