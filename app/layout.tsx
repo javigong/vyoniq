@@ -38,7 +38,28 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ClerkProvider>
+    <ClerkProvider
+      publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
+      signInFallbackRedirectUrl="/dashboard"
+      signUpFallbackRedirectUrl="/dashboard"
+      afterSignInUrl="/dashboard"
+      afterSignUpUrl="/dashboard"
+      appearance={{
+        baseTheme: undefined,
+        variables: {
+          colorPrimary: "#6E56CF",
+          colorText: "#1D1D1F",
+        },
+      }}
+      localization={{
+        signUp: {
+          start: {
+            title: "Join Vyoniq Apps Waitlist",
+            subtitle: "Create your account to join our waitlist",
+          },
+        },
+      }}
+    >
       <html lang="en" suppressHydrationWarning>
         <head>
           <script
