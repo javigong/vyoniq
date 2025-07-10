@@ -1,13 +1,16 @@
 import { SignIn } from "@clerk/nextjs";
 import { Suspense } from "react";
+import { getClerkBaseUrl } from "@/lib/utils";
 
 function SignInContent() {
+  const baseUrl = getClerkBaseUrl();
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50">
       <div className="w-full max-w-md">
         <SignIn
-          forceRedirectUrl="/dashboard"
-          signUpForceRedirectUrl="/dashboard"
+          forceRedirectUrl={`${baseUrl}/dashboard`}
+          signUpForceRedirectUrl={`${baseUrl}/dashboard`}
           routing="path"
           path="/sign-in"
           signUpUrl="/sign-up"
