@@ -355,7 +355,7 @@ export class MCPServer {
       if (!resource && uri.startsWith("vyoniq://blog/")) {
         try {
           const { resolveBlogResource } = await import("./resources/blog");
-          resource = await resolveBlogResource(uri);
+          resource = await resolveBlogResource(uri) || undefined;
         } catch (dynamicError) {
           console.error("Error resolving dynamic blog resource:", dynamicError);
           // Return a helpful error resource instead of throwing
