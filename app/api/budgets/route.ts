@@ -2,6 +2,33 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
 import { z } from "zod";
+import type {
+  Budget,
+  BudgetItem,
+  Inquiry,
+  Payment,
+} from "@/lib/generated/prisma";
+
+type BudgetWithIncludes = Budget & {
+  items: BudgetItem[];
+  inquiry: {
+    id: string;
+    name: string;
+    email: string;
+    serviceType: string;
+    status: string;
+  };
+  payments: {
+    id: string;
+    amount: any; // Decimal type
+    status: string;
+    paidAt: Date | null;
+  }[];
+  _count: {
+    items: number;
+    payments: number;
+  };
+};
 
 // Schema for creating a budget
 const CreateBudgetSchema = z.object({
@@ -218,7 +245,7 @@ export async function GET(request: NextRequest) {
       },
       take: limit,
       skip: offset,
-    });
+    }) as BudgetWithIncludes[];
 
     const totalCount = await prisma.budget.count({ where });
 
