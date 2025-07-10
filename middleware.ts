@@ -8,13 +8,8 @@ export default clerkMiddleware(
     if (isAdminRoute(req)) {
       auth.protect();
     }
-  },
-  {
-    // Configure authorized parties for production
-    authorizedParties: process.env.NODE_ENV === "production" 
-      ? ["https://vyoniq.com"] 
-      : undefined,
   }
+  // Removed authorizedParties as it can cause handshake issues
 );
 
 export const config = {
