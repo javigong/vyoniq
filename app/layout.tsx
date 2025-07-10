@@ -5,13 +5,12 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "sonner";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
+import { getBaseUrl } from "@/lib/utils";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
-  ),
+  metadataBase: new URL(getBaseUrl()),
   title: "Vyoniq | AI-Powered Software Solutions",
   description:
     "Innovative AI-driven software development company specializing in web & mobile apps, hosting services, and AI integrations. Join the waitlist for Vyoniq Apps.",
