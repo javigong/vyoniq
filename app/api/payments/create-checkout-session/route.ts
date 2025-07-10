@@ -110,7 +110,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create line items for Stripe
-    const lineItems = budget.items.map((item) => ({
+    const lineItems = budget.items.map((item: any) => ({
       price_data: {
         currency: "usd",
         product_data: {
@@ -122,7 +122,7 @@ export async function POST(request: NextRequest) {
             category: item.category || "",
           },
         },
-        unit_amount: formatAmountForStripe(Number(item.unitPrice)),
+        unit_amount: Math.round(item.unitPrice * 100),
       },
       quantity: item.quantity,
     }));

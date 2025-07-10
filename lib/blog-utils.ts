@@ -1,6 +1,19 @@
 import prisma from "@/lib/prisma";
+import type {
+  BlogPost,
+  BlogAuthor,
+  BlogCategory,
+  BlogPostCategory,
+} from "@/lib/generated/prisma";
 
-export interface BlogPost {
+type BlogPostWithIncludes = BlogPost & {
+  author: BlogAuthor;
+  categories: (BlogPostCategory & {
+    category: BlogCategory;
+  })[];
+};
+
+export interface BlogPostFormatted {
   slug: string;
   title: string;
   excerpt: string;
@@ -19,9 +32,9 @@ export interface BlogPost {
 }
 
 // Direct database access for build-time and server-side operations
-export async function getBlogPosts(): Promise<BlogPost[]> {
+export async function getBlogPosts(): Promise<BlogPostFormatted[]> {
   try {
-    const posts = await prisma.blogPost.findMany({
+    const posts = (await prisma.blogPost.findMany({
       where: { published: true },
       include: {
         author: true,
@@ -34,7 +47,7 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
       orderBy: {
         publishDate: "desc",
       },
-    });
+    })) as BlogPostWithIncludes[];
 
     return posts.map((post) => ({
       slug: post.slug,
@@ -55,7 +68,7 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
       },
       categories: post.categories.map((pc) => pc.category.name),
       featured: post.featured,
-      tintColor: post.tintColor,
+      tintColor: post.tintColor || undefined,
     }));
   } catch (error) {
     console.error("Error fetching blog posts:", error);
@@ -65,9 +78,9 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
 
 export async function getBlogPostBySlug(
   slug: string
-): Promise<BlogPost | null> {
+): Promise<BlogPostFormatted | null> {
   try {
-    const post = await prisma.blogPost.findFirst({
+    const post = (await prisma.blogPost.findFirst({
       where: {
         slug: slug,
         published: true,
@@ -80,7 +93,7 @@ export async function getBlogPostBySlug(
           },
         },
       },
-    });
+    })) as BlogPostWithIncludes | null;
 
     if (!post) {
       return null;
@@ -105,7 +118,7 @@ export async function getBlogPostBySlug(
       },
       categories: post.categories.map((pc) => pc.category.name),
       featured: post.featured,
-      tintColor: post.tintColor,
+      tintColor: post.tintColor || undefined,
     };
   } catch (error) {
     console.error("Error fetching blog post:", error);

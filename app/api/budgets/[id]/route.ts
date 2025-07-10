@@ -1,7 +1,29 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
+import { Decimal } from "@prisma/client/runtime/library";
 import { z } from "zod";
+import type {
+  Budget,
+  BudgetItem,
+  Inquiry,
+  Payment,
+} from "@/lib/generated/prisma";
+
+type BudgetWithIncludes = Budget & {
+  items: (BudgetItem & {
+    servicePricing?: any;
+  })[];
+  inquiry: {
+    id: string;
+    name: string;
+    email: string;
+    serviceType: string;
+    status: string;
+    userId: string | null;
+  };
+  payments: Payment[];
+};
 
 interface RouteParams {
   id: string;
@@ -80,7 +102,7 @@ export async function GET(
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    const budget = await prisma.budget.findUnique({
+    const budget = (await prisma.budget.findUnique({
       where: { id },
       include: {
         items: {
@@ -104,7 +126,7 @@ export async function GET(
           },
         },
       },
-    });
+    })) as BudgetWithIncludes | null;
 
     if (!budget) {
       return NextResponse.json({ error: "Budget not found" }, { status: 404 });
@@ -191,7 +213,7 @@ export async function PUT(
       const newTotal = items.reduce((sum, item) => {
         return sum + item.unitPrice * item.quantity;
       }, 0);
-      totalAmount = newTotal;
+      totalAmount = new Decimal(newTotal);
     }
 
     // Update budget

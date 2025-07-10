@@ -24,6 +24,21 @@ import {
 } from "lucide-react";
 import { DeleteAccountSection } from "@/components/delete-account-section";
 
+interface InquiryWithCount {
+  id: string;
+  name: string;
+  email: string;
+  serviceType: string;
+  message: string;
+  status: string;
+  createdAt: Date;
+  updatedAt: Date;
+  userId: string | null;
+  _count: {
+    messages: number;
+  };
+}
+
 const statusColors = {
   PENDING:
     "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300",
@@ -64,7 +79,7 @@ export default async function UserDashboard() {
   }
 
   // Fetch user's inquiries
-  const inquiries = await prisma.inquiry.findMany({
+  const inquiries = (await prisma.inquiry.findMany({
     where: {
       OR: [{ userId: userId }, { email: user.email }],
     },
@@ -78,7 +93,7 @@ export default async function UserDashboard() {
     orderBy: {
       createdAt: "desc",
     },
-  });
+  })) as InquiryWithCount[];
 
   // Link inquiries to user if they aren't already linked
   const unlinkedInquiries = inquiries.filter((inquiry) => !inquiry.userId);
@@ -275,26 +290,24 @@ export default async function UserDashboard() {
                   Project Budgets
                 </h3>
                 <p className="text-sm text-vyoniq-text dark:text-vyoniq-dark-text mb-4">
-                  View and manage budgets for your projects, approve quotes, and make payments.
+                  View and manage budgets for your projects, approve quotes, and
+                  make payments.
                 </p>
                 <Button asChild>
-                  <Link href="/dashboard/budgets">
-                    View Budgets
-                  </Link>
+                  <Link href="/dashboard/budgets">View Budgets</Link>
                 </Button>
               </div>
-              
+
               <div className="text-center p-6 border rounded-lg">
                 <h3 className="font-semibold text-vyoniq-blue dark:text-white mb-2">
                   Our Services
                 </h3>
                 <p className="text-sm text-vyoniq-text dark:text-vyoniq-dark-text mb-4">
-                  Explore our full range of AI-powered development and hosting services.
+                  Explore our full range of AI-powered development and hosting
+                  services.
                 </p>
                 <Button asChild variant="outline">
-                  <Link href="/services">
-                    Explore Services
-                  </Link>
+                  <Link href="/services">Explore Services</Link>
                 </Button>
               </div>
             </div>

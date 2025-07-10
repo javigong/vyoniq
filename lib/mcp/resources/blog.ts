@@ -1,50 +1,212 @@
-import prisma from "@/lib/prisma";
-import { MCPResource, MCPResourceTemplate } from "../types";
+import { MCPResource } from "../types";
+import prisma from "../../../lib/prisma";
 
-// Blog Post Resources
-export function createBlogPostResources(): MCPResourceTemplate[] {
-  return [
-    {
-      uriTemplate: "vyoniq://blog/posts/{postId}",
-      name: "Blog Post",
-      description: "Individual blog post with full content and metadata",
-      mimeType: "application/json",
-      annotations: {
-        audience: ["admin", "ai"],
-        priority: 1,
+interface BlogPostWithIncludes {
+  id: string;
+  slug: string;
+  title: string;
+  excerpt: string;
+  content: string;
+  coverImage: string;
+  publishDate: Date;
+  readTime: number;
+  featured: boolean;
+  tintColor: string | null;
+  published: boolean;
+  authorId: string;
+  createdAt: Date;
+  updatedAt: Date;
+  author: {
+    id: string;
+    name: string;
+    avatar: string | null;
+  };
+  categories: Array<{
+    category: {
+      id: string;
+      name: string;
+      slug: string;
+    };
+  }>;
+}
+
+interface BlogCategoryWithCount {
+  id: string;
+  name: string;
+  slug: string;
+  createdAt: Date;
+  _count: {
+    blogPosts: number;
+  };
+}
+
+interface BlogAuthorWithCount {
+  id: string;
+  name: string;
+  avatar: string | null;
+  title: string;
+  bio: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  _count: {
+    blogPosts: number;
+  };
+}
+
+export async function resolveBlogPostsResource(): Promise<MCPResource> {
+  try {
+    const posts = (await prisma.blogPost.findMany({
+      where: {
+        published: true,
       },
-    },
-    {
-      uriTemplate: "vyoniq://blog/posts",
+      include: {
+        author: {
+          select: {
+            id: true,
+            name: true,
+            avatar: true,
+          },
+        },
+        categories: {
+          include: {
+            category: true,
+          },
+        },
+      },
+      orderBy: {
+        publishDate: "desc",
+      },
+    })) as BlogPostWithIncludes[];
+
+    const resourceData = {
+      total: posts.length,
+      posts: posts.map((post) => ({
+        id: post.id,
+        slug: post.slug,
+        title: post.title,
+        excerpt: post.excerpt,
+        content: post.content,
+        coverImage: post.coverImage,
+        publishDate: post.publishDate.toISOString(),
+        readTime: post.readTime,
+        featured: post.featured,
+        tintColor: post.tintColor,
+        author: {
+          id: post.author.id,
+          name: post.author.name,
+          avatar: post.author.avatar,
+        },
+        categories: post.categories.map((pc) => ({
+          id: pc.category.id,
+          name: pc.category.name,
+          slug: pc.category.slug,
+        })),
+      })),
+    };
+
+    return {
+      uri: "vyoniq://blog/posts",
       name: "All Blog Posts",
-      description: "List of all blog posts with metadata",
+      description: `Complete list of ${posts.length} blog posts with metadata`,
       mimeType: "application/json",
+      text: JSON.stringify(resourceData, null, 2),
       annotations: {
         audience: ["admin", "ai"],
         priority: 1,
       },
-    },
-    {
-      uriTemplate: "vyoniq://blog/categories",
-      name: "Blog Categories",
-      description: "List of all blog categories",
+    };
+  } catch (error) {
+    console.error("Error resolving all blog posts resource:", error);
+    throw new Error(`Failed to resolve blog posts resource: ${error}`);
+  }
+}
+
+export async function resolveBlogCategoriesResource(): Promise<MCPResource> {
+  try {
+    const categories = (await prisma.blogCategory.findMany({
+      include: {
+        _count: {
+          select: {
+            blogPosts: true,
+          },
+        },
+      },
+      orderBy: {
+        name: "asc",
+      },
+    })) as BlogCategoryWithCount[];
+
+    const resourceData = {
+      total: categories.length,
+      categories: categories.map((category) => ({
+        id: category.id,
+        name: category.name,
+        slug: category.slug,
+        postCount: category._count.blogPosts,
+        createdAt: category.createdAt.toISOString(),
+      })),
+    };
+
+    return {
+      uri: "vyoniq://blog/categories",
+      name: "All Blog Categories",
+      description: `Complete list of ${categories.length} blog categories with post counts`,
       mimeType: "application/json",
+      text: JSON.stringify(resourceData, null, 2),
       annotations: {
         audience: ["admin", "ai"],
-        priority: 2,
+        priority: 1,
       },
-    },
-    {
-      uriTemplate: "vyoniq://blog/authors",
-      name: "Blog Authors",
-      description: "List of all blog authors",
+    };
+  } catch (error) {
+    console.error("Error resolving blog categories resource:", error);
+    throw new Error(`Failed to resolve blog categories resource: ${error}`);
+  }
+}
+
+export async function resolveBlogAuthorsResource(): Promise<MCPResource> {
+  try {
+    const authors = (await prisma.blogAuthor.findMany({
+      include: {
+        _count: {
+          select: {
+            blogPosts: true,
+          },
+        },
+      },
+      orderBy: {
+        name: "asc",
+      },
+    })) as BlogAuthorWithCount[];
+
+    const resourceData = {
+      total: authors.length,
+      authors: authors.map((author) => ({
+        id: author.id,
+        name: author.name,
+        avatar: author.avatar,
+        title: author.title,
+        bio: author.bio,
+        postCount: author._count.blogPosts,
+        createdAt: author.createdAt.toISOString(),
+      })),
+    };
+
+    return {
+      uri: "vyoniq://blog/authors",
+      name: "All Blog Authors",
+      description: `Complete list of ${authors.length} blog authors with post counts`,
       mimeType: "application/json",
+      text: JSON.stringify(resourceData, null, 2),
       annotations: {
         audience: ["admin", "ai"],
-        priority: 2,
+        priority: 1,
       },
-    },
-  ];
+    };
+  } catch (error) {
+    console.error("Error resolving blog authors resource:", error);
+    throw new Error(`Failed to resolve blog authors resource: ${error}`);
+  }
 }
 
 // Resolve individual blog post resource
@@ -109,176 +271,6 @@ export async function resolveBlogPostResource(
   }
 }
 
-// Resolve all blog posts resource
-export async function resolveAllBlogPostsResource(): Promise<MCPResource> {
-  try {
-    const posts = await prisma.blogPost.findMany({
-      include: {
-        author: true,
-        categories: {
-          include: { category: true },
-        },
-      },
-      orderBy: { publishDate: "desc" },
-    });
-
-    const resourceData = {
-      total: posts.length,
-      published: posts.filter((p) => p.published).length,
-      drafts: posts.filter((p) => !p.published).length,
-      featured: posts.filter((p) => p.featured).length,
-      posts: posts.map((post) => ({
-        id: post.id,
-        title: post.title,
-        slug: post.slug,
-        excerpt: post.excerpt,
-        coverImage: post.coverImage,
-        publishDate: post.publishDate,
-        readTime: post.readTime,
-        featured: post.featured,
-        published: post.published,
-        tintColor: post.tintColor,
-        createdAt: post.createdAt,
-        updatedAt: post.updatedAt,
-        author: {
-          id: post.author.id,
-          name: post.author.name,
-        },
-        categories: post.categories.map((pc) => ({
-          id: pc.category.id,
-          name: pc.category.name,
-        })),
-        wordCount: post.content.split(/\s+/).length,
-      })),
-    };
-
-    return {
-      uri: "vyoniq://blog/posts",
-      name: "All Blog Posts",
-      description: `Complete list of ${posts.length} blog posts with metadata`,
-      mimeType: "application/json",
-      text: JSON.stringify(resourceData, null, 2),
-      annotations: {
-        audience: ["admin", "ai"],
-        priority: 1,
-      },
-    };
-  } catch (error) {
-    console.error("Error resolving all blog posts resource:", error);
-    return {
-      uri: "vyoniq://blog/posts",
-      name: "All Blog Posts",
-      description: "Error loading blog posts",
-      mimeType: "application/json",
-      text: JSON.stringify({ error: "Failed to load blog posts" }, null, 2),
-      annotations: {
-        audience: ["admin", "ai"],
-        priority: 1,
-      },
-    };
-  }
-}
-
-// Resolve blog categories resource
-export async function resolveBlogCategoriesResource(): Promise<MCPResource> {
-  try {
-    const categories = await prisma.blogCategory.findMany({
-      include: {
-        _count: {
-          select: { posts: true },
-        },
-      },
-      orderBy: { name: "asc" },
-    });
-
-    const resourceData = {
-      total: categories.length,
-      categories: categories.map((category) => ({
-        id: category.id,
-        name: category.name,
-        postCount: category._count.posts,
-        createdAt: category.createdAt,
-      })),
-    };
-
-    return {
-      uri: "vyoniq://blog/categories",
-      name: "Blog Categories",
-      description: `List of ${categories.length} blog categories with post counts`,
-      mimeType: "application/json",
-      text: JSON.stringify(resourceData, null, 2),
-      annotations: {
-        audience: ["admin", "ai"],
-        priority: 2,
-      },
-    };
-  } catch (error) {
-    console.error("Error resolving blog categories resource:", error);
-    return {
-      uri: "vyoniq://blog/categories",
-      name: "Blog Categories",
-      description: "Error loading categories",
-      mimeType: "application/json",
-      text: JSON.stringify({ error: "Failed to load categories" }, null, 2),
-      annotations: {
-        audience: ["admin", "ai"],
-        priority: 2,
-      },
-    };
-  }
-}
-
-// Resolve blog authors resource
-export async function resolveBlogAuthorsResource(): Promise<MCPResource> {
-  try {
-    const authors = await prisma.blogAuthor.findMany({
-      include: {
-        _count: {
-          select: { posts: true },
-        },
-      },
-      orderBy: { name: "asc" },
-    });
-
-    const resourceData = {
-      total: authors.length,
-      authors: authors.map((author) => ({
-        id: author.id,
-        name: author.name,
-        bio: author.bio,
-        avatar: author.avatar,
-        postCount: author._count.posts,
-        createdAt: author.createdAt,
-      })),
-    };
-
-    return {
-      uri: "vyoniq://blog/authors",
-      name: "Blog Authors",
-      description: `List of ${authors.length} blog authors with post counts`,
-      mimeType: "application/json",
-      text: JSON.stringify(resourceData, null, 2),
-      annotations: {
-        audience: ["admin", "ai"],
-        priority: 2,
-      },
-    };
-  } catch (error) {
-    console.error("Error resolving blog authors resource:", error);
-    return {
-      uri: "vyoniq://blog/authors",
-      name: "Blog Authors",
-      description: "Error loading authors",
-      mimeType: "application/json",
-      text: JSON.stringify({ error: "Failed to load authors" }, null, 2),
-      annotations: {
-        audience: ["admin", "ai"],
-        priority: 2,
-      },
-    };
-  }
-}
-
 // Resource resolver function
 export async function resolveBlogResource(
   uri: string
@@ -288,7 +280,7 @@ export async function resolveBlogResource(
   switch (urlParts[0]) {
     case "posts":
       if (urlParts.length === 1) {
-        return await resolveAllBlogPostsResource();
+        return await resolveBlogPostsResource();
       } else if (urlParts.length === 2) {
         return await resolveBlogPostResource(urlParts[1]);
       }

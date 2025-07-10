@@ -43,6 +43,29 @@ interface PageParams {
   id: string;
 }
 
+interface InquiryWithMessages {
+  id: string;
+  name: string;
+  email: string;
+  serviceType: string;
+  message: string;
+  status: string;
+  createdAt: Date;
+  updatedAt: Date;
+  userId: string | null;
+  messages: Array<{
+    id: string;
+    message: string;
+    isFromAdmin: boolean;
+    createdAt: Date;
+  }>;
+  user?: {
+    id: string;
+    name: string;
+    email: string;
+  } | null;
+}
+
 export default async function InquiryDetailPage({
   params,
 }: {
@@ -65,7 +88,7 @@ export default async function InquiryDetailPage({
   const { id } = await params;
 
   // Fetch the inquiry with messages
-  const inquiry = await prisma.inquiry.findUnique({
+  const inquiry = (await prisma.inquiry.findUnique({
     where: { id },
     include: {
       messages: {
@@ -81,7 +104,7 @@ export default async function InquiryDetailPage({
         },
       },
     },
-  });
+  })) as InquiryWithMessages | null;
 
   if (!inquiry) {
     notFound();
@@ -179,7 +202,7 @@ export default async function InquiryDetailPage({
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {inquiry.messages.map((message, index) => (
+              {inquiry.messages.map((message: any, index: number) => (
                 <div
                   key={message.id}
                   className={`p-4 rounded-lg ${
