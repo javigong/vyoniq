@@ -6,9 +6,8 @@ function SignInContent() {
     <div className="flex min-h-screen items-center justify-center bg-gray-50">
       <div className="w-full max-w-md">
         <SignIn
-          fallbackRedirectUrl="/dashboard"
-          signUpFallbackRedirectUrl="/dashboard"
           forceRedirectUrl="/dashboard"
+          signUpForceRedirectUrl="/dashboard"
           routing="path"
           path="/sign-in"
           signUpUrl="/sign-up"
