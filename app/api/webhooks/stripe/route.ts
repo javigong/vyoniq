@@ -17,6 +17,9 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.text();
+    if (!stripe) {
+      return NextResponse.json({ error: 'Stripe not configured' }, { status: 500 });
+    }
     event = stripe.webhooks.constructEvent(
       body,
       sig,
