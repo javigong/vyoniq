@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
 import prisma from "@/lib/prisma";
 import { Resend } from "resend";
+import { getBaseUrl } from "@/lib/utils";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -208,7 +209,7 @@ async function sendPaymentConfirmationEmail(budget: any, payment: any, session: 
             </ol>
             
             <div style="text-align: center; margin: 30px 0;">
-              <a href="${process.env.NEXT_PUBLIC_BASE_URL}/dashboard/inquiries/${budget.inquiry.id}" 
+                              <a href="${getBaseUrl()}/dashboard/inquiries/${budget.inquiry.id}" 
                  style="background: #3B82F6; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">
                 View Project Status
               </a>
