@@ -12,11 +12,70 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { scrollToContact } from "@/lib/scroll-utils";
 import { useUser, SignInButton } from "@clerk/nextjs";
 
+function AuthButtons() {
+  const { isSignedIn, user, isLoaded } = useUser();
+
+  // Don't render anything until Clerk is loaded to prevent hydration mismatch
+  if (!isLoaded) {
+    return <div className="w-24 h-8 bg-gray-200 animate-pulse rounded"></div>;
+  }
+
+  return (
+    <>
+      {isSignedIn ? (
+        <Button asChild variant="secondary" size="sm">
+          <Link href="/dashboard">
+            <User className="w-4 h-4 mr-2" />
+            Dashboard
+          </Link>
+        </Button>
+      ) : (
+        <SignInButton mode="modal">
+          <Button variant="secondary" size="sm">
+            <LogIn className="w-4 h-4 mr-2" />
+            Sign In
+          </Button>
+        </SignInButton>
+      )}
+    </>
+  );
+}
+
+function MobileAuthButtons({ onClose }: { onClose: () => void }) {
+  const { isSignedIn, user, isLoaded } = useUser();
+
+  // Don't render anything until Clerk is loaded to prevent hydration mismatch
+  if (!isLoaded) {
+    return (
+      <div className="w-full h-10 bg-gray-200 animate-pulse rounded"></div>
+    );
+  }
+
+  return (
+    <div className="pt-4 border-t border-gray-600">
+      {isSignedIn ? (
+        <Button asChild variant="secondary" className="w-full">
+          <Link href="/dashboard" onClick={onClose}>
+            <User className="w-4 h-4 mr-2" />
+            Dashboard
+          </Link>
+        </Button>
+      ) : (
+        <SignInButton mode="modal">
+          <Button variant="secondary" className="w-full" onClick={onClose}>
+            <LogIn className="w-4 h-4 mr-2" />
+            Sign In
+          </Button>
+        </SignInButton>
+      )}
+    </div>
+  );
+}
+
 export function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
-  const { isSignedIn, user } = useUser();
 
   const handleContactClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -81,22 +140,7 @@ export function Header() {
             ))}
 
             {/* Authentication Buttons */}
-            {isSignedIn ? (
-              <Button asChild variant="secondary" size="sm">
-                <Link href="/dashboard">
-                  <User className="w-4 h-4 mr-2" />
-                  Dashboard
-                </Link>
-              </Button>
-            ) : (
-              <SignInButton mode="modal">
-                <Button variant="secondary" size="sm">
-                  <LogIn className="w-4 h-4 mr-2" />
-                  Sign In
-                </Button>
-              </SignInButton>
-            )}
-
+            <AuthButtons />
             <ThemeToggle />
           </nav>
 
@@ -137,30 +181,7 @@ export function Header() {
                   ))}
 
                   {/* Mobile Authentication Buttons */}
-                  <div className="pt-4 border-t border-gray-600">
-                    {isSignedIn ? (
-                      <Button asChild variant="secondary" className="w-full">
-                        <Link
-                          href="/dashboard"
-                          onClick={() => setIsOpen(false)}
-                        >
-                          <User className="w-4 h-4 mr-2" />
-                          Dashboard
-                        </Link>
-                      </Button>
-                    ) : (
-                      <SignInButton mode="modal">
-                        <Button
-                          variant="secondary"
-                          className="w-full"
-                          onClick={() => setIsOpen(false)}
-                        >
-                          <LogIn className="w-4 h-4 mr-2" />
-                          Sign In
-                        </Button>
-                      </SignInButton>
-                    )}
-                  </div>
+                  <MobileAuthButtons onClose={() => setIsOpen(false)} />
                 </nav>
               </SheetContent>
             </Sheet>
