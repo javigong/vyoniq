@@ -1,8 +1,8 @@
 import Image from "next/image";
-import type { BlogPost } from "@/lib/blog-utils";
+import type { BlogPostFormatted } from "@/lib/blog-utils";
 
 interface BlogAuthorProps {
-  author: BlogPost["author"];
+  author: BlogPostFormatted["author"];
 }
 
 export function BlogAuthor({ author }: BlogAuthorProps) {
