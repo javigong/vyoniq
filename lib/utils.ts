@@ -30,21 +30,3 @@ export function getBaseUrl(): string {
   // Fall back to production URL if in production, otherwise localhost
   return isProduction ? "https://vyoniq.com" : "http://localhost:3000";
 }
-
-/**
- * Get the base URL specifically for Clerk redirects
- * Ensures consistent URL resolution for authentication flows
- */
-export function getClerkBaseUrl(): string {
-  // In production, always use the production domain
-  if (
-    process.env.NODE_ENV === "production" ||
-    process.env.VERCEL_ENV === "production" ||
-    process.env.NEXT_PUBLIC_VERCEL_ENV === "production"
-  ) {
-    return "https://vyoniq.com";
-  }
-
-  // In development, use localhost
-  return "http://localhost:3000";
-}

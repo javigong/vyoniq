@@ -2,37 +2,35 @@
 
 /**
  * Debug script to check production authentication setup
- * Run: node scripts/debug-production-auth.js
+ * Run this to diagnose Clerk authentication issues in production
  */
 
+const { execSync } = require("child_process");
+const fs = require("fs");
+const path = require("path");
+
 console.log("🔍 Vyoniq Production Authentication Debug\n");
-console.log("=".repeat(50));
 
-// Check Node.js environment
-console.log("\n📋 ENVIRONMENT CHECK:");
-console.log(`NODE_ENV: ${process.env.NODE_ENV || "undefined"}`);
-console.log(`VERCEL_ENV: ${process.env.VERCEL_ENV || "undefined"}`);
-console.log(
-  `NEXT_PUBLIC_VERCEL_ENV: ${process.env.NEXT_PUBLIC_VERCEL_ENV || "undefined"}`
-);
-console.log(`Platform: ${process.platform}`);
-console.log(`Node Version: ${process.version}`);
-
-// Check production environment detection
-console.log("\n🎯 PRODUCTION DETECTION:");
-const isProduction =
-  process.env.NODE_ENV === "production" ||
-  process.env.VERCEL_ENV === "production" ||
-  process.env.NEXT_PUBLIC_VERCEL_ENV === "production";
-
-console.log(`Is Production Detected: ${isProduction ? "YES" : "NO"}`);
-if (!isProduction && process.env.NODE_ENV !== "development") {
-  console.log(`⚠️  Production not detected - this might be the issue!`);
-  console.log(`   Set NODE_ENV=production in your production environment`);
+// Check if we're in the right directory
+const packageJsonPath = path.join(process.cwd(), "package.json");
+if (!fs.existsSync(packageJsonPath)) {
+  console.log(
+    "❌ Error: Please run this script from the project root directory"
+  );
+  process.exit(1);
 }
 
-// Check essential environment variables
-console.log("\n🔑 ENVIRONMENT VARIABLES:");
+// Read package.json to confirm we're in the right project
+const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
+if (!packageJson.name || !packageJson.name.includes("vyoniq")) {
+  console.log("❌ Error: This doesn't appear to be the Vyoniq project");
+  process.exit(1);
+}
+
+console.log("📊 ENVIRONMENT VARIABLES CHECK:");
+console.log("=".repeat(50));
+
+// Check for required environment variables
 const requiredEnvVars = [
   "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY",
   "CLERK_SECRET_KEY",
@@ -75,28 +73,20 @@ requiredEnvVars.forEach((varName) => {
   }
 });
 
-// Check Base URL specifically
-console.log("\n🌐 BASE URL ANALYSIS:");
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-if (!baseUrl) {
-  console.log(`❌ NEXT_PUBLIC_BASE_URL not set`);
-  console.log(`   📝 This will cause localhost fallback in production!`);
-  console.log(`   🔧 Set: NEXT_PUBLIC_BASE_URL=https://vyoniq.com`);
-} else if (baseUrl.includes("localhost")) {
-  console.log(`❌ NEXT_PUBLIC_BASE_URL contains localhost: ${baseUrl}`);
-  console.log(`   📝 This is the source of your redirect issue!`);
-  console.log(`   🔧 Change to: NEXT_PUBLIC_BASE_URL=https://vyoniq.com`);
-} else if (baseUrl === "https://vyoniq.com") {
-  console.log(`✅ NEXT_PUBLIC_BASE_URL correctly set: ${baseUrl}`);
-} else {
-  console.log(`⚠️  NEXT_PUBLIC_BASE_URL set to: ${baseUrl}`);
-  console.log(`   📝 Expected: https://vyoniq.com`);
-}
+console.log("\n🔧 URL CONFIGURATION CHECK:");
+console.log("=".repeat(50));
 
-// Simulate both URL functions
-console.log("\n🔍 SIMULATED URL FUNCTIONS:");
+// Check production environment detection
+const isProduction =
+  process.env.NODE_ENV === "production" ||
+  process.env.VERCEL_ENV === "production" ||
+  process.env.NEXT_PUBLIC_VERCEL_ENV === "production";
 
-// getBaseUrl function
+console.log(`Environment: ${process.env.NODE_ENV || "undefined"}`);
+console.log(`Production detected: ${isProduction}`);
+console.log(`Base URL: ${process.env.NEXT_PUBLIC_BASE_URL || "undefined"}`);
+
+// Simulate getBaseUrl function
 function simulateGetBaseUrl() {
   if (process.env.NEXT_PUBLIC_BASE_URL) {
     return process.env.NEXT_PUBLIC_BASE_URL;
@@ -110,52 +100,36 @@ function simulateGetBaseUrl() {
   return isProduction ? "https://vyoniq.com" : "http://localhost:3000";
 }
 
-// getClerkBaseUrl function
-function simulateGetClerkBaseUrl() {
-  if (
-    process.env.NODE_ENV === "production" ||
-    process.env.VERCEL_ENV === "production" ||
-    process.env.NEXT_PUBLIC_VERCEL_ENV === "production"
-  ) {
-    return "https://vyoniq.com";
-  }
-
-  return "http://localhost:3000";
-}
-
 const simulatedBaseUrl = simulateGetBaseUrl();
-const simulatedClerkBaseUrl = simulateGetClerkBaseUrl();
 
 console.log(`getBaseUrl(): ${simulatedBaseUrl}`);
-console.log(`getClerkBaseUrl(): ${simulatedClerkBaseUrl}`);
 
-if (simulatedBaseUrl.includes("localhost") && isProduction) {
+// Check for localhost in production
+if (isProduction && simulatedBaseUrl.includes("localhost")) {
   console.log(`❌ CRITICAL: getBaseUrl() returns localhost in production!`);
+  console.log(`   This is why authentication redirects are failing.`);
+  console.log(`   Fix: Set NEXT_PUBLIC_BASE_URL=https://vyoniq.com`);
 }
-if (simulatedClerkBaseUrl.includes("localhost") && isProduction) {
-  console.log(
-    `❌ CRITICAL: getClerkBaseUrl() returns localhost in production!`
-  );
-}
-if (
-  !simulatedBaseUrl.includes("localhost") &&
-  !simulatedClerkBaseUrl.includes("localhost")
-) {
-  console.log(`✅ Both URL functions return correct production URLs`);
-}
+
+console.log("\n🔍 CLERK CONFIGURATION CHECK:");
+console.log("=".repeat(50));
 
 // Check Clerk configuration
-console.log("\n👤 CLERK CONFIGURATION:");
-console.log("Required Clerk Dashboard Settings:");
-console.log("  📍 Authorized domains: vyoniq.com");
-console.log("  📍 Allowed redirect origins:");
-console.log("    - https://vyoniq.com");
-console.log("    - https://www.vyoniq.com");
-console.log("  📍 After sign-in URL: /dashboard");
-console.log("  📍 After sign-up URL: /dashboard");
+const clerkPublishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+if (clerkPublishableKey) {
+  console.log(`Clerk Publishable Key: ${clerkPublishableKey.slice(0, 20)}...`);
 
-// Check for common issues
-console.log("\n🐛 COMMON ISSUES & FIXES:");
+  if (clerkPublishableKey.includes("_test_")) {
+    console.log(`⚠️  Using TEST keys in production!`);
+    hasClerkIssues = true;
+  } else if (clerkPublishableKey.includes("_live_")) {
+    console.log(`✅ Using LIVE keys`);
+  }
+}
+
+console.log("\n📋 SUMMARY:");
+console.log("=".repeat(50));
+
 if (missingVars.length > 0) {
   console.log(`❌ Missing environment variables: ${missingVars.join(", ")}`);
 }
@@ -178,34 +152,23 @@ if (hasClerkIssues) {
 }
 
 console.log("\n📊 SUMMARY:");
-if (
-  missingVars.length === 0 &&
-  !hasClerkIssues &&
-  isProduction &&
-  process.env.NEXT_PUBLIC_BASE_URL === "https://vyoniq.com"
-) {
-  console.log("✅ All configuration looks correct!");
-  console.log("   If issues persist, check Clerk Dashboard configuration.");
-  console.log(
-    "   Check: https://dashboard.clerk.com → Configure → Restrictions"
-  );
-} else {
-  console.log("❌ Configuration issues found. Fix the items above.");
-}
+console.log("=".repeat(50));
+console.log(`Missing variables: ${missingVars.length}`);
+console.log(`Production ready: ${missingVars.length === 0 && !hasClerkIssues}`);
 
-console.log("\n🎯 IMMEDIATE ACTION ITEMS:");
-console.log("1. Set NODE_ENV=production in production environment");
-console.log("2. Set NEXT_PUBLIC_BASE_URL=https://vyoniq.com in production");
-console.log("3. Visit https://dashboard.clerk.com → Configure → Restrictions");
-console.log("4. Add https://vyoniq.com to 'Allowed redirect origins'");
-console.log("5. Remove any localhost entries from production Clerk config");
-console.log("6. Verify you're using LIVE Clerk keys (not TEST keys)");
+console.log("\n🎯 NEXT STEPS:");
+console.log("=".repeat(50));
+console.log(`1. Fix any missing environment variables`);
+console.log(`2. Ensure you're using LIVE Clerk keys in production`);
+console.log(`3. Set NEXT_PUBLIC_BASE_URL=https://vyoniq.com`);
+console.log(`4. Check Clerk Dashboard → Configure → Restrictions`);
+console.log(`5. Add https://vyoniq.com to allowed redirect origins`);
+console.log(`6. Test authentication flow after changes`);
 
-console.log("\n🚀 NEW IMPROVEMENTS:");
-console.log("✅ Updated URL functions to handle client/server contexts");
-console.log("✅ Added absolute URLs for Clerk redirects");
-console.log("✅ Improved production environment detection");
-console.log("✅ Enhanced debug information");
-
-console.log("\n" + "=".repeat(50));
-console.log("Debug complete! 🚀");
+console.log("\n📞 SUPPORT:");
+console.log("=".repeat(50));
+console.log(`If issues persist, check:`);
+console.log(`- Clerk Dashboard restrictions`);
+console.log(`- Browser cache/localStorage`);
+console.log(`- Production deployment logs`);
+console.log(`- Network tab in browser dev tools`);
