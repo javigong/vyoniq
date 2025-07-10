@@ -5,10 +5,7 @@ import { useFormStatus } from "react-dom";
 import { subscribeToNewsletter } from "@/lib/actions";
 import { toast } from "sonner";
 
-const initialState = {
-  error: null,
-  success: null,
-};
+const initialState: { error?: string; success?: string } = {};
 
 function SubmitButton() {
   const { pending } = useFormStatus();
