@@ -15,6 +15,23 @@ import { Button } from "@/components/ui/button";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { ArrowLeft, DollarSign, FileText, Clock } from "lucide-react";
+import type { Budget, BudgetItem, Payment } from "@/lib/generated/prisma";
+
+type BudgetWithIncludes = Budget & {
+  items: BudgetItem[];
+  inquiry: {
+    id: string;
+    name: string;
+    email: string;
+    serviceType: string;
+  };
+  payments: {
+    id: string;
+    amount: any; // Decimal type
+    status: string;
+    paidAt: Date | null;
+  }[];
+};
 
 export default async function BudgetsPage() {
   const { userId } = await auth();
@@ -32,7 +49,7 @@ export default async function BudgetsPage() {
   }
 
   // Fetch user's budgets
-  const budgets = await prisma.budget.findMany({
+  const budgets = (await prisma.budget.findMany({
     where: {
       inquiry: {
         OR: [{ userId: userId }, { email: user.email }],
@@ -63,7 +80,7 @@ export default async function BudgetsPage() {
     orderBy: {
       createdAt: "desc",
     },
-  });
+  })) as BudgetWithIncludes[];
 
   // Calculate summary statistics
   const totalBudgets = budgets.length;
@@ -184,15 +201,18 @@ export default async function BudgetsPage() {
             <BudgetListClient
               budgets={budgets.map((budget) => ({
                 ...budget,
+                validUntil: budget.validUntil?.toISOString() || null,
+                createdAt: budget.createdAt.toISOString(),
                 totalAmount: Number(budget.totalAmount),
                 items: budget.items.map((item) => ({
                   ...item,
+                  createdAt: item.createdAt.toISOString(),
                   unitPrice: Number(item.unitPrice),
                   totalPrice: Number(item.totalPrice),
                 })),
                 payments: budget.payments.map((payment) => ({
                   ...payment,
-                  amount: Number(payment.amount),
+                  paidAt: payment.paidAt?.toISOString() || null,
                 })),
               }))}
             />
