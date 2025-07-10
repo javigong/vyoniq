@@ -2,12 +2,20 @@ import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
 const isAdminRoute = createRouteMatcher(["/admin(.*)"]);
 
-export default clerkMiddleware((auth, req) => {
-  // Protect the admin routes.
-  if (isAdminRoute(req)) {
-    auth.protect();
+export default clerkMiddleware(
+  (auth, req) => {
+    // Protect the admin routes.
+    if (isAdminRoute(req)) {
+      auth.protect();
+    }
+  },
+  {
+    // Configure authorized parties for production
+    authorizedParties: process.env.NODE_ENV === "production" 
+      ? ["https://vyoniq.com"] 
+      : undefined,
   }
-});
+);
 
 export const config = {
   matcher: [
