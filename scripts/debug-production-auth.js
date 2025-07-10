@@ -1,138 +1,152 @@
 #!/usr/bin/env node
 
 /**
- * Production Authentication Debug Script
- * Run this script to check your production authentication setup
+ * Debug script to check production authentication setup
+ * Run: node scripts/debug-production-auth.js
  */
 
-const fs = require("fs");
-const path = require("path");
-
 console.log("🔍 Vyoniq Production Authentication Debug\n");
+console.log("=".repeat(50));
 
-// Check environment variables
-console.log("📋 Environment Variables Check:");
+// Check Node.js environment
+console.log("\n📋 ENVIRONMENT CHECK:");
+console.log(`NODE_ENV: ${process.env.NODE_ENV || "undefined"}`);
+console.log(`Platform: ${process.platform}`);
+console.log(`Node Version: ${process.version}`);
+
+// Check essential environment variables
+console.log("\n🔑 ENVIRONMENT VARIABLES:");
 const requiredEnvVars = [
   "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY",
   "CLERK_SECRET_KEY",
   "NEXT_PUBLIC_BASE_URL",
   "DATABASE_URL",
+  "RESEND_API_KEY",
+  "STRIPE_PUBLISHABLE_KEY",
+  "STRIPE_SECRET_KEY",
 ];
 
-const envPath = path.join(process.cwd(), ".env.local");
-const envExists = fs.existsSync(envPath);
+let missingVars = [];
+let hasClerkIssues = false;
 
-if (!envExists) {
-  console.log("❌ .env.local file not found");
-  console.log("   Create .env.local from .env.example");
-} else {
-  console.log("✅ .env.local file exists");
-
-  const envContent = fs.readFileSync(envPath, "utf8");
-
-  requiredEnvVars.forEach((varName) => {
-    const hasVar =
-      envContent.includes(`${varName}=`) &&
-      !envContent.includes(`${varName}=your_`) &&
-      !envContent.includes(`${varName}=`);
-
-    if (hasVar) {
-      console.log(`✅ ${varName} is set`);
-    } else {
-      console.log(`❌ ${varName} is missing or using placeholder value`);
-    }
-  });
-}
-
-// Check for deprecated props in code
-console.log("\n🔧 Code Configuration Check:");
-const filesToCheck = [
-  "app/layout.tsx",
-  "app/sign-in/[[...sign-in]]/page.tsx",
-  "app/sign-up/[[...sign-up]]/page.tsx",
-];
-
-filesToCheck.forEach((filePath) => {
-  const fullPath = path.join(process.cwd(), filePath);
-  if (fs.existsSync(fullPath)) {
-    const content = fs.readFileSync(fullPath, "utf8");
-    const hasDeprecatedProps =
-      content.includes("afterSignInUrl") ||
-      content.includes("afterSignUpUrl") ||
-      content.includes("fallbackRedirectUrl");
-
-    if (hasDeprecatedProps) {
-      console.log(`❌ ${filePath} contains deprecated props`);
-    } else {
-      console.log(`✅ ${filePath} uses current props`);
-    }
+requiredEnvVars.forEach((varName) => {
+  const value = process.env[varName];
+  if (!value) {
+    console.log(`❌ ${varName}: NOT SET`);
+    missingVars.push(varName);
   } else {
-    console.log(`⚠️  ${filePath} not found`);
+    if (varName.includes("SECRET") || varName.includes("DATABASE_URL")) {
+      console.log(`✅ ${varName}: Set (hidden)`);
+    } else {
+      console.log(`✅ ${varName}: ${value}`);
+    }
+
+    // Check Clerk environment
+    if (varName === "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY") {
+      if (value.includes("_test_")) {
+        console.log(
+          `   ⚠️  Using TEST environment (should be LIVE for production)`
+        );
+        hasClerkIssues = true;
+      } else if (value.includes("_live_")) {
+        console.log(`   ✅ Using LIVE environment`);
+      } else {
+        console.log(`   ❓ Unknown Clerk environment`);
+        hasClerkIssues = true;
+      }
+    }
   }
 });
 
-console.log("\n🔧 Clerk Configuration Checklist:");
-console.log("Please verify these settings in your Clerk Dashboard:");
+// Check Base URL specifically
+console.log("\n🌐 BASE URL ANALYSIS:");
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+if (!baseUrl) {
+  console.log(`❌ NEXT_PUBLIC_BASE_URL not set`);
+  console.log(`   📝 This will cause localhost fallback in production!`);
+  console.log(`   🔧 Set: NEXT_PUBLIC_BASE_URL=https://vyoniq.com`);
+} else if (baseUrl.includes("localhost")) {
+  console.log(`❌ NEXT_PUBLIC_BASE_URL contains localhost: ${baseUrl}`);
+  console.log(`   📝 This is the source of your redirect issue!`);
+  console.log(`   🔧 Change to: NEXT_PUBLIC_BASE_URL=https://vyoniq.com`);
+} else if (baseUrl === "https://vyoniq.com") {
+  console.log(`✅ NEXT_PUBLIC_BASE_URL correctly set: ${baseUrl}`);
+} else {
+  console.log(`⚠️  NEXT_PUBLIC_BASE_URL set to: ${baseUrl}`);
+  console.log(`   📝 Expected: https://vyoniq.com`);
+}
 
-const clerkChecklist = [
-  "Authorized domains include your production domain (vyoniq.com)",
-  "**NEW** Allowed redirect origins configured:",
-  "  - http://localhost:3000 (for development)",
-  "  - https://vyoniq.com (for production)",
-  "  - https://www.vyoniq.com (if using www subdomain)",
-  "Sign-in URL is set to /sign-in",
-  "Sign-up URL is set to /sign-up",
-  "After sign-in URL is set to /dashboard",
-  "After sign-up URL is set to /dashboard",
-  "Webhook endpoints are configured for production",
-  "CORS settings include your production domain",
-  "Enhanced email matching is enabled",
-  "Session lifetime is configured appropriately",
-  "Production keys are being used (not test keys)",
-];
+// Simulate getBaseUrl function
+console.log("\n🔍 SIMULATED getBaseUrl() FUNCTION:");
+function simulateGetBaseUrl() {
+  if (process.env.NEXT_PUBLIC_BASE_URL) {
+    return process.env.NEXT_PUBLIC_BASE_URL;
+  }
+  return process.env.NODE_ENV === "production"
+    ? "https://vyoniq.com"
+    : "http://localhost:3000";
+}
 
-clerkChecklist.forEach((item, index) => {
-  console.log(`${index + 1}. ${item}`);
-});
+const simulatedBaseUrl = simulateGetBaseUrl();
+console.log(`Result: ${simulatedBaseUrl}`);
+if (
+  simulatedBaseUrl.includes("localhost") &&
+  process.env.NODE_ENV === "production"
+) {
+  console.log(`❌ CRITICAL: getBaseUrl() returns localhost in production!`);
+} else {
+  console.log(`✅ getBaseUrl() returns correct URL`);
+}
 
-console.log("\n🚨 Common Production Issues:");
-const commonIssues = [
-  "Domain mismatch: Ensure your production domain matches Clerk configuration",
-  "HTTP vs HTTPS: Production should use HTTPS",
-  "Cookie settings: Check if cookies are being set correctly",
-  "CORS issues: Verify allowed origins in Clerk Dashboard",
-  "**NEW** Redirect origins: Configure allowed redirect origins in Clerk Dashboard",
-  "Webhook URLs: Ensure webhook endpoints are accessible",
-  "Environment variables: Double-check all required env vars are set",
-  "DNS propagation: If using a new domain, wait for DNS propagation",
-  "**FIXED** Deprecated props: Updated to use forceRedirectUrl instead of afterSignInUrl",
-];
+// Check Clerk configuration
+console.log("\n👤 CLERK CONFIGURATION:");
+console.log("Required Clerk Dashboard Settings:");
+console.log("  📍 Authorized domains: vyoniq.com");
+console.log("  📍 Allowed redirect origins:");
+console.log("    - https://vyoniq.com");
+console.log("    - https://www.vyoniq.com");
+console.log("  📍 After sign-in URL: /dashboard");
+console.log("  📍 After sign-up URL: /dashboard");
 
-commonIssues.forEach((issue, index) => {
-  console.log(`${index + 1}. ${issue}`);
-});
+// Check for common issues
+console.log("\n🐛 COMMON ISSUES & FIXES:");
+if (missingVars.length > 0) {
+  console.log(`❌ Missing environment variables: ${missingVars.join(", ")}`);
+}
 
-console.log("\n📝 Next Steps:");
-console.log("1. Configure allowed redirect origins in Clerk Dashboard");
-console.log("   Go to Configure → Restrictions → Allowed redirect origins");
-console.log("2. Visit your production site and try to sign in");
-console.log("3. Check browser console for JavaScript errors");
-console.log("4. Check network tab for failed requests");
-console.log("5. Visit /debug-auth on your production site");
-console.log("6. Check your application logs for authentication errors");
-console.log("7. Test with incognito/private browsing mode");
+if (!process.env.NEXT_PUBLIC_BASE_URL) {
+  console.log(`❌ NEXT_PUBLIC_BASE_URL not set - this is likely your issue!`);
+  console.log(
+    `   🔧 Add to your production environment: NEXT_PUBLIC_BASE_URL=https://vyoniq.com`
+  );
+}
 
-console.log("\n✅ Recent Fixes Applied:");
-console.log("- ✅ Removed deprecated afterSignInUrl and afterSignUpUrl props");
-console.log("- ✅ Updated to use forceRedirectUrl for consistent redirects");
-console.log("- ✅ Added signInForceRedirectUrl and signUpForceRedirectUrl");
-console.log("- ✅ Cleaned up ClerkProvider configuration");
+if (hasClerkIssues) {
+  console.log(`❌ Clerk environment issues detected`);
+  console.log(`   🔧 Make sure you're using the LIVE keys for production`);
+}
 
-console.log("\n✅ If issues persist, check:");
-console.log("- Browser developer tools (Console & Network tabs)");
-console.log("- Production application logs");
-console.log("- Clerk Dashboard logs");
-console.log("- Domain and SSL certificate configuration");
-console.log(
-  "- **NEW** Allowed redirect origins configuration in Clerk Dashboard"
-);
+console.log("\n📊 SUMMARY:");
+if (
+  missingVars.length === 0 &&
+  !hasClerkIssues &&
+  process.env.NEXT_PUBLIC_BASE_URL === "https://vyoniq.com"
+) {
+  console.log("✅ All configuration looks correct!");
+  console.log("   The issue might be in the Clerk Dashboard configuration.");
+  console.log(
+    "   Check: https://dashboard.clerk.com → Configure → Restrictions"
+  );
+} else {
+  console.log("❌ Configuration issues found. Fix the items above.");
+}
+
+console.log("\n🎯 IMMEDIATE ACTION ITEMS:");
+console.log("1. Set NEXT_PUBLIC_BASE_URL=https://vyoniq.com in production");
+console.log("2. Visit https://dashboard.clerk.com → Configure → Restrictions");
+console.log("3. Add https://vyoniq.com to 'Allowed redirect origins'");
+console.log("4. Remove any localhost entries from production Clerk config");
+console.log("5. Verify you're using LIVE Clerk keys (not TEST keys)");
+
+console.log("\n" + "=".repeat(50));
+console.log("Debug complete! 🚀");
