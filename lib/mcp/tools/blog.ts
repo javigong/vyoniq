@@ -15,6 +15,35 @@ import {
   MCPTool,
 } from "../types";
 
+interface BlogPostWithIncludes {
+  id: string;
+  slug: string;
+  title: string;
+  excerpt: string;
+  content: string;
+  coverImage: string;
+  publishDate: Date;
+  readTime: number;
+  featured: boolean;
+  tintColor: string | null;
+  published: boolean;
+  authorId: string;
+  createdAt: Date;
+  updatedAt: Date;
+  author: {
+    id: string;
+    name: string;
+    avatar: string | null;
+  };
+  categories: Array<{
+    category: {
+      id: string;
+      name: string;
+      slug: string;
+    };
+  }>;
+}
+
 // Helper functions to create responses (avoiding circular dependency)
 function createSuccessResponse(
   content: string,
@@ -195,7 +224,7 @@ export async function updateBlogPostHandler(
     if (data.categoryIds) {
       // Delete existing category associations
       await prisma.blogPostCategory.deleteMany({
-        where: { postId: data.id },
+        where: { blogPostId: data.id },
       });
 
       // Create new category associations
@@ -308,7 +337,7 @@ export async function deleteBlogPostHandler(
 
     // Delete associated categories first
     await prisma.blogPostCategory.deleteMany({
-      where: { postId: data.id },
+      where: { blogPostId: data.id },
     });
 
     // Delete the post
@@ -358,7 +387,15 @@ export async function createCategoryHandler(
     }
 
     const category = await prisma.blogCategory.create({
-      data: { name: data.name },
+      data: {
+        name: data.name,
+        slug: data.name
+          .toLowerCase()
+          .replace(/[^a-z0-9\s-]/g, "")
+          .replace(/\s+/g, "-")
+          .replace(/-+/g, "-")
+          .trim(),
+      },
     });
 
     return createSuccessResponse(
@@ -393,7 +430,7 @@ export async function listBlogPostsHandler(
 
     const validatedArgs = ListBlogPostsSchema.parse(args || {});
 
-    const posts = await prisma.blogPost.findMany({
+    const posts = (await prisma.blogPost.findMany({
       where:
         validatedArgs.published !== undefined
           ? { published: validatedArgs.published }
@@ -405,7 +442,7 @@ export async function listBlogPostsHandler(
         },
       },
       orderBy: { publishDate: "desc" },
-    });
+    })) as BlogPostWithIncludes[];
 
     const postList = posts
       .map(
@@ -449,7 +486,7 @@ export async function listCategoriesHandler(
     const categories = await prisma.blogCategory.findMany({
       include: {
         _count: {
-          select: { posts: true },
+          select: { blogPosts: true },
         },
       },
     });
@@ -457,7 +494,7 @@ export async function listCategoriesHandler(
     const categoryList = categories
       .map(
         (category) =>
-          `${category.id}: "${category.name}" (${category._count.posts} posts)`
+          `${category.id}: "${category.name}" (${category._count.blogPosts} posts)`
       )
       .join("\n");
 
@@ -493,46 +530,35 @@ export async function getBlogPostHandler(
 
     const data = GetBlogPostSchema.parse(args);
 
-    const post = await prisma.blogPost.findUnique({
+    const post = (await prisma.blogPost.findUnique({
       where: { id: data.id },
       include: {
-        author: true,
+        author: {
+          select: {
+            id: true,
+            name: true,
+            avatar: true,
+          },
+        },
         categories: {
-          include: { category: true },
+          include: {
+            category: true,
+          },
         },
       },
-    });
+    })) as BlogPostWithIncludes | null;
 
     if (!post) {
-      return createErrorResponse(`Blog post with ID '${data.id}' not found`);
+      return createErrorResponse(`Blog post with ID ${data.id} not found`);
     }
 
-    const categoryNames = post.categories
-      .map((c) => c.category.name)
-      .join(", ");
-
-    const postDetails = `# ${post.title}
-
-**Status:** ${post.published ? "Published" : "Draft"}
-**Author:** ${post.author.name}
-**Publish Date:** ${post.publishDate.toISOString().split("T")[0]}
-**Read Time:** ${post.readTime} minutes
-**Categories:** ${categoryNames}
-**Featured:** ${post.featured ? "Yes" : "No"}
-${post.tintColor ? `**Tint Color:** ${post.tintColor}` : ""}
-
-## Excerpt
-${post.excerpt}
-
-## Full Content
-${post.content}
-
----
-**Post ID:** ${post.id}
-**Created:** ${post.createdAt.toISOString()}
-**Updated:** ${post.updatedAt.toISOString()}`;
-
-    return createSuccessResponse(postDetails);
+    return createSuccessResponse(
+      `Blog post "${post.title}" (ID: ${post.id}) - Status: ${
+        post.published ? "Published" : "Draft"
+      } - Created: ${post.createdAt.toLocaleDateString()} - Author: ${
+        post.author.name
+      } - Categories: ${post.categories.map((c) => c.category.name).join(", ")}`
+    );
   } catch (error) {
     console.error("Error getting blog post:", error);
     return createErrorResponse(
