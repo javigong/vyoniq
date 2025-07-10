@@ -3,6 +3,7 @@
 import prisma from "./prisma";
 import { revalidatePath } from "next/cache";
 import crypto from "crypto";
+import { getBaseUrl } from "./utils";
 
 function generateUnsubscribeToken(): string {
   return crypto.randomBytes(32).toString("hex");
@@ -51,9 +52,7 @@ export async function subscribeToNewsletter(
     // Send welcome email
     try {
       const response = await fetch(
-        `${
-          process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
-        }/api/emails/newsletter/welcome`,
+        `${getBaseUrl()}/api/emails/newsletter/welcome`,
         {
           method: "POST",
           headers: {

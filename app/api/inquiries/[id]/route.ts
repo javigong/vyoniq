@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { Resend } from "resend";
+import { getBaseUrl } from "@/lib/utils";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -229,9 +230,7 @@ export async function POST(
                 </div>
                 
                 <div style="text-align: center; margin: 30px 0;">
-                  <a href="${
-                    process.env.NEXT_PUBLIC_BASE_URL || "https://vyoniq.com"
-                  }/dashboard/inquiries/${id}" 
+                  <a href="${getBaseUrl()}/dashboard/inquiries/${id}" 
                      style="background: #10B981; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">
                     View Full Conversation
                   </a>
@@ -273,9 +272,7 @@ export async function POST(
                   <p>${message}</p>
                 </div>
                 
-                <a href="${
-                  process.env.NEXT_PUBLIC_BASE_URL || "https://vyoniq.com"
-                }/admin/dashboard" 
+                <a href="${getBaseUrl()}/admin/dashboard" 
                    style="background: #3B82F6; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">
                   View in Admin Dashboard
                 </a>
