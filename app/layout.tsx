@@ -39,8 +39,8 @@ export default function RootLayout({
 }) {
   return (
     <ClerkProvider
-      afterSignInUrl="/redirect-after-auth"
-      afterSignUpUrl="/redirect-after-auth"
+      publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
+      domain={process.env.NODE_ENV === "production" ? "vyoniq.com" : undefined}
       signInFallbackRedirectUrl="/dashboard"
       signUpFallbackRedirectUrl="/dashboard"
     >
