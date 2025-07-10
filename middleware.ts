@@ -38,9 +38,19 @@ const isAdminRoute = createRouteMatcher(["/admin(.*)", "/api/admin(.*)"]);
 const isProduction = process.env.NODE_ENV === "production";
 const isDevelopment = process.env.NODE_ENV === "development";
 
+// Helper function to get the base URL for the current request
+function getBaseUrl(request: Request): string {
+  const host = request.headers.get("host") || "";
+  const protocol =
+    request.headers.get("x-forwarded-proto") ||
+    (host.includes("localhost") ? "http" : "https");
+  return `${protocol}://${host}`;
+}
+
 export default clerkMiddleware(
   async (auth, req) => {
     const { pathname } = req.nextUrl;
+    const baseUrl = getBaseUrl(req);
 
     // Skip protection for public routes
     if (isPublicRoute(req)) {
@@ -56,10 +66,12 @@ export default clerkMiddleware(
         if (!userId) {
           if (isDevelopment) {
             console.log(`🔒 Authentication required for: ${pathname}`);
+            console.log(`🌐 Base URL: ${baseUrl}`);
           }
 
-          const signInUrl = new URL("/sign-in", req.url);
-          signInUrl.searchParams.set("redirect_url", req.url);
+          // Use the current domain for redirect URLs
+          const signInUrl = new URL("/sign-in", baseUrl);
+          signInUrl.searchParams.set("redirect_url", `${baseUrl}${pathname}`);
           return NextResponse.redirect(signInUrl);
         }
 
@@ -77,8 +89,8 @@ export default clerkMiddleware(
               );
             }
 
-            // Redirect non-admin users to dashboard
-            const dashboardUrl = new URL("/dashboard", req.url);
+            // Redirect non-admin users to dashboard using current domain
+            const dashboardUrl = new URL("/dashboard", baseUrl);
             return NextResponse.redirect(dashboardUrl);
           }
 
@@ -104,11 +116,12 @@ export default clerkMiddleware(
           timestamp: new Date().toISOString(),
           userAgent: req.headers.get("user-agent"),
           host: req.headers.get("host"),
+          baseUrl,
         });
 
-        // Graceful fallback - redirect to sign-in
-        const signInUrl = new URL("/sign-in", req.url);
-        signInUrl.searchParams.set("redirect_url", req.url);
+        // Graceful fallback - redirect to sign-in using current domain
+        const signInUrl = new URL("/sign-in", baseUrl);
+        signInUrl.searchParams.set("redirect_url", `${baseUrl}${pathname}`);
         signInUrl.searchParams.set("error", "auth_error");
         return NextResponse.redirect(signInUrl);
       }
