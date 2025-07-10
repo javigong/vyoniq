@@ -21,7 +21,7 @@ import {
 } from "./tools/blog";
 
 // Import blog resources
-import { createBlogPostResources, resolveBlogResource } from "./resources/blog";
+import { resolveBlogResource } from "./resources/blog";
 
 // Import inquiry tools
 import {
@@ -63,12 +63,6 @@ export function initializeMCPServer() {
   mcpServer.addTool(createInquiryTool, createInquiryHandler);
   mcpServer.addTool(getInquiryStatsTool, getInquiryStatsHandler);
   mcpServer.addTool(deleteUserAccountTool, deleteUserAccountHandler);
-
-  // Register blog resource templates
-  const blogResourceTemplates = createBlogPostResources();
-  blogResourceTemplates.forEach((template) => {
-    mcpServer.addResourceTemplate(template);
-  });
 
   // Note: Dynamic resource resolution is now handled directly in the server's handleResourceRead method
 
