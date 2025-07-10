@@ -35,11 +35,47 @@ export default async function DebugAuth() {
             <p>
               <strong>getBaseUrl():</strong> {getBaseUrl()}
             </p>
+            <p className="text-red-600">
+              <strong>⚠️ Issue:</strong> If getBaseUrl() shows localhost in
+              production, set NEXT_PUBLIC_BASE_URL=https://vyoniq.com in your
+              production environment
+            </p>
           </div>
         </div>
 
         <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-xl font-semibold mb-4">Clerk Auth</h2>
+          <h2 className="text-xl font-semibold mb-4">
+            Clerk Environment Variables
+          </h2>
+          <div className="space-y-2">
+            <p>
+              <strong>NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY:</strong>{" "}
+              {process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+                ? `${process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY.substring(
+                    0,
+                    20
+                  )}...`
+                : "undefined"}
+            </p>
+            <p>
+              <strong>CLERK_SECRET_KEY:</strong>{" "}
+              {process.env.CLERK_SECRET_KEY ? "Set (hidden)" : "undefined"}
+            </p>
+            <p>
+              <strong>Environment:</strong>{" "}
+              {process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.includes("_test_")
+                ? "Development/Test"
+                : process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.includes(
+                    "_live_"
+                  )
+                ? "Production/Live"
+                : "Unknown"}
+            </p>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow p-6 mb-6">
+          <h2 className="text-xl font-semibold mb-4">Clerk Auth Status</h2>
           <div className="space-y-2">
             <p>
               <strong>User ID:</strong> {userId || "Not authenticated"}
@@ -64,24 +100,71 @@ export default async function DebugAuth() {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">Expected Redirects</h2>
+        <div className="bg-white rounded-lg shadow p-6 mb-6">
+          <h2 className="text-xl font-semibold mb-4">
+            Expected vs Actual Redirect URLs
+          </h2>
           <div className="space-y-2">
-            {userId ? (
-              user?.isAdmin ? (
-                <p className="text-green-600">
-                  Should redirect to: <strong>/admin/dashboard</strong>
+            <p>
+              <strong>Expected Production URLs:</strong>
+            </p>
+            <ul className="list-disc ml-6 text-green-600">
+              <li>Sign-in redirect: https://vyoniq.com/dashboard</li>
+              <li>Sign-up redirect: https://vyoniq.com/dashboard</li>
+              <li>Base URL: https://vyoniq.com</li>
+            </ul>
+            <p className="mt-4">
+              <strong>Current getBaseUrl():</strong>
+              <span
+                className={
+                  getBaseUrl().includes("localhost")
+                    ? "text-red-600 font-bold"
+                    : "text-green-600"
+                }
+              >
+                {getBaseUrl()}
+              </span>
+            </p>
+            {getBaseUrl().includes("localhost") && (
+              <div className="bg-red-50 border border-red-200 rounded p-4 mt-4">
+                <p className="text-red-800 font-semibold">🚨 PROBLEM FOUND!</p>
+                <p className="text-red-700">
+                  Your production environment is using localhost URLs. Set
+                  NEXT_PUBLIC_BASE_URL=https://vyoniq.com in your production
+                  environment.
                 </p>
-              ) : (
-                <p className="text-blue-600">
-                  Should redirect to: <strong>/dashboard</strong>
-                </p>
-              )
-            ) : (
-              <p className="text-red-600">
-                Should redirect to: <strong>/sign-in</strong>
-              </p>
+              </div>
             )}
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-xl font-semibold mb-4">Fix Instructions</h2>
+          <div className="space-y-2">
+            <h3 className="font-semibold text-lg">
+              1. Set Production Environment Variable:
+            </h3>
+            <div className="bg-gray-100 p-3 rounded font-mono text-sm">
+              NEXT_PUBLIC_BASE_URL=https://vyoniq.com
+            </div>
+
+            <h3 className="font-semibold text-lg mt-4">
+              2. Clerk Dashboard Configuration:
+            </h3>
+            <ul className="list-disc ml-6">
+              <li>Go to Clerk Dashboard → Configure → Restrictions</li>
+              <li>Add to "Allowed redirect origins": https://vyoniq.com</li>
+              <li>Remove any localhost entries from production</li>
+            </ul>
+
+            <h3 className="font-semibold text-lg mt-4">
+              3. Verify Domain Settings:
+            </h3>
+            <ul className="list-disc ml-6">
+              <li>Authorized domains: vyoniq.com</li>
+              <li>After sign-in URL: /dashboard</li>
+              <li>After sign-up URL: /dashboard</li>
+            </ul>
           </div>
         </div>
       </div>
