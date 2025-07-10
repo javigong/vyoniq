@@ -1,7 +1,7 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
-// Define protected routes using createRouteMatcher
+// Define protected routes that require authentication
 const isProtectedRoute = createRouteMatcher([
   "/dashboard(.*)",
   "/admin(.*)",
@@ -12,51 +12,121 @@ const isProtectedRoute = createRouteMatcher([
   "/api/mcp(.*)",
 ]);
 
-// Check if we're in production environment
-const isProduction =
-  process.env.NODE_ENV === "production" ||
-  process.env.VERCEL_ENV === "production" ||
-  process.env.NEXT_PUBLIC_VERCEL_ENV === "production";
+// Define public routes that should be accessible without authentication
+const isPublicRoute = createRouteMatcher([
+  "/",
+  "/sign-in(.*)",
+  "/sign-up(.*)",
+  "/about",
+  "/services(.*)",
+  "/blog(.*)",
+  "/privacy",
+  "/terms",
+  "/vyoniq-apps",
+  "/unsubscribe",
+  "/api/blog(.*)",
+  "/api/service-pricing",
+  "/api/emails/newsletter/unsubscribe",
+  "/api/webhooks(.*)",
+  "/api/payments/create-checkout-session",
+]);
+
+// Define admin routes that require additional permissions
+const isAdminRoute = createRouteMatcher(["/admin(.*)", "/api/admin(.*)"]);
+
+// Environment detection
+const isProduction = process.env.NODE_ENV === "production";
+const isDevelopment = process.env.NODE_ENV === "development";
 
 export default clerkMiddleware(
   async (auth, req) => {
-    // Handle problematic Clerk handshake requests
-    if (req.nextUrl.searchParams.has("__clerk_handshake")) {
-      // Clear the handshake parameter and redirect to clean URL
-      const url = new URL(req.url);
-      url.searchParams.delete("__clerk_handshake");
+    const { pathname } = req.nextUrl;
 
-      // If it's the homepage, redirect to clean homepage
-      if (url.pathname === "/") {
-        return NextResponse.redirect(new URL("/", req.url));
-      }
-
-      // Otherwise redirect to the clean URL
-      return NextResponse.redirect(url);
+    // Skip protection for public routes
+    if (isPublicRoute(req)) {
+      return NextResponse.next();
     }
 
     // Protect routes that require authentication
     if (isProtectedRoute(req)) {
       try {
-        await auth.protect();
-      } catch (error) {
-        // Log the error for debugging
-        console.error("Authentication error:", error);
+        const { userId, sessionClaims } = await auth();
 
-        // If auth fails, redirect to sign-in instead of throwing error
+        // Check if user is authenticated
+        if (!userId) {
+          if (isDevelopment) {
+            console.log(`🔒 Authentication required for: ${pathname}`);
+          }
+
+          const signInUrl = new URL("/sign-in", req.url);
+          signInUrl.searchParams.set("redirect_url", req.url);
+          return NextResponse.redirect(signInUrl);
+        }
+
+        // Additional check for admin routes
+        if (isAdminRoute(req)) {
+          const publicMetadata = sessionClaims?.publicMetadata as
+            | { role?: string }
+            | undefined;
+          const isAdmin = publicMetadata?.role === "admin";
+
+          if (!isAdmin) {
+            if (isDevelopment) {
+              console.log(
+                `🚫 Admin access denied for user ${userId} on: ${pathname}`
+              );
+            }
+
+            // Redirect non-admin users to dashboard
+            const dashboardUrl = new URL("/dashboard", req.url);
+            return NextResponse.redirect(dashboardUrl);
+          }
+
+          if (isDevelopment) {
+            console.log(
+              `✅ Admin access granted for user ${userId} on: ${pathname}`
+            );
+          }
+        }
+
+        if (isDevelopment) {
+          console.log(
+            `✅ Authentication successful for user ${userId} on: ${pathname}`
+          );
+        }
+
+        return NextResponse.next();
+      } catch (error) {
+        // Enhanced error logging
+        console.error("🔥 Clerk middleware error:", {
+          error: error instanceof Error ? error.message : "Unknown error",
+          pathname,
+          timestamp: new Date().toISOString(),
+          userAgent: req.headers.get("user-agent"),
+          host: req.headers.get("host"),
+        });
+
+        // Graceful fallback - redirect to sign-in
         const signInUrl = new URL("/sign-in", req.url);
         signInUrl.searchParams.set("redirect_url", req.url);
+        signInUrl.searchParams.set("error", "auth_error");
         return NextResponse.redirect(signInUrl);
       }
     }
+
+    // Default: allow the request to proceed
+    return NextResponse.next();
   },
   {
-    // Configure authorizedParties for production
-    // This ensures Clerk recognizes your production domain
-    authorizedParties: isProduction ? ["vyoniq.com", "www.vyoniq.com"] : [],
+    // Configure authorized parties based on environment
+    // Development: undefined allows localhost and any development domains
+    // Production: restrict to specific domains for security
+    authorizedParties: isProduction
+      ? ["vyoniq.com", "www.vyoniq.com"]
+      : undefined, // This allows localhost:3000, localhost:3001, etc.
 
     // Enable debug mode in development for better error messages
-    debug: !isProduction,
+    debug: isDevelopment,
   }
 );
 
