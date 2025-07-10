@@ -38,12 +38,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ClerkProvider
-      publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
-      domain={process.env.NODE_ENV === "production" ? "vyoniq.com" : undefined}
-      signInFallbackRedirectUrl="/dashboard"
-      signUpFallbackRedirectUrl="/dashboard"
-    >
+    <ClerkProvider>
       <html lang="en" suppressHydrationWarning>
         <head>
           <script
