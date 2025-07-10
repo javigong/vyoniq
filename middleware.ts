@@ -12,32 +12,46 @@ const isProtectedRoute = createRouteMatcher([
   "/api/mcp(.*)",
 ]);
 
-export default clerkMiddleware(async (auth, req) => {
-  // Handle problematic Clerk handshake requests
-  if (req.nextUrl.searchParams.has("__clerk_handshake")) {
-    // Clear the handshake parameter and redirect to clean URL
-    const url = new URL(req.url);
-    url.searchParams.delete("__clerk_handshake");
+export default clerkMiddleware(
+  async (auth, req) => {
+    // Handle problematic Clerk handshake requests
+    if (req.nextUrl.searchParams.has("__clerk_handshake")) {
+      // Clear the handshake parameter and redirect to clean URL
+      const url = new URL(req.url);
+      url.searchParams.delete("__clerk_handshake");
 
-    // If it's the homepage, redirect to clean homepage
-    if (url.pathname === "/") {
-      return NextResponse.redirect(new URL("/", req.url));
+      // If it's the homepage, redirect to clean homepage
+      if (url.pathname === "/") {
+        return NextResponse.redirect(new URL("/", req.url));
+      }
+
+      // Otherwise redirect to the clean URL
+      return NextResponse.redirect(url);
     }
 
-    // Otherwise redirect to the clean URL
-    return NextResponse.redirect(url);
-  }
+    // Protect routes that require authentication
+    if (isProtectedRoute(req)) {
+      try {
+        await auth.protect();
+      } catch (error) {
+        // Log the error for debugging
+        console.error("Authentication error:", error);
 
-  // Protect routes that require authentication
-  if (isProtectedRoute(req)) {
-    try {
-      await auth.protect();
-    } catch (error) {
-      // If auth fails, redirect to sign-in instead of throwing error
-      return NextResponse.redirect(new URL("/sign-in", req.url));
+        // If auth fails, redirect to sign-in instead of throwing error
+        const signInUrl = new URL("/sign-in", req.url);
+        signInUrl.searchParams.set("redirect_url", req.url);
+        return NextResponse.redirect(signInUrl);
+      }
     }
+  },
+  {
+    // Configure authorizedParties for production
+    authorizedParties:
+      process.env.NODE_ENV === "production"
+        ? ["vyoniq.com", "www.vyoniq.com"]
+        : [],
   }
-});
+);
 
 export const config = {
   matcher: [
