@@ -6,22 +6,26 @@ import { BudgetCard } from "./budget-card";
 interface BudgetItem {
   id: string;
   name: string;
-  description?: string;
+  description?: string | null;
   quantity: number;
   unitPrice: number;
   totalPrice: number;
-  category?: string;
+  category?: string | null;
+  createdAt: string;
+  budgetId: string;
+  servicePricingId?: string | null;
+  isCustom: boolean;
 }
 
 interface Budget {
   id: string;
   title: string;
-  description?: string;
+  description?: string | null;
   totalAmount: number;
   status: string;
-  validUntil?: string;
-  adminNotes?: string;
-  clientNotes?: string;
+  validUntil?: string | null;
+  adminNotes?: string | null;
+  clientNotes?: string | null;
   createdAt: string;
   items: BudgetItem[];
   inquiry: {
@@ -34,7 +38,7 @@ interface Budget {
     id: string;
     amount: number;
     status: string;
-    paidAt?: string;
+    paidAt?: string | null;
   }>;
 }
 
