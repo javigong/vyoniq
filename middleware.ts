@@ -1,16 +1,22 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-const isAdminRoute = createRouteMatcher(["/admin(.*)"]);
+// Define protected routes using createRouteMatcher
+const isProtectedRoute = createRouteMatcher([
+  "/dashboard(.*)",
+  "/admin(.*)",
+  "/api/admin(.*)",
+  "/api/budgets(.*)",
+  "/api/inquiries(.*)",
+  "/api/user(.*)",
+  "/api/mcp(.*)",
+]);
 
-export default clerkMiddleware(
-  (auth, req) => {
-    // Protect the admin routes.
-    if (isAdminRoute(req)) {
-      auth.protect();
-    }
+export default clerkMiddleware(async (auth, req) => {
+  // Protect routes that require authentication
+  if (isProtectedRoute(req)) {
+    await auth.protect();
   }
-  // Removed authorizedParties as it can cause handshake issues
-);
+});
 
 export const config = {
   matcher: [
