@@ -1,27 +1,20 @@
+import { getBaseUrl } from "@/lib/utils";
 import { auth } from "@clerk/nextjs/server";
-import { getBaseUrl, getClerkBaseUrl } from "@/lib/utils";
 import prisma from "@/lib/prisma";
 
 export default async function DebugAuth() {
   const { userId } = await auth();
-
   let user = null;
+
   if (userId) {
     try {
       user = await prisma.user.findUnique({
         where: { id: userId },
-        select: { id: true, email: true, isAdmin: true, isOnWaitlist: true },
       });
     } catch (error) {
-      console.error("Error fetching user:", error);
+      console.error("Database error:", error);
     }
   }
-
-  // Check production environment detection
-  const isProduction =
-    process.env.NODE_ENV === "production" ||
-    process.env.VERCEL_ENV === "production" ||
-    process.env.NEXT_PUBLIC_VERCEL_ENV === "production";
 
   return (
     <div className="min-h-screen bg-gray-100 py-12 px-4">
@@ -46,12 +39,11 @@ export default async function DebugAuth() {
                 <div>
                   getClerkBaseUrl():{" "}
                   <span className="font-mono bg-gray-100 px-2 py-1 rounded">
-                    {getClerkBaseUrl()}
+                    {getBaseUrl()}
                   </span>
                 </div>
               </div>
             </div>
-
             <div className="p-4 bg-yellow-50 rounded">
               <p className="font-semibold text-yellow-800">
                 Expected Production URLs:
@@ -71,19 +63,6 @@ export default async function DebugAuth() {
                 </div>
               </div>
             </div>
-
-            {(getBaseUrl().includes("localhost") ||
-              getClerkBaseUrl().includes("localhost")) && (
-              <div className="p-4 bg-red-50 border border-red-200 rounded">
-                <p className="font-semibold text-red-800">
-                  ❌ LOCALHOST DETECTED IN PRODUCTION!
-                </p>
-                <p className="text-red-700 mt-2">
-                  This is the source of your redirect issue. The URL functions
-                  are returning localhost URLs in production.
-                </p>
-              </div>
-            )}
           </div>
         </div>
 
@@ -97,7 +76,7 @@ export default async function DebugAuth() {
               <p>
                 <strong>NODE_ENV:</strong>{" "}
                 <span className="font-mono bg-gray-100 px-2 py-1 rounded">
-                  {process.env.NODE_ENV || "undefined"}
+                  {process.env.NODE_ENV}
                 </span>
               </p>
               <p>
@@ -118,18 +97,24 @@ export default async function DebugAuth() {
                 <strong>Production Detected:</strong>{" "}
                 <span
                   className={`font-mono px-2 py-1 rounded ${
-                    isProduction
+                    process.env.NODE_ENV === "production" ||
+                    process.env.VERCEL_ENV === "production" ||
+                    process.env.NEXT_PUBLIC_VERCEL_ENV === "production"
                       ? "bg-green-100 text-green-800"
                       : "bg-red-100 text-red-800"
                   }`}
                 >
-                  {isProduction ? "YES" : "NO"}
+                  {process.env.NODE_ENV === "production" ||
+                  process.env.VERCEL_ENV === "production" ||
+                  process.env.NEXT_PUBLIC_VERCEL_ENV === "production"
+                    ? "YES"
+                    : "NO"}
                 </span>
               </p>
               <p>
                 <strong>NEXT_PUBLIC_BASE_URL:</strong>{" "}
                 <span className="font-mono bg-gray-100 px-2 py-1 rounded">
-                  {process.env.NEXT_PUBLIC_BASE_URL || "undefined"}
+                  {process.env.NEXT_PUBLIC_BASE_URL || "Not set"}
                 </span>
               </p>
             </div>
@@ -151,13 +136,13 @@ export default async function DebugAuth() {
             <p>
               <strong>Database User:</strong>{" "}
               <span className="font-mono bg-gray-100 px-2 py-1 rounded">
-                {user ? `${user.email} (Admin: ${user.isAdmin})` : "Not found"}
+                {user ? `${user.name || user.email}` : "Not found"}
               </span>
             </p>
           </div>
         </div>
 
-        {/* Clerk Environment Variables */}
+        {/* Clerk Configuration */}
         <div className="bg-white rounded-lg shadow p-6 mb-6">
           <h2 className="text-xl font-semibold mb-4">🔑 Clerk Configuration</h2>
           <div className="space-y-2">
@@ -193,12 +178,13 @@ export default async function DebugAuth() {
           </div>
         </div>
 
-        {/* Clerk Dashboard Issues */}
+        {/* Possible Issues & Solutions */}
         <div className="bg-white rounded-lg shadow p-6 mb-6">
           <h2 className="text-xl font-semibold mb-4">
             🚨 Possible Issues & Solutions
           </h2>
           <div className="space-y-4">
+            {/* Browser/Session Cache Issue */}
             <div className="p-4 bg-red-50 border border-red-200 rounded">
               <h3 className="font-semibold text-red-800 mb-2">
                 1. Browser/Session Cache Issue
@@ -216,6 +202,7 @@ export default async function DebugAuth() {
               </div>
             </div>
 
+            {/* Clerk Dashboard Configuration */}
             <div className="p-4 bg-yellow-50 border border-yellow-200 rounded">
               <h3 className="font-semibold text-yellow-800 mb-2">
                 2. Clerk Dashboard Configuration
@@ -237,6 +224,7 @@ export default async function DebugAuth() {
               </div>
             </div>
 
+            {/* Environment Variables */}
             <div className="p-4 bg-blue-50 border border-blue-200 rounded">
               <h3 className="font-semibold text-blue-800 mb-2">
                 3. Environment Variables
@@ -251,6 +239,32 @@ export default async function DebugAuth() {
                 <div>CLERK_SECRET_KEY=sk_live_...</div>
               </div>
             </div>
+
+            {/* Check for localhost in production */}
+            {getBaseUrl().includes("localhost") && (
+              <div className="p-4 bg-red-50 border border-red-200 rounded">
+                <h3 className="font-semibold text-red-800 mb-2">
+                  4. 🚨 CRITICAL: Localhost in Production
+                </h3>
+                <p className="text-red-700 mb-2">
+                  Your production environment is returning localhost URLs! This
+                  is why authentication redirects are failing.
+                </p>
+                <div className="bg-red-100 p-3 rounded text-sm">
+                  <p className="font-semibold">Immediate Fix:</p>
+                  <ul className="list-disc ml-4 mt-1">
+                    <li>
+                      Set <code>NEXT_PUBLIC_BASE_URL=https://vyoniq.com</code>{" "}
+                      in your production environment
+                    </li>
+                    <li>
+                      Ensure <code>NODE_ENV=production</code> is properly set
+                    </li>
+                    <li>Restart your production server</li>
+                  </ul>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
