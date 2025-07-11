@@ -14,6 +14,7 @@ import {
   ListBlogPostsSchema,
   ListCategoriesSchema,
   GetBlogPostSchema,
+  RevalidateBlogSchema,
   MCPAuthContext,
   MCPToolResult,
   MCPTool,
@@ -991,6 +992,79 @@ export async function getBlogPostHandler(
     console.error("Error getting blog post:", error);
     return createErrorResponse(
       `Failed to get blog post: ${
+        error instanceof Error ? error.message : "Unknown error"
+      }`
+    );
+  }
+}
+
+// Revalidate Blog Tool
+export const revalidateBlogTool: MCPTool = {
+  name: "revalidate_blog",
+  description:
+    "Revalidate cached blog pages to show latest content immediately",
+  inputSchema: zodToJsonSchema(RevalidateBlogSchema, { $refStrategy: "none" }),
+  zodSchema: RevalidateBlogSchema,
+};
+
+export async function revalidateBlogHandler(
+  args: unknown,
+  auth: MCPAuthContext
+): Promise<MCPToolResult> {
+  try {
+    if (!auth.isAdmin) {
+      return createErrorResponse("Unauthorized: Admin access required");
+    }
+
+    const data = RevalidateBlogSchema.parse(args);
+
+    if (data.action === "revalidate-post" && !data.slug) {
+      return createErrorResponse(
+        "Slug is required when action is 'revalidate-post'"
+      );
+    }
+
+    // Make a request to our revalidation API
+    const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+    const response = await fetch(`${baseUrl}/api/revalidate/blog`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        // Pass through the authorization for admin check
+        "Authorization": `Bearer ${auth.apiKeyId || "internal"}`,
+      },
+      body: JSON.stringify({
+        action: data.action,
+        slug: data.slug,
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      return createErrorResponse(
+        `Failed to revalidate: ${error.error || "Unknown error"}`
+      );
+    }
+
+    const result = await response.json();
+
+    if (data.action === "revalidate-all") {
+      return createSuccessResponse(
+        `✅ Successfully revalidated all blog pages\n` +
+        `Timestamp: ${result.timestamp}\n` +
+        `All blog posts and the blog index page have been updated with the latest content.`
+      );
+    } else {
+      return createSuccessResponse(
+        `✅ Successfully revalidated blog post: ${data.slug}\n` +
+        `Timestamp: ${result.timestamp}\n` +
+        `The blog post page and blog index have been updated with the latest content.`
+      );
+    }
+  } catch (error) {
+    console.error("Error revalidating blog:", error);
+    return createErrorResponse(
+      `Failed to revalidate blog: ${
         error instanceof Error ? error.message : "Unknown error"
       }`
     );
