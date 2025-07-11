@@ -64,6 +64,7 @@ export async function GET() {
       slug: post.slug,
       title: post.title,
       excerpt: post.excerpt,
+      content: post.content,
       coverImage: post.coverImage,
       publishDate: post.publishDate.toISOString(),
       readTime: post.readTime,
