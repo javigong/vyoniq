@@ -26,6 +26,8 @@ import {
   listCategoriesHandler,
   getBlogPostTool,
   getBlogPostHandler,
+  revalidateBlogTool,
+  revalidateBlogHandler,
 } from "./tools/blog";
 
 // Import blog resources
@@ -66,6 +68,7 @@ export function initializeMCPServer() {
   mcpServer.addTool(listBlogPostsTool, listBlogPostsHandler);
   mcpServer.addTool(listCategoriesTool, listCategoriesHandler);
   mcpServer.addTool(getBlogPostTool, getBlogPostHandler);
+  mcpServer.addTool(revalidateBlogTool, revalidateBlogHandler);
 
   // Register inquiry management tools
   mcpServer.addTool(listInquiriesTool, listInquiriesHandler);
