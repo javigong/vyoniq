@@ -15,6 +15,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { StructuredData } from "@/components/structured-data";
+import { MarkdownRenderer } from "@/components/markdown-renderer";
 
 interface BlogPostPageProps {
   params: {
@@ -186,67 +187,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             <div className="flex flex-col md:flex-row gap-8">
               {/* Main Content */}
               <div className="md:w-3/4">
-                <div className="prose prose-lg dark:prose-invert max-w-none">
-                  {post.content.split("\n").map((paragraph, index) => {
-                    if (paragraph.startsWith("# ")) {
-                      return (
-                        <h1
-                          key={index}
-                          className="text-3xl font-bold mt-8 mb-4 text-vyoniq-blue dark:text-white"
-                        >
-                          {paragraph.substring(2)}
-                        </h1>
-                      );
-                    } else if (paragraph.startsWith("## ")) {
-                      return (
-                        <h2
-                          key={index}
-                          className="text-2xl font-bold mt-6 mb-3 text-vyoniq-blue dark:text-white"
-                        >
-                          {paragraph.substring(3)}
-                        </h2>
-                      );
-                    } else if (paragraph.startsWith("### ")) {
-                      return (
-                        <h3
-                          key={index}
-                          className="text-xl font-bold mt-5 mb-2 text-vyoniq-blue dark:text-white"
-                        >
-                          {paragraph.substring(4)}
-                        </h3>
-                      );
-                    } else if (paragraph.startsWith("- ")) {
-                      return (
-                        <li
-                          key={index}
-                          className="ml-6 mb-1 text-vyoniq-text dark:text-vyoniq-dark-text"
-                        >
-                          {paragraph.substring(2)}
-                        </li>
-                      );
-                    } else if (paragraph.startsWith("**")) {
-                      return (
-                        <p
-                          key={index}
-                          className="font-bold mb-4 text-vyoniq-text dark:text-vyoniq-dark-text"
-                        >
-                          {paragraph.replace(/\*\*/g, "")}
-                        </p>
-                      );
-                    } else if (paragraph.trim() === "") {
-                      return null;
-                    } else {
-                      return (
-                        <p
-                          key={index}
-                          className="mb-4 text-vyoniq-text dark:text-vyoniq-dark-text"
-                        >
-                          {paragraph}
-                        </p>
-                      );
-                    }
-                  })}
-                </div>
+                <MarkdownRenderer content={post.content} />
 
                 <BlogShareButtons title={post.title} slug={post.slug} />
               </div>
