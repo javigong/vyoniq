@@ -208,6 +208,59 @@ export const CreateCategorySchema = z.object({
     .describe("The name of the new blog category to create"),
 });
 
+export const UpdateCategorySchema = z.object({
+  id: z
+    .string()
+    .min(1, "Category ID is required")
+    .describe("The unique ID of the category to update"),
+  name: z
+    .string()
+    .min(1, "Category name is required")
+    .describe("The new name for the category"),
+});
+
+export const DeleteCategorySchema = z.object({
+  id: z
+    .string()
+    .min(1, "Category ID is required")
+    .describe("The unique ID of the category to delete"),
+  movePostsToCategory: z
+    .string()
+    .optional()
+    .describe("Category ID to move posts to (creates 'Uncategorized' if not specified)"),
+});
+
+export const SuggestCategoriesSchema = z.object({
+  content: z
+    .string()
+    .min(1, "Content is required")
+    .describe("The blog post content to analyze for category suggestions"),
+  title: z
+    .string()
+    .min(1, "Title is required")
+    .describe("The blog post title to analyze for category suggestions"),
+  existingCategoryIds: z
+    .array(z.string())
+    .optional()
+    .default([])
+    .describe("Already selected category IDs to exclude from suggestions"),
+});
+
+export const BulkUpdatePostsSchema = z.object({
+  postIds: z
+    .array(z.string())
+    .min(1, "At least one post ID is required")
+    .describe("Array of blog post IDs to update"),
+  updates: z.object({
+    published: z.boolean().optional().describe("Publish or unpublish all posts"),
+    featured: z.boolean().optional().describe("Mark all posts as featured or not"),
+    categoryIds: z.array(z.string()).optional().describe("Apply these categories to all posts"),
+    addCategoryIds: z.array(z.string()).optional().describe("Add these categories to all posts"),
+    removeCategoryIds: z.array(z.string()).optional().describe("Remove these categories from all posts"),
+    tintColor: z.string().optional().describe("Apply this tint color to all posts"),
+  }).describe("Updates to apply to all selected posts"),
+});
+
 export const ListBlogPostsSchema = z.object({
   published: z
     .boolean()

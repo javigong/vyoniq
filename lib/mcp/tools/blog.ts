@@ -7,6 +7,10 @@ import {
   PublishBlogPostSchema,
   DeleteBlogPostSchema,
   CreateCategorySchema,
+  UpdateCategorySchema,
+  DeleteCategorySchema,
+  SuggestCategoriesSchema,
+  BulkUpdatePostsSchema,
   ListBlogPostsSchema,
   ListCategoriesSchema,
   GetBlogPostSchema,
@@ -377,13 +381,24 @@ export async function createCategoryHandler(
 
     const data = CreateCategorySchema.parse(args);
 
-    // Check if category already exists
-    const existingCategory = await prisma.blogCategory.findUnique({
-      where: { name: data.name },
+    // Enhanced: Check for similar categories to avoid duplicates
+    const similarCategories = await prisma.blogCategory.findMany({
+      where: {
+        OR: [
+          { name: { contains: data.name } },
+          { slug: { contains: data.name.toLowerCase().replace(/\s+/g, "-") } },
+        ],
+      },
     });
 
-    if (existingCategory) {
-      return createErrorResponse(`Category '${data.name}' already exists`);
+    if (similarCategories.length > 0) {
+      return createErrorResponse(
+        `Similar categories found: ${similarCategories
+          .map((c) => c.name)
+          .join(
+            ", "
+          )}. Consider using existing categories or choose a more specific name.`
+      );
     }
 
     const category = await prisma.blogCategory.create({
@@ -405,6 +420,419 @@ export async function createCategoryHandler(
     console.error("Error creating category:", error);
     return createErrorResponse(
       `Failed to create category: ${
+        error instanceof Error ? error.message : "Unknown error"
+      }`
+    );
+  }
+}
+
+// Update Category Tool
+export const updateCategoryTool: MCPTool = {
+  name: "update_category",
+  description: "Update an existing blog category name or slug",
+  inputSchema: zodToJsonSchema(UpdateCategorySchema, { $refStrategy: "none" }),
+  zodSchema: UpdateCategorySchema,
+};
+
+export async function updateCategoryHandler(
+  args: unknown,
+  auth: MCPAuthContext
+): Promise<MCPToolResult> {
+  try {
+    if (!auth.isAdmin) {
+      return createErrorResponse("Unauthorized: Admin access required");
+    }
+
+    const data = UpdateCategorySchema.parse(args);
+
+    // Check if category exists
+    const existingCategory = await prisma.blogCategory.findUnique({
+      where: { id: data.id },
+      include: {
+        _count: {
+          select: { blogPosts: true },
+        },
+      },
+    });
+
+    if (!existingCategory) {
+      return createErrorResponse(`Category with ID '${data.id}' not found`);
+    }
+
+    // Check if new name conflicts with existing categories
+    const conflictingCategory = await prisma.blogCategory.findFirst({
+      where: {
+        name: data.name,
+        id: { not: data.id },
+      },
+    });
+
+    if (conflictingCategory) {
+      return createErrorResponse(`Category '${data.name}' already exists`);
+    }
+
+    // Update the category
+    const updatedCategory = await prisma.blogCategory.update({
+      where: { id: data.id },
+      data: {
+        name: data.name,
+        slug: data.name
+          .toLowerCase()
+          .replace(/[^a-z0-9\s-]/g, "")
+          .replace(/\s+/g, "-")
+          .replace(/-+/g, "-")
+          .trim(),
+      },
+    });
+
+    return createSuccessResponse(
+      `Successfully updated category: "${updatedCategory.name}" (ID: ${updatedCategory.id})\n` +
+        `Associated with ${existingCategory._count.blogPosts} blog posts`
+    );
+  } catch (error) {
+    console.error("Error updating category:", error);
+    return createErrorResponse(
+      `Failed to update category: ${
+        error instanceof Error ? error.message : "Unknown error"
+      }`
+    );
+  }
+}
+
+// Delete Category Tool
+export const deleteCategoryTool: MCPTool = {
+  name: "delete_category",
+  description:
+    "Delete a blog category and optionally move posts to another category",
+  inputSchema: zodToJsonSchema(DeleteCategorySchema, { $refStrategy: "none" }),
+  zodSchema: DeleteCategorySchema,
+};
+
+export async function deleteCategoryHandler(
+  args: unknown,
+  auth: MCPAuthContext
+): Promise<MCPToolResult> {
+  try {
+    if (!auth.isAdmin) {
+      return createErrorResponse("Unauthorized: Admin access required");
+    }
+
+    const data = DeleteCategorySchema.parse(args);
+
+    // Check if category exists
+    const categoryToDelete = await prisma.blogCategory.findUnique({
+      where: { id: data.id },
+      include: {
+        _count: {
+          select: { blogPosts: true },
+        },
+      },
+    });
+
+    if (!categoryToDelete) {
+      return createErrorResponse(`Category with ID '${data.id}' not found`);
+    }
+
+    let targetCategoryId = data.movePostsToCategory;
+
+    // If posts exist and no target category specified, create "Uncategorized"
+    if (categoryToDelete._count.blogPosts > 0 && !targetCategoryId) {
+      let uncategorizedCategory = await prisma.blogCategory.findFirst({
+        where: { name: "Uncategorized" },
+      });
+
+      if (!uncategorizedCategory) {
+        uncategorizedCategory = await prisma.blogCategory.create({
+          data: {
+            name: "Uncategorized",
+            slug: "uncategorized",
+          },
+        });
+      }
+
+      targetCategoryId = uncategorizedCategory.id;
+    }
+
+    // Move posts to target category if specified
+    if (targetCategoryId && categoryToDelete._count.blogPosts > 0) {
+      await prisma.blogPostCategory.updateMany({
+        where: { categoryId: data.id },
+        data: { categoryId: targetCategoryId },
+      });
+    }
+
+    // Delete the category
+    await prisma.blogCategory.delete({
+      where: { id: data.id },
+    });
+
+    return createSuccessResponse(
+      `Successfully deleted category: "${categoryToDelete.name}"\n` +
+        `${categoryToDelete._count.blogPosts} posts ${
+          targetCategoryId ? `moved to target category` : "were unassigned"
+        }`
+    );
+  } catch (error) {
+    console.error("Error deleting category:", error);
+    return createErrorResponse(
+      `Failed to delete category: ${
+        error instanceof Error ? error.message : "Unknown error"
+      }`
+    );
+  }
+}
+
+// Suggest Categories Tool
+export const suggestCategoriesTool: MCPTool = {
+  name: "suggest_categories_for_post",
+  description:
+    "Analyze post content and suggest relevant categories based on existing categories",
+  inputSchema: zodToJsonSchema(SuggestCategoriesSchema, {
+    $refStrategy: "none",
+  }),
+  zodSchema: SuggestCategoriesSchema,
+};
+
+export async function suggestCategoriesHandler(
+  args: unknown,
+  auth: MCPAuthContext
+): Promise<MCPToolResult> {
+  try {
+    if (!auth.isAdmin) {
+      return createErrorResponse("Unauthorized: Admin access required");
+    }
+
+    const data = SuggestCategoriesSchema.parse(args);
+
+    // Get all existing categories
+    const allCategories = await prisma.blogCategory.findMany({
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+      },
+    });
+
+    // Filter out already selected categories
+    const availableCategories = allCategories.filter(
+      (cat) => !data.existingCategoryIds.includes(cat.id)
+    );
+
+    // Simple keyword-based suggestion algorithm
+    const contentText = `${data.title} ${data.content}`.toLowerCase();
+    const suggestions = [];
+
+    for (const category of availableCategories) {
+      const categoryKeywords = category.name.toLowerCase().split(/[\s-&]+/);
+      const categorySlugKeywords = category.slug.split("-");
+
+      let score = 0;
+
+      // Check for exact keyword matches
+      for (const keyword of [...categoryKeywords, ...categorySlugKeywords]) {
+        if (keyword.length > 2) {
+          // Ignore very short words
+          const keywordRegex = new RegExp(`\\b${keyword}\\b`, "gi");
+          const matches = contentText.match(keywordRegex);
+          if (matches) {
+            score += matches.length;
+          }
+        }
+      }
+
+      // Boost score for title matches
+      const titleText = data.title.toLowerCase();
+      for (const keyword of categoryKeywords) {
+        if (keyword.length > 2 && titleText.includes(keyword)) {
+          score += 3; // Higher weight for title matches
+        }
+      }
+
+      if (score > 0) {
+        suggestions.push({
+          category,
+          score,
+          reason: `Found ${score} relevant keyword matches`,
+        });
+      }
+    }
+
+    // Sort by score and take top 5
+    suggestions.sort((a, b) => b.score - a.score);
+    const topSuggestions = suggestions.slice(0, 5);
+
+    if (topSuggestions.length === 0) {
+      return createSuccessResponse(
+        "No category suggestions found based on content analysis.\n" +
+          "Consider creating new categories or manually selecting from existing ones."
+      );
+    }
+
+    const suggestionText = topSuggestions
+      .map(
+        (s, index) =>
+          `${index + 1}. ${s.category.name} (ID: ${s.category.id}) - ${
+            s.reason
+          }`
+      )
+      .join("\n");
+
+    return createSuccessResponse(
+      `Found ${topSuggestions.length} category suggestions:\n\n${suggestionText}\n\n` +
+        `Available categories: ${availableCategories.length}\n` +
+        `Already selected: ${data.existingCategoryIds.length}`
+    );
+  } catch (error) {
+    console.error("Error suggesting categories:", error);
+    return createErrorResponse(
+      `Failed to suggest categories: ${
+        error instanceof Error ? error.message : "Unknown error"
+      }`
+    );
+  }
+}
+
+// Bulk Update Posts Tool
+export const bulkUpdatePostsTool: MCPTool = {
+  name: "bulk_update_posts",
+  description: "Update multiple blog posts at once with various operations",
+  inputSchema: zodToJsonSchema(BulkUpdatePostsSchema, { $refStrategy: "none" }),
+  zodSchema: BulkUpdatePostsSchema,
+};
+
+export async function bulkUpdatePostsHandler(
+  args: unknown,
+  auth: MCPAuthContext
+): Promise<MCPToolResult> {
+  try {
+    if (!auth.isAdmin) {
+      return createErrorResponse("Unauthorized: Admin access required");
+    }
+
+    const data = BulkUpdatePostsSchema.parse(args);
+
+    // Verify all posts exist
+    const existingPosts = await prisma.blogPost.findMany({
+      where: {
+        id: { in: data.postIds },
+      },
+      select: {
+        id: true,
+        title: true,
+      },
+    });
+
+    if (existingPosts.length !== data.postIds.length) {
+      const foundIds = existingPosts.map((p) => p.id);
+      const missingIds = data.postIds.filter((id) => !foundIds.includes(id));
+      return createErrorResponse(
+        `Some posts not found: ${missingIds.join(", ")}`
+      );
+    }
+
+    const results = [];
+
+    // Update basic fields
+    if (
+      data.updates.published !== undefined ||
+      data.updates.featured !== undefined ||
+      data.updates.tintColor !== undefined
+    ) {
+      const updateData: any = {};
+      if (data.updates.published !== undefined)
+        updateData.published = data.updates.published;
+      if (data.updates.featured !== undefined)
+        updateData.featured = data.updates.featured;
+      if (data.updates.tintColor !== undefined)
+        updateData.tintColor = data.updates.tintColor;
+
+      const updateResult = await prisma.blogPost.updateMany({
+        where: {
+          id: { in: data.postIds },
+        },
+        data: updateData,
+      });
+
+      results.push(`Updated ${updateResult.count} posts with basic fields`);
+    }
+
+    // Handle category operations
+    if (data.updates.categoryIds) {
+      // Replace all categories
+      await prisma.blogPostCategory.deleteMany({
+        where: { blogPostId: { in: data.postIds } },
+      });
+
+      if (data.updates.categoryIds.length > 0) {
+        const categoryAssignments = data.postIds.flatMap((postId) =>
+          data.updates.categoryIds!.map((categoryId) => ({
+            blogPostId: postId,
+            categoryId,
+          }))
+        );
+
+        await prisma.blogPostCategory.createMany({
+          data: categoryAssignments,
+        });
+      }
+
+      results.push(`Replaced categories for ${data.postIds.length} posts`);
+    }
+
+    if (data.updates.addCategoryIds && data.updates.addCategoryIds.length > 0) {
+      // Add categories (avoid duplicates)
+      const newAssignments = [];
+
+      for (const postId of data.postIds) {
+        for (const categoryId of data.updates.addCategoryIds) {
+          const existing = await prisma.blogPostCategory.findUnique({
+            where: {
+              blogPostId_categoryId: {
+                blogPostId: postId,
+                categoryId,
+              },
+            },
+          });
+
+          if (!existing) {
+            newAssignments.push({ blogPostId: postId, categoryId });
+          }
+        }
+      }
+
+      if (newAssignments.length > 0) {
+        await prisma.blogPostCategory.createMany({
+          data: newAssignments,
+        });
+      }
+
+      results.push(`Added ${newAssignments.length} new category assignments`);
+    }
+
+    if (
+      data.updates.removeCategoryIds &&
+      data.updates.removeCategoryIds.length > 0
+    ) {
+      // Remove categories
+      const deleteResult = await prisma.blogPostCategory.deleteMany({
+        where: {
+          blogPostId: { in: data.postIds },
+          categoryId: { in: data.updates.removeCategoryIds },
+        },
+      });
+
+      results.push(`Removed ${deleteResult.count} category assignments`);
+    }
+
+    return createSuccessResponse(
+      `Bulk update completed for ${
+        data.postIds.length
+      } posts:\n\n${results.join("\n")}`
+    );
+  } catch (error) {
+    console.error("Error in bulk update:", error);
+    return createErrorResponse(
+      `Failed to bulk update posts: ${
         error instanceof Error ? error.message : "Unknown error"
       }`
     );

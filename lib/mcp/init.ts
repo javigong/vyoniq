@@ -12,6 +12,14 @@ import {
   deleteBlogPostHandler,
   createCategoryTool,
   createCategoryHandler,
+  updateCategoryTool,
+  updateCategoryHandler,
+  deleteCategoryTool,
+  deleteCategoryHandler,
+  suggestCategoriesTool,
+  suggestCategoriesHandler,
+  bulkUpdatePostsTool,
+  bulkUpdatePostsHandler,
   listBlogPostsTool,
   listBlogPostsHandler,
   listCategoriesTool,
@@ -51,6 +59,10 @@ export function initializeMCPServer() {
   mcpServer.addTool(publishBlogPostTool, publishBlogPostHandler);
   mcpServer.addTool(deleteBlogPostTool, deleteBlogPostHandler);
   mcpServer.addTool(createCategoryTool, createCategoryHandler);
+  mcpServer.addTool(updateCategoryTool, updateCategoryHandler);
+  mcpServer.addTool(deleteCategoryTool, deleteCategoryHandler);
+  mcpServer.addTool(suggestCategoriesTool, suggestCategoriesHandler);
+  mcpServer.addTool(bulkUpdatePostsTool, bulkUpdatePostsHandler);
   mcpServer.addTool(listBlogPostsTool, listBlogPostsHandler);
   mcpServer.addTool(listCategoriesTool, listCategoriesHandler);
   mcpServer.addTool(getBlogPostTool, getBlogPostHandler);
@@ -118,6 +130,28 @@ export function initializeMCPServer() {
           {
             name: "create_category",
             description: "Create a new blog category",
+            category: "Blog Management",
+          },
+          {
+            name: "update_category",
+            description: "Update an existing blog category name or slug",
+            category: "Blog Management",
+          },
+          {
+            name: "delete_category",
+            description:
+              "Delete a blog category and optionally move posts to another category",
+            category: "Blog Management",
+          },
+          {
+            name: "suggest_categories_for_post",
+            description: "Analyze post content and suggest relevant categories",
+            category: "Blog Management",
+          },
+          {
+            name: "bulk_update_posts",
+            description:
+              "Update multiple blog posts at once with various operations",
             category: "Blog Management",
           },
           {
