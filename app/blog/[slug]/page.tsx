@@ -83,6 +83,9 @@ export async function generateStaticParams() {
   }));
 }
 
+// Enable ISR with revalidation
+export const revalidate = 3600; // Revalidate every hour (3600 seconds)
+
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const { slug } = await params;
   const post = await getBlogPostBySlug(slug);
