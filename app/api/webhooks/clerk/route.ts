@@ -1,7 +1,7 @@
 import { Webhook } from "svix";
 import { headers } from "next/headers";
 import { type WebhookEvent } from "@clerk/nextjs/server";
-import { WaitlistWelcomeEmail } from "@/components/emails/waitlist-welcome-email";
+import { NewsletterWelcomeEmail } from "@/components/emails/newsletter-welcome-email";
 import { Resend } from "resend";
 import * as React from "react";
 import prisma from "@/lib/prisma";
@@ -80,7 +80,7 @@ export async function POST(req: Request) {
           id: evt.data.id,
           email: primaryEmail,
           name: name,
-          isOnWaitlist: true,
+          isNewsletterSubscriber: true,
         },
       });
     } catch (dbError) {
@@ -93,10 +93,13 @@ export async function POST(req: Request) {
     // Send welcome email
     try {
       await resend.emails.send({
-        from: "Vyoniq Waitlist <waitlist@vyoniq.com>",
+        from: "Vyoniq Newsletter <newsletter@vyoniq.com>",
         to: [primaryEmail],
-        subject: "Welcome to the Vyoniq Apps Waitlist!",
-        react: WaitlistWelcomeEmail({ name }) as React.ReactElement,
+        subject: "Welcome to Vyoniq - Stay Updated!",
+        react: NewsletterWelcomeEmail({
+          name,
+          unsubscribeToken: "", // Will be generated when needed
+        }) as React.ReactElement,
       });
 
       console.log(`Sent welcome email to ${primaryEmail}`);
