@@ -16,7 +16,7 @@ This repository contains the source code for the official Vyoniq landing page.
   - **AI Integrations:** Enhance your applications and business processes with intelligent features.
 - **Vyoniq Apps (Coming Soon):** Announcing our forthcoming subscription-based web application for smart data management and interaction, powered by MCP (Multi-Client Platform) servers.
 - **Lead Generation:** A fully functional contact form to handle client inquiries and project requests.
-- **Waitlist Sign-Up:** A dedicated system for users to register their interest in the upcoming Vyoniq Apps application.
+- **Newsletter System:** A comprehensive newsletter system to keep users updated with the latest developments and insights.
 - **Modern Tech Stack:** A responsive, accessible, and performant landing page built for an excellent user experience.
 
 ## 🚀 Tech Stack
