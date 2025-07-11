@@ -109,9 +109,3 @@ export async function OPTIONS(request: NextRequest) {
     },
   });
 }
-
-// Export metadata for the API route
-export const metadata = {
-  title: "Vyoniq MCP Server",
-  description: "Model Context Protocol server for Vyoniq admin dashboard",
-};
