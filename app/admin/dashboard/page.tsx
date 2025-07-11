@@ -27,6 +27,9 @@ import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
+// Force dynamic rendering to avoid static generation issues with auth()
+export const dynamic = "force-dynamic";
+
 async function AdminDashboard() {
   const { userId } = await auth();
 
