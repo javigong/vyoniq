@@ -244,7 +244,7 @@ export function AdminBlogSection({ initialPosts = [] }: AdminBlogSectionProps) {
     });
   };
 
-  const startEdit = (post: BlogPost) => {
+    const startEdit = (post: BlogPost) => {
     setFormData({
       title: post.title,
       excerpt: post.excerpt,
@@ -353,6 +353,52 @@ export function AdminBlogSection({ initialPosts = [] }: AdminBlogSectionProps) {
                       rows={10}
                       required
                     />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="categories">Categories</Label>
+                    <div className="space-y-2">
+                      <div className="flex flex-wrap gap-2">
+                        {categories.map((category) => (
+                          <label
+                            key={category.id}
+                            className="flex items-center"
+                          >
+                            <input
+                              type="checkbox"
+                              checked={formData.categoryIds.includes(
+                                category.id
+                              )}
+                              onChange={(e) => {
+                                if (e.target.checked) {
+                                  setFormData({
+                                    ...formData,
+                                    categoryIds: [
+                                      ...formData.categoryIds,
+                                      category.id,
+                                    ],
+                                  });
+                                } else {
+                                  setFormData({
+                                    ...formData,
+                                    categoryIds: formData.categoryIds.filter(
+                                      (id) => id !== category.id
+                                    ),
+                                  });
+                                }
+                              }}
+                              className="mr-2"
+                            />
+                            <Badge variant="outline">{category.name}</Badge>
+                          </label>
+                        ))}
+                      </div>
+                      {categories.length === 0 && (
+                        <p className="text-sm text-gray-500">
+                          No categories available. Create categories first.
+                        </p>
+                      )}
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
