@@ -10,6 +10,7 @@ export default function SignInPage() {
   const router = useRouter();
   const [showForm, setShowForm] = useState(false);
   const [isProduction] = useState(process.env.NODE_ENV === "production");
+  const [hasCheckedAuth, setHasCheckedAuth] = useState(false);
 
   // In production, show form immediately after short delay
   useEffect(() => {
@@ -26,14 +27,41 @@ export default function SignInPage() {
     if (isSignedIn && user) {
       console.log("User is already signed in, redirecting to dashboard");
       router.replace("/dashboard");
+      setHasCheckedAuth(true);
     }
   }, [isSignedIn, user, router]);
+
+  // In production mode, also poll for authentication state changes
+  useEffect(() => {
+    if (isProduction && showForm && !hasCheckedAuth) {
+      const authCheckInterval = setInterval(() => {
+        if (isSignedIn && user) {
+          console.log(
+            "Authentication detected via polling, redirecting to dashboard"
+          );
+          router.replace("/dashboard");
+          setHasCheckedAuth(true);
+          clearInterval(authCheckInterval);
+        }
+      }, 500); // Check every 500ms
+
+      // Clear interval after 30 seconds to prevent infinite polling
+      const timeout = setTimeout(() => {
+        clearInterval(authCheckInterval);
+      }, 30000);
+
+      return () => {
+        clearInterval(authCheckInterval);
+        clearTimeout(timeout);
+      };
+    }
+  }, [isProduction, showForm, hasCheckedAuth, isSignedIn, user, router]);
 
   // Show sign-in form if:
   // 1. In production mode and showForm is true (bypasses Clerk loading issues)
   // 2. In development mode and Clerk has loaded and user is not signed in
   if (
-    (isProduction && showForm) ||
+    (isProduction && showForm && !hasCheckedAuth) ||
     (!isProduction && isLoaded && !isSignedIn)
   ) {
     return (
@@ -46,6 +74,8 @@ export default function SignInPage() {
               colorText: "#1D1D1F",
             },
           }}
+          afterSignInUrl="/dashboard"
+          redirectUrl="/dashboard"
         />
       </div>
     );
@@ -57,7 +87,11 @@ export default function SignInPage() {
       <div className="w-full max-w-md text-center">
         <div className="animate-pulse">
           <div className="bg-gray-200 h-96 rounded-lg"></div>
-          <p className="mt-4 text-gray-600">Loading authentication...</p>
+          <p className="mt-4 text-gray-600">
+            {hasCheckedAuth
+              ? "Redirecting to dashboard..."
+              : "Loading authentication..."}
+          </p>
           {isProduction && (
             <p className="mt-2 text-sm text-gray-500">
               Production mode detected
