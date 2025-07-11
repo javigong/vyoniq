@@ -227,7 +227,9 @@ export const DeleteCategorySchema = z.object({
   movePostsToCategory: z
     .string()
     .optional()
-    .describe("Category ID to move posts to (creates 'Uncategorized' if not specified)"),
+    .describe(
+      "Category ID to move posts to (creates 'Uncategorized' if not specified)"
+    ),
 });
 
 export const SuggestCategoriesSchema = z.object({
@@ -251,14 +253,34 @@ export const BulkUpdatePostsSchema = z.object({
     .array(z.string())
     .min(1, "At least one post ID is required")
     .describe("Array of blog post IDs to update"),
-  updates: z.object({
-    published: z.boolean().optional().describe("Publish or unpublish all posts"),
-    featured: z.boolean().optional().describe("Mark all posts as featured or not"),
-    categoryIds: z.array(z.string()).optional().describe("Apply these categories to all posts"),
-    addCategoryIds: z.array(z.string()).optional().describe("Add these categories to all posts"),
-    removeCategoryIds: z.array(z.string()).optional().describe("Remove these categories from all posts"),
-    tintColor: z.string().optional().describe("Apply this tint color to all posts"),
-  }).describe("Updates to apply to all selected posts"),
+  updates: z
+    .object({
+      published: z
+        .boolean()
+        .optional()
+        .describe("Publish or unpublish all posts"),
+      featured: z
+        .boolean()
+        .optional()
+        .describe("Mark all posts as featured or not"),
+      categoryIds: z
+        .array(z.string())
+        .optional()
+        .describe("Apply these categories to all posts"),
+      addCategoryIds: z
+        .array(z.string())
+        .optional()
+        .describe("Add these categories to all posts"),
+      removeCategoryIds: z
+        .array(z.string())
+        .optional()
+        .describe("Remove these categories from all posts"),
+      tintColor: z
+        .string()
+        .optional()
+        .describe("Apply this tint color to all posts"),
+    })
+    .describe("Updates to apply to all selected posts"),
 });
 
 export const ListBlogPostsSchema = z.object({
@@ -279,6 +301,18 @@ export const GetBlogPostSchema = z.object({
     .string()
     .min(1, "Post ID is required")
     .describe("The unique ID of the blog post to retrieve"),
+});
+
+export const RevalidateBlogSchema = z.object({
+  action: z
+    .enum(["revalidate-post", "revalidate-all"])
+    .describe("Type of revalidation to perform"),
+  slug: z
+    .string()
+    .optional()
+    .describe(
+      "Blog post slug to revalidate (required for 'revalidate-post' action)"
+    ),
 });
 
 // Analytics Types for MCP

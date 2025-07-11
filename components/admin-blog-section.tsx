@@ -127,6 +127,54 @@ export function AdminBlogSection({ initialPosts = [] }: AdminBlogSectionProps) {
     }
   };
 
+  const revalidateBlogPost = async (slug: string) => {
+    try {
+      const response = await fetch("/api/revalidate/blog", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          action: "revalidate-post",
+          slug: slug,
+        }),
+      });
+
+      if (response.ok) {
+        toast.success("Blog post cache updated successfully");
+      }
+    } catch (error) {
+      console.error("Error revalidating blog post:", error);
+      // Don't show error toast for revalidation failures as it's not critical
+    }
+  };
+
+  const revalidateAllBlogPosts = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch("/api/revalidate/blog", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          action: "revalidate-all",
+        }),
+      });
+
+      if (response.ok) {
+        toast.success("All blog posts cache updated successfully");
+      } else {
+        toast.error("Failed to update blog cache");
+      }
+    } catch (error) {
+      console.error("Error revalidating all blog posts:", error);
+      toast.error("Failed to update blog cache");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -163,6 +211,11 @@ export function AdminBlogSection({ initialPosts = [] }: AdminBlogSectionProps) {
           setShowCreateForm(false);
         }
         resetForm();
+
+        // Revalidate the specific blog post after successful save
+        if (newPost.slug) {
+          await revalidateBlogPost(newPost.slug);
+        }
       } else {
         const error = await response.json();
         toast.error(error.error || "Failed to save blog post");
@@ -187,8 +240,14 @@ export function AdminBlogSection({ initialPosts = [] }: AdminBlogSectionProps) {
       });
 
       if (response.ok) {
+        const deletedPost = posts.find((p) => p.id === postId);
         setPosts(posts.filter((p) => p.id !== postId));
         toast.success("Blog post deleted successfully");
+
+        // Revalidate after deletion
+        if (deletedPost?.slug) {
+          await revalidateBlogPost(deletedPost.slug);
+        }
       } else {
         toast.error("Failed to delete blog post");
       }
@@ -220,6 +279,11 @@ export function AdminBlogSection({ initialPosts = [] }: AdminBlogSectionProps) {
             updatedPost.published ? "published" : "unpublished"
           } successfully`
         );
+        
+        // Revalidate after status change
+        if (updatedPost.slug) {
+          await revalidateBlogPost(updatedPost.slug);
+        }
       } else {
         toast.error("Failed to update post status");
       }
@@ -244,7 +308,7 @@ export function AdminBlogSection({ initialPosts = [] }: AdminBlogSectionProps) {
     });
   };
 
-    const startEdit = (post: BlogPost) => {
+  const startEdit = (post: BlogPost) => {
     setFormData({
       title: post.title,
       excerpt: post.excerpt,
@@ -278,13 +342,22 @@ export function AdminBlogSection({ initialPosts = [] }: AdminBlogSectionProps) {
                 Manage your blog posts and categories
               </CardDescription>
             </div>
-            <Button
-              onClick={() => setShowCreateForm(true)}
-              disabled={showCreateForm}
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Create Post
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={revalidateAllBlogPosts}
+                disabled={loading}
+              >
+                🔄 Refresh Cache
+              </Button>
+              <Button
+                onClick={() => setShowCreateForm(true)}
+                disabled={showCreateForm}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Create Post
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent>

@@ -18,9 +18,9 @@ import { StructuredData } from "@/components/structured-data";
 import { MarkdownRenderer } from "@/components/markdown-renderer";
 
 interface BlogPostPageProps {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }
 
 export async function generateMetadata({
@@ -82,6 +82,9 @@ export async function generateStaticParams() {
     slug: post.slug,
   }));
 }
+
+// Enable ISR with revalidation
+export const revalidate = 3600; // Revalidate every hour (3600 seconds)
 
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const { slug } = await params;
