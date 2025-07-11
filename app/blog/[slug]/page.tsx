@@ -18,9 +18,9 @@ import { StructuredData } from "@/components/structured-data";
 import { MarkdownRenderer } from "@/components/markdown-renderer";
 
 interface BlogPostPageProps {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }
 
 export async function generateMetadata({
