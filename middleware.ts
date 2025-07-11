@@ -21,9 +21,6 @@ const isPublicRoute = createRouteMatcher([
   "/api/payments/create-checkout-session",
 ]);
 
-// Define admin routes that require additional permissions
-const isAdminRoute = createRouteMatcher(["/admin(.*)", "/api/admin(.*)"]);
-
 // Environment detection
 const isProduction = process.env.NODE_ENV === "production";
 const isDevelopment = process.env.NODE_ENV === "development";
@@ -64,31 +61,7 @@ export default clerkMiddleware(
         return NextResponse.redirect(signInUrl);
       }
 
-      // Additional check for admin routes
-      if (isAdminRoute(req)) {
-        const publicMetadata = sessionClaims?.publicMetadata as
-          | { role?: string }
-          | undefined;
-        const isAdmin = publicMetadata?.role === "admin";
-
-        if (!isAdmin) {
-          if (isDevelopment) {
-            console.log(
-              `🚫 Admin access denied for user ${userId} on: ${pathname}`
-            );
-          }
-
-          // Redirect non-admin users to dashboard using current domain
-          const dashboardUrl = new URL("/dashboard", baseUrl);
-          return NextResponse.redirect(dashboardUrl);
-        }
-
-        if (isDevelopment) {
-          console.log(
-            `✅ Admin access granted for user ${userId} on: ${pathname}`
-          );
-        }
-      }
+      // Admin route protection is handled at the page level
 
       if (isDevelopment) {
         console.log(
