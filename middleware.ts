@@ -1,6 +1,5 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
 
 // Define public routes that should be accessible without authentication
 // Everything else will be protected by default
@@ -21,9 +20,6 @@ const isPublicRoute = createRouteMatcher([
   "/api/webhooks(.*)",
   "/api/payments/create-checkout-session",
 ]);
-
-// Define admin routes that require additional permissions
-const isAdminRoute = createRouteMatcher(["/admin(.*)", "/api/admin(.*)"]);
 
 // Environment detection
 const isProduction = process.env.NODE_ENV === "production";
@@ -65,34 +61,7 @@ export default clerkMiddleware(
         return NextResponse.redirect(signInUrl);
       }
 
-      // Additional check for admin routes
-      if (isAdminRoute(req)) {
-        // Check admin status from database
-        const user = await prisma.user.findUnique({
-          where: { id: userId },
-          select: { isAdmin: true },
-        });
-
-        const isAdmin = user?.isAdmin || false;
-
-        if (!isAdmin) {
-          if (isDevelopment) {
-            console.log(
-              `🚫 Admin access denied for user ${userId} on: ${pathname}`
-            );
-          }
-
-          // Redirect non-admin users to dashboard using current domain
-          const dashboardUrl = new URL("/dashboard", baseUrl);
-          return NextResponse.redirect(dashboardUrl);
-        }
-
-        if (isDevelopment) {
-          console.log(
-            `✅ Admin access granted for user ${userId} on: ${pathname}`
-          );
-        }
-      }
+      // Admin route protection is handled at the page level
 
       if (isDevelopment) {
         console.log(
