@@ -13,15 +13,16 @@ export const metadata: Metadata = {
   metadataBase: new URL(getBaseUrl()),
   title: "Vyoniq | AI-Powered Software Solutions",
   description:
-    "Innovative AI-driven software development company specializing in web & mobile apps, hosting services, and AI integrations. Join the waitlist for Vyoniq Apps.",
+    "Innovative AI-driven software development company specializing in web & mobile apps, hosting services, and AI integrations. Subscribe to our newsletter for updates.",
   keywords: [
     "AI",
     "software development",
-    "Vyoniq Apps",
+    "Vyoniq",
     "web development",
     "mobile apps",
     "hosting",
     "AI integrations",
+    "newsletter",
   ],
   openGraph: {
     title: "Vyoniq | AI-Powered Software Solutions",
@@ -52,8 +53,8 @@ export default function RootLayout({
       localization={{
         signUp: {
           start: {
-            title: "Join Vyoniq Apps Waitlist",
-            subtitle: "Create your account to join our waitlist",
+            title: "Join Vyoniq Community",
+            subtitle: "Create your account to access your dashboard",
           },
         },
       }}
