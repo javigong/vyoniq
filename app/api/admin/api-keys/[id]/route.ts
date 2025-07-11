@@ -29,11 +29,12 @@ export async function DELETE(
       );
     }
 
-    const success = await deleteApiKey(params.id, userId);
+    const { id } = params;
+    const success = await deleteApiKey(id, userId);
 
     if (!success) {
       return NextResponse.json(
-        { error: "API key not found or access denied" },
+        { error: "API key not found or failed to delete" },
         { status: 404 }
       );
     }
@@ -74,26 +75,27 @@ export async function PUT(
       );
     }
 
+    const { id } = params;
     const body = await request.json();
     const { name } = body;
 
     if (!name || typeof name !== "string") {
       return NextResponse.json(
-        { error: "New name is required" },
+        { error: "Invalid name provided" },
         { status: 400 }
       );
     }
 
-    const success = await updateApiKeyName(params.id, userId, name.trim());
+    const updatedApiKey = await updateApiKeyName(id, userId, name.trim());
 
-    if (!success) {
+    if (!updatedApiKey) {
       return NextResponse.json(
-        { error: "API key not found or access denied" },
+        { error: "API Key not found or update failed" },
         { status: 404 }
       );
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json(updatedApiKey);
   } catch (error) {
     console.error("Error updating API key:", error);
     return NextResponse.json(
