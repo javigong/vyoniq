@@ -158,8 +158,8 @@ export default function AIIntegrationsPage() {
             </div>
             <div className="flex-1">
               <Image
-                src="/placeholder.svg?height=400&width=600"
-                alt="AI integration visualization"
+                src="/ai-integrations-service.jpg"
+                alt="Advanced AI integration technology with neural networks and intelligent systems"
                 width={600}
                 height={400}
                 className="w-full h-auto rounded-lg shadow-xl"
