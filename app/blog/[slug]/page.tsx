@@ -25,7 +25,7 @@ interface BlogPostPageProps {
 export async function generateMetadata({
   params,
 }: BlogPostPageProps): Promise<Metadata> {
-  const { slug } = await params;
+  const { slug } = params;
   const post = await getBlogPostBySlug(slug);
 
   if (!post) {
@@ -83,7 +83,7 @@ export async function generateStaticParams() {
 }
 
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
-  const { slug } = await params;
+  const { slug } = params;
   const post = await getBlogPostBySlug(slug);
 
   if (!post) {
