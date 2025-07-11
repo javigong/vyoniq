@@ -1,5 +1,6 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
 
 // Define public routes that should be accessible without authentication
 // Everything else will be protected by default
@@ -66,10 +67,13 @@ export default clerkMiddleware(
 
       // Additional check for admin routes
       if (isAdminRoute(req)) {
-        const publicMetadata = sessionClaims?.publicMetadata as
-          | { role?: string }
-          | undefined;
-        const isAdmin = publicMetadata?.role === "admin";
+        // Check admin status from database
+        const user = await prisma.user.findUnique({
+          where: { id: userId },
+          select: { isAdmin: true },
+        });
+
+        const isAdmin = user?.isAdmin || false;
 
         if (!isAdmin) {
           if (isDevelopment) {
