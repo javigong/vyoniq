@@ -8,32 +8,32 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Vyoniq Apps | AI-Powered Data Management Platform Coming Soon",
+  title: "Vyoniq Innovation Hub | Stay Updated with Latest AI Solutions",
   description:
-    "Join the waitlist for Vyoniq Apps - the revolutionary AI-powered data management platform with smart data entry, chat interfaces, and MCP server integration. Coming soon!",
+    "Stay updated with Vyoniq's latest AI-powered solutions, blog posts, and innovative tools. Subscribe to our newsletter for exclusive insights and updates.",
   keywords: [
-    "Vyoniq Apps",
-    "AI data management",
-    "smart data entry",
-    "MCP server integration",
-    "data management platform",
-    "AI chat interface",
-    "intelligent data processing",
-    "data automation",
-    "waitlist",
+    "Vyoniq Innovation",
+    "AI solutions",
+    "software development",
+    "AI integrations",
+    "web development",
+    "mobile apps",
+    "hosting services",
+    "newsletter",
+    "technology updates",
   ],
   openGraph: {
-    title: "Vyoniq Apps | AI-Powered Data Management Platform Coming Soon",
+    title: "Vyoniq Innovation Hub | Stay Updated with Latest AI Solutions",
     description:
-      "Revolutionary AI-powered data management with smart data entry and chat interfaces. Join the exclusive waitlist for early access.",
+      "Get the latest updates on Vyoniq's AI-powered solutions, new blog posts, and innovative tools. Subscribe to our newsletter for exclusive insights.",
     url: "https://vyoniq.com/vyoniq-apps",
     siteName: "Vyoniq",
     images: [
       {
-        url: "/placeholder.svg?height=630&width=1200&text=Vyoniq+Apps+Coming+Soon",
+        url: "/placeholder.svg?height=630&width=1200&text=Vyoniq+Innovation+Hub",
         width: 1200,
         height: 630,
-        alt: "Vyoniq Apps AI-powered data management platform",
+        alt: "Vyoniq Innovation Hub - Stay Updated",
       },
     ],
     locale: "en_US",
@@ -41,11 +41,11 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Vyoniq Apps | AI-Powered Data Management Platform Coming Soon",
+    title: "Vyoniq Innovation Hub | Stay Updated with Latest AI Solutions",
     description:
-      "Revolutionary AI-powered data management with smart data entry and chat interfaces. Join the waitlist!",
+      "Get the latest updates on Vyoniq's AI-powered solutions and innovative tools. Subscribe to our newsletter!",
     images: [
-      "/placeholder.svg?height=630&width=1200&text=Vyoniq+Apps+Coming+Soon",
+      "/placeholder.svg?height=630&width=1200&text=Vyoniq+Innovation+Hub",
     ],
   },
   alternates: {
@@ -67,27 +67,27 @@ export const metadata: Metadata = {
 const features = [
   {
     icon: Database,
-    title: "Smart Data Entry",
+    title: "AI-Powered Solutions",
     description:
-      "AI-powered data entry that learns from your patterns and automates repetitive tasks.",
+      "Cutting-edge AI integrations that transform your business processes and workflows.",
   },
   {
     icon: MessageSquare,
-    title: "Chat Interface",
+    title: "Expert Insights",
     description:
-      "Natural language interactions with your data through MCP server integration.",
+      "In-depth blog posts and technical articles from our development team.",
   },
   {
     icon: Zap,
-    title: "Real-time Processing",
+    title: "Latest Updates",
     description:
-      "Lightning-fast data processing and analysis with instant insights.",
+      "Be the first to know about new services, tools, and technological breakthroughs.",
   },
   {
     icon: Shield,
-    title: "Enterprise Security",
+    title: "Exclusive Content",
     description:
-      "Bank-level security with end-to-end encryption and compliance standards.",
+      "Subscriber-only content including case studies, tutorials, and industry insights.",
   },
 ];
 
@@ -101,17 +101,17 @@ export default function VyoniqAppsPage() {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              Vyoniq Apps: Coming Soon
+              Vyoniq Innovation Hub
             </h1>
             <p className="text-xl md:text-2xl mb-8 text-gray-100">
-              The future of intelligent data management is almost here
+              Stay ahead with the latest AI-powered solutions and insights
             </p>
             <Button
               asChild
               size="lg"
               className="bg-vyoniq-green hover:bg-vyoniq-green/90 text-white font-semibold px-8 py-3 transform hover:scale-105 transition-all duration-200"
             >
-              <Link href="/sign-up">Join Waitlist</Link>
+              <Link href="#newsletter">Subscribe to Newsletter</Link>
             </Button>
           </div>
         </div>
@@ -122,11 +122,11 @@ export default function VyoniqAppsPage() {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-vyoniq-blue dark:text-white mb-4">
-              Revolutionary Features
+              What You'll Get
             </h2>
             <p className="text-lg text-vyoniq-text dark:text-vyoniq-dark-text max-w-2xl mx-auto">
-              Experience the next generation of data management with AI-powered
-              capabilities
+              Join our newsletter community and get exclusive access to
+              insights, updates, and innovative solutions
             </p>
           </div>
 
@@ -152,27 +152,6 @@ export default function VyoniqAppsPage() {
               </Card>
             ))}
           </div>
-
-          {/* Mockup Section */}
-          <div className="max-w-4xl mx-auto">
-            <div className="relative">
-              <Image
-                src="/placeholder.svg?height=500&width=800"
-                alt="Vyoniq Apps interface preview"
-                width={800}
-                height={500}
-                className="w-full h-auto rounded-lg shadow-2xl"
-              />
-              {/* Work in Progress Watermark */}
-              <div className="absolute inset-0 bg-black/30 rounded-lg flex items-center justify-center">
-                <div className="bg-white/95 px-8 py-4 rounded-lg transform -rotate-12 shadow-xl">
-                  <span className="text-vyoniq-blue font-bold text-2xl">
-                    Work in Progress
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -181,18 +160,18 @@ export default function VyoniqAppsPage() {
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-3xl md:text-4xl font-bold text-vyoniq-blue dark:text-white mb-6">
-              Be Among the First to Experience Vyoniq Apps
+              Ready to Stay Updated?
             </h2>
             <p className="text-lg text-vyoniq-text dark:text-vyoniq-dark-text mb-8">
-              Join our exclusive waitlist and get early access to the most
-              advanced data management platform ever created.
+              Subscribe to our newsletter and be the first to know about our
+              latest AI-powered solutions, blog posts, and innovative tools.
             </p>
             <Button
               asChild
               size="lg"
               className="bg-vyoniq-green hover:bg-vyoniq-green/90 text-white font-semibold px-8 py-3 transform hover:scale-105 transition-all duration-200"
             >
-              <Link href="/sign-up">Join Waitlist Now</Link>
+              <Link href="#newsletter">Subscribe Now</Link>
             </Button>
           </div>
         </div>
