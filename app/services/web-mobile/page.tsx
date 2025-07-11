@@ -1,11 +1,11 @@
-import { Header } from "@/components/header"
-import { Footer } from "@/components/footer"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Code, Smartphone, Zap, Shield, ArrowRight } from "lucide-react"
-import Image from "next/image"
-import Link from "next/link"
-import type { Metadata } from "next"
+import { Header } from "@/components/header";
+import { Footer } from "@/components/footer";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Code, Smartphone, Zap, Shield, ArrowRight } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "AI-Powered Web & Mobile App Development | Vyoniq",
@@ -45,7 +45,9 @@ export const metadata: Metadata = {
     title: "AI-Powered Web & Mobile App Development | Vyoniq",
     description:
       "Professional web and mobile app development with AI optimization. React, Next.js, React Native applications.",
-    images: ["/placeholder.svg?height=630&width=1200&text=Web+Mobile+Development"],
+    images: [
+      "/placeholder.svg?height=630&width=1200&text=Web+Mobile+Development",
+    ],
   },
   alternates: {
     canonical: "https://vyoniq.com/services/web-mobile",
@@ -61,13 +63,14 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
-}
+};
 
 const features = [
   {
     icon: Code,
     title: "Modern Frameworks",
-    description: "Built with React, Next.js, and React Native for optimal performance.",
+    description:
+      "Built with React, Next.js, and React Native for optimal performance.",
   },
   {
     icon: Smartphone,
@@ -84,7 +87,7 @@ const features = [
     title: "Enterprise Security",
     description: "Built-in security features and compliance standards.",
   },
-]
+];
 
 export default function WebMobilePage() {
   return (
@@ -100,9 +103,12 @@ export default function WebMobilePage() {
                 <Code className="h-12 w-12 text-vyoniq-green" />
               </div>
             </div>
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">AI-Powered Web & Mobile Apps</h1>
+            <h1 className="text-4xl md:text-6xl font-bold mb-6">
+              AI-Powered Web & Mobile Apps
+            </h1>
             <p className="text-xl md:text-2xl text-gray-100 dark:text-vyoniq-dark-muted">
-              Scalable applications built with cutting-edge technologies and AI optimization
+              Scalable applications built with cutting-edge technologies and AI
+              optimization
             </p>
           </div>
         </div>
@@ -117,10 +123,11 @@ export default function WebMobilePage() {
                 Transform Your Ideas Into Reality
               </h2>
               <p className="text-lg text-vyoniq-text dark:text-vyoniq-dark-text mb-6 leading-relaxed">
-                Our AI-powered development process ensures your web and mobile applications are not just built to
-                current standards, but optimized for future scalability. We leverage machine learning to identify
-                performance bottlenecks, security vulnerabilities, and user experience improvements before they become
-                issues.
+                Our AI-powered development process ensures your web and mobile
+                applications are not just built to current standards, but
+                optimized for future scalability. We leverage machine learning
+                to identify performance bottlenecks, security vulnerabilities,
+                and user experience improvements before they become issues.
               </p>
               <div className="space-y-3 mb-8">
                 {[
@@ -132,7 +139,9 @@ export default function WebMobilePage() {
                 ].map((benefit) => (
                   <div key={benefit} className="flex items-center">
                     <ArrowRight className="h-4 w-4 text-vyoniq-green mr-3" />
-                    <span className="text-vyoniq-text dark:text-vyoniq-dark-text">{benefit}</span>
+                    <span className="text-vyoniq-text dark:text-vyoniq-dark-text">
+                      {benefit}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -146,8 +155,8 @@ export default function WebMobilePage() {
             </div>
             <div className="flex-1">
               <Image
-                src="/placeholder.svg?height=400&width=600"
-                alt="Web and mobile app development showcase"
+                src="/web-mobile-service.jpg"
+                alt="Modern mobile app development with interactive user interface"
                 width={600}
                 height={400}
                 className="w-full h-auto rounded-lg shadow-xl"
@@ -158,15 +167,22 @@ export default function WebMobilePage() {
           {/* Features Grid */}
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {features.map((feature) => (
-              <Card key={feature.title} className="text-center border-0 shadow-lg bg-white dark:bg-vyoniq-dark-card">
+              <Card
+                key={feature.title}
+                className="text-center border-0 shadow-lg bg-white dark:bg-vyoniq-dark-card"
+              >
                 <CardHeader>
                   <div className="mx-auto mb-4 p-3 bg-vyoniq-blue/5 dark:bg-vyoniq-green/10 rounded-full w-fit">
                     <feature.icon className="h-8 w-8 text-vyoniq-green" />
                   </div>
-                  <CardTitle className="text-xl text-vyoniq-blue dark:text-white">{feature.title}</CardTitle>
+                  <CardTitle className="text-xl text-vyoniq-blue dark:text-white">
+                    {feature.title}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-vyoniq-text dark:text-vyoniq-dark-text">{feature.description}</p>
+                  <p className="text-vyoniq-text dark:text-vyoniq-dark-text">
+                    {feature.description}
+                  </p>
                 </CardContent>
               </Card>
             ))}
@@ -176,5 +192,5 @@ export default function WebMobilePage() {
 
       <Footer />
     </main>
-  )
+  );
 }
