@@ -17,6 +17,7 @@ const isPublicRoute = createRouteMatcher([
   "/api/emails/newsletter/unsubscribe",
   "/api/webhooks(.*)",
   "/api/payments/create-checkout-session",
+  "/api/mcp",
 ]);
 
 export default clerkMiddleware((auth, req) => {
