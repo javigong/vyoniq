@@ -75,7 +75,7 @@ const services = [
       "Cloud-Native Architecture",
     ],
     href: "/services/web-mobile",
-    image: "/placeholder.svg?height=300&width=400",
+    image: "/web-mobile-service.jpg",
   },
   {
     icon: Server,
@@ -84,7 +84,7 @@ const services = [
       "Reliable, secure, and scalable hosting solutions with AI monitoring and optimization.",
     features: ["99.9% Uptime", "Auto-Scaling", "AI Monitoring", "Global CDN"],
     href: "/services/hosting",
-    image: "/placeholder.svg?height=300&width=400",
+    image: "/hosting-service.jpg",
   },
   {
     icon: Sparkles,
@@ -98,7 +98,7 @@ const services = [
       "Business Automation",
     ],
     href: "/services/ai-integrations",
-    image: "/placeholder.svg?height=300&width=400",
+    image: "/ai-integrations-service.jpg",
   },
 ];
 
