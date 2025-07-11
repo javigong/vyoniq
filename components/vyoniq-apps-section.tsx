@@ -33,20 +33,12 @@ export function VyoniqAppsSection() {
           <div className="flex-1 relative">
             <div className="relative">
               <Image
-                src="/placeholder.svg?height=400&width=600"
-                alt="Vyoniq Apps data management interface mockup"
+                src="/newsletter-innovation.jpg"
+                alt="Stay updated with Vyoniq's latest AI innovations and technology solutions"
                 width={600}
                 height={400}
                 className="w-full h-auto rounded-lg shadow-xl"
               />
-              {/* In Development Watermark */}
-              <div className="absolute inset-0 bg-black/20 dark:bg-black/40 rounded-lg flex items-center justify-center">
-                <div className="bg-white/90 dark:bg-vyoniq-dark-card/90 px-6 py-3 rounded-lg transform -rotate-12">
-                  <span className="text-vyoniq-blue dark:text-white font-bold text-lg">
-                    In Development
-                  </span>
-                </div>
-              </div>
             </div>
           </div>
         </div>
