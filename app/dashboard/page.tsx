@@ -21,8 +21,10 @@ import {
   XCircle,
   Plus,
   LogOut,
+  AlertTriangle,
 } from "lucide-react";
 import { DeleteAccountSection } from "@/components/delete-account-section";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 // Force dynamic rendering to avoid static generation issues with auth()
 export const dynamic = "force-dynamic";
@@ -58,6 +60,10 @@ const statusIcons = {
 };
 
 export default async function UserDashboard() {
+  let inquiries: InquiryWithCount[] = [];
+  let user = null;
+  let dbError: string | null = null;
+
   try {
     const { userId } = await auth();
 
@@ -73,54 +79,105 @@ export default async function UserDashboard() {
       return redirect("/sign-in");
     }
 
-    // Get or create user record
-    let user = await prisma.user.findUnique({
-      where: { id: userId },
-    });
+    // Add logging for DATABASE_URL to check if it's loaded
+    const dbUrl = process.env.DATABASE_URL;
+    console.log(
+      "🔍 DATABASE_URL loaded:",
+      dbUrl ? `postgres://...${dbUrl.slice(-10)}` : "Not found"
+    );
 
-    if (!user) {
-      console.log("👤 Creating new user record for:", userId);
-      // Create user record if it doesn't exist
-      const clerkUser = await auth();
-      user = await prisma.user.create({
-        data: {
-          id: userId,
-          email: (clerkUser.sessionClaims?.email as string) || "",
-          name: (clerkUser.sessionClaims?.name as string) || "",
-        },
+    // Wrap all database operations in a try...catch block
+    try {
+      user = await prisma.user.findUnique({
+        where: { id: userId },
       });
+
+      if (!user) {
+        console.log("👤 Creating new user record for:", userId);
+        const clerkUser = await auth();
+        user = await prisma.user.create({
+          data: {
+            id: userId,
+            email: (clerkUser.sessionClaims?.email as string) || "",
+            name: (clerkUser.sessionClaims?.name as string) || "",
+          },
+        });
+      }
+
+      if (user) {
+        inquiries = (await prisma.inquiry.findMany({
+          where: {
+            OR: [{ userId: userId }, { email: user.email }],
+          },
+          include: {
+            _count: {
+              select: {
+                messages: true,
+              },
+            },
+          },
+          orderBy: {
+            createdAt: "desc",
+          },
+        })) as InquiryWithCount[];
+
+        const unlinkedInquiries = inquiries.filter(
+          (inquiry) => !inquiry.userId
+        );
+        if (unlinkedInquiries.length > 0) {
+          await prisma.inquiry.updateMany({
+            where: {
+              id: {
+                in: unlinkedInquiries.map((inquiry) => inquiry.id),
+              },
+            },
+            data: {
+              userId: userId,
+            },
+          });
+        }
+      }
+    } catch (error) {
+      console.error("🔥 Database operation failed:", error);
+      dbError =
+        "Could not connect to the database or a database error occurred. Please try again later.";
     }
 
-    // Fetch user's inquiries
-    const inquiries = (await prisma.inquiry.findMany({
-      where: {
-        OR: [{ userId: userId }, { email: user.email }],
-      },
-      include: {
-        _count: {
-          select: {
-            messages: true,
-          },
-        },
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    })) as InquiryWithCount[];
+    if (dbError) {
+      return (
+        <div className="min-h-screen bg-vyoniq-gray dark:bg-vyoniq-dark-bg">
+          <Header />
+          <main className="container mx-auto px-4 py-8">
+            <Alert variant="destructive">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertTitle>Dashboard Error</AlertTitle>
+              <AlertDescription>
+                {dbError} If the problem persists, please contact support.
+              </AlertDescription>
+            </Alert>
+          </main>
+          <Footer />
+        </div>
+      );
+    }
 
-    // Link inquiries to user if they aren't already linked
-    const unlinkedInquiries = inquiries.filter((inquiry) => !inquiry.userId);
-    if (unlinkedInquiries.length > 0) {
-      await prisma.inquiry.updateMany({
-        where: {
-          id: {
-            in: unlinkedInquiries.map((inquiry) => inquiry.id),
-          },
-        },
-        data: {
-          userId: userId,
-        },
-      });
+    if (!user) {
+      return (
+        <div className="min-h-screen bg-vyoniq-gray dark:bg-vyoniq-dark-bg">
+          <Header />
+          <main className="container mx-auto px-4 py-8">
+            <Alert variant="destructive">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertTitle>Authentication Error</AlertTitle>
+              <AlertDescription>
+                Could not retrieve user profile. Please try signing out and back
+                in.
+              </AlertDescription>
+            </Alert>
+          </main>
+          <Footer />
+        </div>
+      );
     }
 
     const getStatusBadge = (status: string) => {
@@ -248,92 +305,41 @@ export default async function UserDashboard() {
                   <p className="text-vyoniq-text dark:text-vyoniq-dark-text mb-4">
                     You haven't submitted any inquiries yet.
                   </p>
-                  <Button asChild>
-                    <Link href="/#contact">Submit Your First Inquiry</Link>
-                  </Button>
                 </div>
               ) : (
-                <div className="space-y-4">
+                <ul className="space-y-4">
                   {inquiries.map((inquiry) => (
-                    <div
+                    <li
                       key={inquiry.id}
-                      className="border rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-vyoniq-slate transition-colors"
+                      className="p-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                     >
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-3">
-                          <h3 className="font-semibold text-vyoniq-blue dark:text-white">
+                      <Link
+                        href={`/dashboard/inquiries/${inquiry.id}`}
+                        className="block"
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <p className="font-semibold text-vyoniq-blue dark:text-white">
                             {inquiry.serviceType}
-                          </h3>
+                          </p>
                           {getStatusBadge(inquiry.status)}
                         </div>
-                        <div className="text-sm text-gray-500">
-                          {new Date(inquiry.createdAt).toLocaleDateString()}
-                        </div>
-                      </div>
-                      <p className="text-vyoniq-text dark:text-vyoniq-dark-text mb-3 line-clamp-2">
-                        {inquiry.message}
-                      </p>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4 text-sm text-gray-500">
-                          <span className="flex items-center gap-1">
-                            <MessageSquare className="w-4 h-4" />
-                            {inquiry._count.messages} messages
+                        <p className="text-sm text-vyoniq-text dark:text-vyoniq-dark-text truncate mb-2">
+                          {inquiry.message}
+                        </p>
+                        <div className="text-xs text-gray-500 flex items-center justify-between">
+                          <span>
+                            Last updated:{" "}
+                            {inquiry.updatedAt.toLocaleDateString()}
                           </span>
-                          <span>ID: {inquiry.id.slice(-8)}</span>
+                          <span>{inquiry._count.messages} messages</span>
                         </div>
-                        <Button variant="outline" asChild>
-                          <Link href={`/dashboard/inquiries/${inquiry.id}`}>
-                            View Details
-                          </Link>
-                        </Button>
-                      </div>
-                    </div>
+                      </Link>
+                    </li>
                   ))}
-                </div>
+                </ul>
               )}
             </CardContent>
           </Card>
-
-          {/* Services & Budgets Section */}
-          <Card className="mb-8">
-            <CardHeader>
-              <CardTitle>Your Services & Budgets</CardTitle>
-              <CardDescription>
-                Manage your budgets, payments, and purchased services.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="text-center p-6 border rounded-lg">
-                  <h3 className="font-semibold text-vyoniq-blue dark:text-white mb-2">
-                    Project Budgets
-                  </h3>
-                  <p className="text-sm text-vyoniq-text dark:text-vyoniq-dark-text mb-4">
-                    View and manage budgets for your projects, approve quotes,
-                    and make payments.
-                  </p>
-                  <Button asChild>
-                    <Link href="/dashboard/budgets">View Budgets</Link>
-                  </Button>
-                </div>
-
-                <div className="text-center p-6 border rounded-lg">
-                  <h3 className="font-semibold text-vyoniq-blue dark:text-white mb-2">
-                    Our Services
-                  </h3>
-                  <p className="text-sm text-vyoniq-text dark:text-vyoniq-dark-text mb-4">
-                    Explore our full range of AI-powered development and hosting
-                    services.
-                  </p>
-                  <Button asChild variant="outline">
-                    <Link href="/services">Explore Services</Link>
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Delete Account Section */}
           <DeleteAccountSection />
         </main>
 
@@ -341,9 +347,28 @@ export default async function UserDashboard() {
       </div>
     );
   } catch (error) {
-    console.error("💥 Dashboard error:", error);
+    // Enhanced error logging for the entire page component
+    console.error("🔥 Critical Dashboard Page Error:", {
+      error: error instanceof Error ? error.message : "Unknown error",
+      timestamp: new Date().toISOString(),
+    });
 
-    // In case of any error, redirect to sign-in with error parameter
-    return redirect("/sign-in?error=dashboard_error");
+    // Fallback error UI if anything else goes wrong
+    return (
+      <div className="min-h-screen bg-vyoniq-gray dark:bg-vyoniq-dark-bg">
+        <Header />
+        <main className="container mx-auto px-4 py-8">
+          <Alert variant="destructive">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertTitle>An Unexpected Error Occurred</AlertTitle>
+            <AlertDescription>
+              Something went wrong while loading the dashboard. Please try
+              refreshing the page. If the problem persists, contact support.
+            </AlertDescription>
+          </Alert>
+        </main>
+        <Footer />
+      </div>
+    );
   }
 }
