@@ -45,11 +45,6 @@ async function AdminDashboard() {
     return redirect("/");
   }
 
-  const waitlistUsers = await prisma.user.findMany({
-    where: { isOnWaitlist: true },
-    orderBy: { createdAt: "desc" },
-  });
-
   const newsletterSubscribers = await prisma.user.findMany({
     where: { isNewsletterSubscriber: true },
     orderBy: { createdAt: "desc" },
@@ -115,18 +110,6 @@ async function AdminDashboard() {
 
         {/* Stats Cards */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-12 mb-8">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Waitlist Users
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-vyoniq-blue dark:text-white">
-                {waitlistUsers.length}
-              </div>
-            </CardContent>
-          </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
@@ -285,37 +268,7 @@ async function AdminDashboard() {
         </div>
 
         {/* Data Tables */}
-        <div className="grid gap-8 md:grid-cols-1 lg:grid-cols-2">
-          <Card>
-            <CardHeader>
-              <CardTitle>Vyoniq Apps Waitlist</CardTitle>
-              <CardDescription>
-                Users who signed up for early access.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Signed Up</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {waitlistUsers.map((user) => (
-                    <TableRow key={user.id}>
-                      <TableCell>{user.name || "N/A"}</TableCell>
-                      <TableCell>{user.email}</TableCell>
-                      <TableCell>
-                        {new Date(user.createdAt).toLocaleDateString()}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+        <div className="grid gap-8 md:grid-cols-1">
           <Card>
             <CardHeader>
               <CardTitle>Newsletter Subscribers</CardTitle>

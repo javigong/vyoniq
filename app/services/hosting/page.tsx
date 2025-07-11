@@ -1,11 +1,11 @@
-import { Header } from "@/components/header"
-import { Footer } from "@/components/footer"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Server, Shield, Zap, Globe, ArrowRight } from "lucide-react"
-import Image from "next/image"
-import Link from "next/link"
-import type { Metadata } from "next"
+import { Header } from "@/components/header";
+import { Footer } from "@/components/footer";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Server, Shield, Zap, Globe, ArrowRight } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "AI-Powered Cloud Hosting Solutions | 99.9% Uptime | Vyoniq",
@@ -61,13 +61,14 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
-}
+};
 
 const features = [
   {
     icon: Server,
     title: "99.9% Uptime",
-    description: "Guaranteed reliability with redundant infrastructure and monitoring.",
+    description:
+      "Guaranteed reliability with redundant infrastructure and monitoring.",
   },
   {
     icon: Zap,
@@ -84,7 +85,7 @@ const features = [
     title: "Global CDN",
     description: "Worldwide content delivery for optimal performance.",
   },
-]
+];
 
 export default function HostingPage() {
   return (
@@ -100,9 +101,12 @@ export default function HostingPage() {
                 <Server className="h-12 w-12 text-vyoniq-green" />
               </div>
             </div>
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">AI-Powered Hosting Solutions</h1>
+            <h1 className="text-4xl md:text-6xl font-bold mb-6">
+              AI-Powered Hosting Solutions
+            </h1>
             <p className="text-xl md:text-2xl text-gray-100 dark:text-vyoniq-dark-muted">
-              Reliable, secure, and scalable hosting with intelligent monitoring and optimization
+              Reliable, secure, and scalable hosting with intelligent monitoring
+              and optimization
             </p>
           </div>
         </div>
@@ -117,9 +121,11 @@ export default function HostingPage() {
                 Next-Generation Hosting Infrastructure
               </h2>
               <p className="text-lg text-vyoniq-text dark:text-vyoniq-dark-text mb-6 leading-relaxed">
-                Our AI-powered hosting platform continuously monitors and optimizes your applications for peak
-                performance. With predictive scaling, automated security updates, and intelligent load balancing, your
-                applications stay fast, secure, and available 24/7.
+                Our AI-powered hosting platform continuously monitors and
+                optimizes your applications for peak performance. With
+                predictive scaling, automated security updates, and intelligent
+                load balancing, your applications stay fast, secure, and
+                available 24/7.
               </p>
               <div className="space-y-3 mb-8">
                 {[
@@ -131,7 +137,9 @@ export default function HostingPage() {
                 ].map((benefit) => (
                   <div key={benefit} className="flex items-center">
                     <ArrowRight className="h-4 w-4 text-vyoniq-green mr-3" />
-                    <span className="text-vyoniq-text dark:text-vyoniq-dark-text">{benefit}</span>
+                    <span className="text-vyoniq-text dark:text-vyoniq-dark-text">
+                      {benefit}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -145,8 +153,8 @@ export default function HostingPage() {
             </div>
             <div className="flex-1">
               <Image
-                src="/placeholder.svg?height=400&width=600"
-                alt="Hosting infrastructure visualization"
+                src="/hosting-service.jpg"
+                alt="Modern cloud hosting infrastructure with servers and network connectivity"
                 width={600}
                 height={400}
                 className="w-full h-auto rounded-lg shadow-xl"
@@ -157,15 +165,22 @@ export default function HostingPage() {
           {/* Features Grid */}
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {features.map((feature) => (
-              <Card key={feature.title} className="text-center border-0 shadow-lg bg-white dark:bg-vyoniq-dark-card">
+              <Card
+                key={feature.title}
+                className="text-center border-0 shadow-lg bg-white dark:bg-vyoniq-dark-card"
+              >
                 <CardHeader>
                   <div className="mx-auto mb-4 p-3 bg-vyoniq-blue/5 dark:bg-vyoniq-green/10 rounded-full w-fit">
                     <feature.icon className="h-8 w-8 text-vyoniq-green" />
                   </div>
-                  <CardTitle className="text-xl text-vyoniq-blue dark:text-white">{feature.title}</CardTitle>
+                  <CardTitle className="text-xl text-vyoniq-blue dark:text-white">
+                    {feature.title}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-vyoniq-text dark:text-vyoniq-dark-text">{feature.description}</p>
+                  <p className="text-vyoniq-text dark:text-vyoniq-dark-text">
+                    {feature.description}
+                  </p>
                 </CardContent>
               </Card>
             ))}
@@ -175,5 +190,5 @@ export default function HostingPage() {
 
       <Footer />
     </main>
-  )
+  );
 }

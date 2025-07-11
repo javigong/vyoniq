@@ -738,9 +738,6 @@ export function AdminMCPSection() {
                 <CardContent>
                   <div className="space-y-2 text-sm font-mono">
                     <div>
-                      <code>vyoniq://users/waitlist</code> - Waitlist users
-                    </div>
-                    <div>
                       <code>vyoniq://users/subscribers</code> - Newsletter
                       subscribers
                     </div>

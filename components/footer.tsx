@@ -35,6 +35,7 @@ export function Footer() {
     initialState
   );
   const formRef = useRef<HTMLFormElement>(null);
+  const emailInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (state?.success) {
@@ -45,6 +46,54 @@ export function Footer() {
       toast.error(state.error);
     }
   }, [state]);
+
+  useEffect(() => {
+    // Focus the email input when newsletter section comes into view
+    const handleNewsletterFocus = () => {
+      setTimeout(() => {
+        emailInputRef.current?.focus();
+      }, 800); // Longer delay to ensure smooth scrolling completes
+    };
+
+    // Listen for hash changes (when clicking #newsletter links)
+    const handleHashChange = () => {
+      if (window.location.hash === "#newsletter") {
+        handleNewsletterFocus();
+      }
+    };
+
+    // Check if we're already on the newsletter hash on page load
+    if (window.location.hash === "#newsletter") {
+      handleNewsletterFocus();
+    }
+
+    // Listen for hash changes
+    window.addEventListener("hashchange", handleHashChange);
+
+    // Also listen for scroll events to detect when user scrolls to newsletter
+    let scrollTimeout: NodeJS.Timeout;
+    const handleScroll = () => {
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        const newsletterSection = document.getElementById("newsletter");
+        if (newsletterSection && window.location.hash === "#newsletter") {
+          const rect = newsletterSection.getBoundingClientRect();
+          const isVisible = rect.top >= 0 && rect.top <= window.innerHeight;
+          if (isVisible) {
+            emailInputRef.current?.focus();
+          }
+        }
+      }, 100);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("hashchange", handleHashChange);
+      window.removeEventListener("scroll", handleScroll);
+      clearTimeout(scrollTimeout);
+    };
+  }, []);
 
   return (
     <footer className="bg-vyoniq-slate dark:bg-vyoniq-dark-bg text-white py-16 border-t border-gray-200 dark:border-gray-800">
@@ -60,7 +109,7 @@ export function Footer() {
             <p className="text-gray-300 dark:text-vyoniq-dark-muted mb-4">
               AI-powered software solutions for the future of business.
             </p>
-            <div>
+            <div id="newsletter">
               <h4 className="text-lg font-semibold mb-2">
                 Subscribe to our newsletter
               </h4>
@@ -69,6 +118,7 @@ export function Footer() {
               </p>
               <form ref={formRef} action={formAction} className="flex gap-2">
                 <input
+                  ref={emailInputRef}
                   type="email"
                   name="email"
                   placeholder="Your email address"

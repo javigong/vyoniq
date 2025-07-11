@@ -16,12 +16,14 @@ export function HeroSection() {
           <div className="flex-1 text-center lg:text-left animate-fade-in">
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">
               Vyoniq: Innovate Faster with{" "}
-              <span className="text-vyoniq-green whitespace-nowrap">AI-Powered</span> Software
-              Solutions
+              <span className="text-vyoniq-green whitespace-nowrap">
+                AI-Powered
+              </span>{" "}
+              Software Solutions
             </h1>
             <p className="text-lg md:text-xl text-gray-100 dark:text-vyoniq-dark-muted mb-8 max-w-2xl">
-              Web & Mobile Apps, Hosting, AI Integrations, and Coming Soon:
-              Vyoniq Apps for Smart Data Management
+              Web & Mobile Apps, Hosting, AI Integrations, and innovative
+              solutions to accelerate your business growth
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <Button
@@ -29,7 +31,7 @@ export function HeroSection() {
                 size="lg"
                 className="bg-accent hover:bg-accent/90 text-white font-semibold px-8 py-4 min-h-[48px] transform hover:scale-105 active:scale-100 transition-all duration-200 touch-manipulation"
               >
-                <Link href="#contact">Get a Quote</Link>
+                <Link href="#contact">Get in Touch</Link>
               </Button>
               <Button
                 asChild
@@ -37,7 +39,7 @@ export function HeroSection() {
                 variant="outline"
                 className="border-2 border-white text-white hover:bg-white hover:text-primary font-semibold px-8 py-4 min-h-[48px] transform hover:scale-105 active:scale-100 transition-all duration-200 touch-manipulation backdrop-blur-sm"
               >
-                <Link href="/sign-up">Join Vyoniq Apps Waitlist</Link>
+                <Link href="#newsletter">Stay Updated</Link>
               </Button>
             </div>
           </div>
