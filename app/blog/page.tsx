@@ -1,5 +1,5 @@
-import type { Metadata } from "next"
-import BlogClientPage from "./BlogClientPage"
+import type { Metadata } from "next";
+import BlogClientPage from "./BlogClientPage";
 
 export const metadata: Metadata = {
   title: "LLM & AI Development Insights | Vyoniq Blog",
@@ -37,14 +37,20 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "LLM & AI Development Insights | Vyoniq Blog",
-    description: "Expert insights on Large Language Models, AI agents, Cursor IDE, MCP servers, and LLM integration.",
-    images: ["/placeholder.svg?height=630&width=1200&text=Vyoniq+LLM+Blog+Insights"],
+    description:
+      "Expert insights on Large Language Models, AI agents, Cursor IDE, MCP servers, and LLM integration.",
+    images: [
+      "/placeholder.svg?height=630&width=1200&text=Vyoniq+LLM+Blog+Insights",
+    ],
   },
   alternates: {
     canonical: "https://vyoniq.com/blog",
   },
-}
+};
+
+// Enable ISR with revalidation for blog index
+export const revalidate = 3600; // Revalidate every hour
 
 export default function BlogPage() {
-  return <BlogClientPage />
+  return <BlogClientPage />;
 }
