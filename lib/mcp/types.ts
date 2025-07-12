@@ -92,7 +92,7 @@ export const CreateBlogPostSchema = z.object({
     .string()
     .optional()
     .describe(
-      "Publication date in ISO string format (optional, defaults to current date)"
+      "Publication date in ISO string format (optional, defaults to current date if not provided). Use ISO format like '2025-01-12T10:30:00.000Z' for specific dates."
     ),
   readTime: z
     .number()
@@ -114,7 +114,22 @@ export const CreateBlogPostSchema = z.object({
   tintColor: z
     .string()
     .optional()
-    .describe("Optional hex color code for post theming"),
+    .refine(
+      (color) => {
+        if (!color) return true; // Optional field
+        // Check if it's a valid RGBA color with transparency
+        const rgbaPattern =
+          /^rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*0\.[1-9]\d*\s*\)$/;
+        return rgbaPattern.test(color);
+      },
+      {
+        message:
+          "Tint color must be an RGBA color with transparency between 0.1 and 0.9 (e.g., 'rgba(244, 114, 182, 0.3)')",
+      }
+    )
+    .describe(
+      "Optional tint color for post theming. Should be an RGBA color with transparency (e.g., 'rgba(244, 114, 182, 0.3)' or 'rgba(251, 146, 60, 0.3)'). Use 0.3 opacity for proper tinting effect. Do NOT use solid colors like '#fff' or hex codes."
+    ),
   categoryIds: z
     .array(z.string())
     .optional()
@@ -161,7 +176,22 @@ export const UpdateBlogPostSchema = z.object({
   tintColor: z
     .string()
     .optional()
-    .describe("Optional hex color code for post theming"),
+    .refine(
+      (color) => {
+        if (!color) return true; // Optional field
+        // Check if it's a valid RGBA color with transparency
+        const rgbaPattern =
+          /^rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*0\.[1-9]\d*\s*\)$/;
+        return rgbaPattern.test(color);
+      },
+      {
+        message:
+          "Tint color must be an RGBA color with transparency between 0.1 and 0.9 (e.g., 'rgba(244, 114, 182, 0.3)')",
+      }
+    )
+    .describe(
+      "Optional tint color for post theming. Should be an RGBA color with transparency (e.g., 'rgba(244, 114, 182, 0.3)' or 'rgba(251, 146, 60, 0.3)'). Use 0.3 opacity for proper tinting effect. Do NOT use solid colors like '#fff' or hex codes."
+    ),
   categoryIds: z
     .array(z.string())
     .optional()
@@ -278,7 +308,22 @@ export const BulkUpdatePostsSchema = z.object({
       tintColor: z
         .string()
         .optional()
-        .describe("Apply this tint color to all posts"),
+        .refine(
+          (color) => {
+            if (!color) return true; // Optional field
+            // Check if it's a valid RGBA color with transparency
+            const rgbaPattern =
+              /^rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*0\.[1-9]\d*\s*\)$/;
+            return rgbaPattern.test(color);
+          },
+          {
+            message:
+              "Tint color must be an RGBA color with transparency between 0.1 and 0.9 (e.g., 'rgba(244, 114, 182, 0.3)')",
+          }
+        )
+        .describe(
+          "Apply this tint color to all posts. Should be an RGBA color with transparency (e.g., 'rgba(244, 114, 182, 0.3)' or 'rgba(251, 146, 60, 0.3)'). Use 0.3 opacity for proper tinting effect. Do NOT use solid colors like '#fff' or hex codes."
+        ),
     })
     .describe("Updates to apply to all selected posts"),
 });
