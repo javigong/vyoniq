@@ -8,10 +8,13 @@ import { ContactForm } from "@/components/contact-form";
 import { Footer } from "@/components/footer";
 import { Toaster } from "@/components/ui/toaster";
 import { ScrollToContact } from "@/components/scroll-to-contact";
+import { OrganizationStructuredData, WebsiteStructuredData } from "@/components/structured-data";
 
 export default function HomePage() {
   return (
     <main className="min-h-screen">
+      <OrganizationStructuredData />
+      <WebsiteStructuredData />
       <Header />
       <HeroSection />
       <ServicesOverview />
