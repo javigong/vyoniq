@@ -11,26 +11,69 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   metadataBase: new URL(getBaseUrl()),
-  title: "Vyoniq | AI-Powered Software Solutions",
+  title: "Vyoniq | AI-Powered Software Development & LLM Integration Services",
   description:
-    "Innovative AI-driven software development company specializing in web & mobile apps, hosting services, and AI integrations. Subscribe to our newsletter for updates.",
+    "Professional AI-powered software development company specializing in LLM integration, AI agents, web & mobile apps, MCP servers, and modern AI development tools. Transform your business with cutting-edge AI solutions.",
   keywords: [
-    "AI",
-    "software development",
+    "AI software development",
+    "LLM integration",
+    "AI agents",
     "Vyoniq",
     "web development",
     "mobile apps",
-    "hosting",
+    "MCP servers",
     "AI integrations",
+    "Cursor IDE",
+    "artificial intelligence",
+    "software development company",
+    "AI consulting",
+    "machine learning",
+    "AI development tools",
     "newsletter",
   ],
   openGraph: {
-    title: "Vyoniq | AI-Powered Software Solutions",
+    title:
+      "Vyoniq | AI-Powered Software Development & LLM Integration Services",
     description:
-      "Innovative AI-driven software development company specializing in web & mobile apps, hosting services, and AI integrations.",
-    images: ["/placeholder.svg?height=630&width=1200"],
+      "Professional AI-powered software development company specializing in LLM integration, AI agents, web & mobile apps, and modern AI development tools.",
+    url: getBaseUrl(),
+    siteName: "Vyoniq",
+    images: [
+      {
+        url: "/placeholder.svg?height=630&width=1200&text=Vyoniq+AI+Software+Development",
+        width: 1200,
+        height: 630,
+        alt: "Vyoniq - AI-Powered Software Development Services",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
   },
-  generator: "v0.dev",
+  twitter: {
+    card: "summary_large_image",
+    title:
+      "Vyoniq | AI-Powered Software Development & LLM Integration Services",
+    description:
+      "Professional AI-powered software development company specializing in LLM integration, AI agents, and modern AI development tools.",
+    images: [
+      "/placeholder.svg?height=630&width=1200&text=Vyoniq+AI+Software+Development",
+    ],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
+  },
+  generator: "Next.js",
 };
 
 export default function RootLayout({
@@ -61,20 +104,28 @@ export default function RootLayout({
     >
       <html lang="en" suppressHydrationWarning>
         <head>
-          <script
-            async
-            src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"
-          />
-          <script
-            dangerouslySetInnerHTML={{
-              __html: `
-                window.dataLayer = window.dataLayer || [];
-                function gtag(){dataLayer.push(arguments);}
-                gtag('js', new Date());
-                gtag('config', 'GA_MEASUREMENT_ID');
-              `,
-            }}
-          />
+          {/* Google Analytics 4 */}
+          {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID && (
+            <>
+              <script
+                async
+                src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}`}
+              />
+              <script
+                dangerouslySetInnerHTML={{
+                  __html: `
+                    window.dataLayer = window.dataLayer || [];
+                    function gtag(){dataLayer.push(arguments);}
+                    gtag('js', new Date());
+                    gtag('config', '${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}', {
+                      page_title: document.title,
+                      page_location: window.location.href,
+                    });
+                  `,
+                }}
+              />
+            </>
+          )}
         </head>
         <body className={inter.className}>
           <ThemeProvider
