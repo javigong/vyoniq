@@ -40,9 +40,9 @@ export function OrganizationStructuredData() {
     image: "https://vyoniq.com/placeholder.svg?height=630&width=1200&text=Vyoniq+AI+Software+Development",
     contactPoint: [
       {
-        "@type": "ContactPoint",
-        contactType: "customer service",
-        url: "https://vyoniq.com/#contact",
+      "@type": "ContactPoint",
+      contactType: "customer service",
+      url: "https://vyoniq.com/#contact",
         availableLanguage: "English",
       },
       {
@@ -50,7 +50,7 @@ export function OrganizationStructuredData() {
         contactType: "technical support",
         url: "https://vyoniq.com/#contact",
         availableLanguage: "English",
-      },
+    },
     ],
     sameAs: [
       "https://linkedin.com/company/vyoniq",

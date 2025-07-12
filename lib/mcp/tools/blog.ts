@@ -984,7 +984,7 @@ export async function getBlogPostHandler(
     return createSuccessResponse(
       `Blog post "${post.title}" (ID: ${post.id}) - Status: ${
         post.published ? "Published" : "Draft"
-      } - Created: ${post.createdAt.toLocaleDateString()} - Author: ${
+      } - Publish Date: ${post.publishDate.toLocaleDateString()} - Created: ${post.createdAt.toLocaleDateString()} - Author: ${
         post.author.name
       } - Categories: ${post.categories.map((c) => c.category.name).join(", ")}`
     );
@@ -1031,7 +1031,7 @@ export async function revalidateBlogHandler(
       headers: {
         "Content-Type": "application/json",
         // Pass through the authorization for admin check
-        "Authorization": `Bearer ${auth.apiKeyId || "internal"}`,
+        Authorization: `Bearer ${auth.apiKeyId || "internal"}`,
       },
       body: JSON.stringify({
         action: data.action,
@@ -1051,14 +1051,14 @@ export async function revalidateBlogHandler(
     if (data.action === "revalidate-all") {
       return createSuccessResponse(
         `✅ Successfully revalidated all blog pages\n` +
-        `Timestamp: ${result.timestamp}\n` +
-        `All blog posts and the blog index page have been updated with the latest content.`
+          `Timestamp: ${result.timestamp}\n` +
+          `All blog posts and the blog index page have been updated with the latest content.`
       );
     } else {
       return createSuccessResponse(
         `✅ Successfully revalidated blog post: ${data.slug}\n` +
-        `Timestamp: ${result.timestamp}\n` +
-        `The blog post page and blog index have been updated with the latest content.`
+          `Timestamp: ${result.timestamp}\n` +
+          `The blog post page and blog index have been updated with the latest content.`
       );
     }
   } catch (error) {
