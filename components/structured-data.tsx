@@ -27,33 +27,134 @@ export function StructuredData({ type, data }: StructuredDataProps) {
 export function OrganizationStructuredData() {
   const organizationData = {
     name: "Vyoniq",
+    alternateName: "Vyoniq Technologies",
     description:
-      "AI-powered software development company specializing in LLM integration, AI agents, and modern development tools like Cursor and MCP servers.",
+      "Professional AI-powered software development company specializing in LLM integration, AI agents, web & mobile apps, MCP servers, and modern AI development tools.",
     url: "https://vyoniq.com",
-    logo: "https://vyoniq.com/logo.png",
-    contactPoint: {
-      "@type": "ContactPoint",
-      contactType: "customer service",
-      url: "https://vyoniq.com/#contact",
+    logo: {
+      "@type": "ImageObject",
+      url: "https://vyoniq.com/logo.png",
+      width: 200,
+      height: 200,
     },
-    sameAs: ["https://linkedin.com/company/vyoniq", "https://github.com/vyoniq"],
+    image: "https://vyoniq.com/placeholder.svg?height=630&width=1200&text=Vyoniq+AI+Software+Development",
+    contactPoint: [
+      {
+        "@type": "ContactPoint",
+        contactType: "customer service",
+        url: "https://vyoniq.com/#contact",
+        availableLanguage: "English",
+      },
+      {
+        "@type": "ContactPoint",
+        contactType: "technical support",
+        url: "https://vyoniq.com/#contact",
+        availableLanguage: "English",
+      },
+    ],
+    sameAs: [
+      "https://linkedin.com/company/vyoniq",
+      "https://github.com/vyoniq",
+      "https://twitter.com/vyoniq",
+    ],
     foundingDate: "2025",
     founder: {
       "@type": "Person",
       name: "Javier Gongora",
       jobTitle: "Founder & Software Developer",
       description: "Expert in LLM integration, AI agents, and modern AI development tools",
+      url: "https://vyoniq.com/about",
+      sameAs: [
+        "https://linkedin.com/in/javier-gongora",
+        "https://github.com/javigong",
+      ],
     },
-    areaServed: "Worldwide",
+    areaServed: {
+      "@type": "Place",
+      name: "Worldwide",
+    },
     serviceType: [
-      "LLM Integration",
+      "LLM Integration Services",
       "AI Agent Development",
-      "Web Development",
+      "Web Application Development",
       "Mobile App Development",
       "MCP Server Implementation",
       "AI Development Consulting",
+      "Software Development Services",
+      "AI Integration Services",
     ],
+    knowsAbout: [
+      "Large Language Models",
+      "AI Agents",
+      "Machine Learning",
+      "Software Development",
+      "Web Development",
+      "Mobile Development",
+      "AI Integration",
+      "MCP Servers",
+      "Cursor IDE",
+      "Next.js",
+      "React",
+      "TypeScript",
+    ],
+    hasOfferCatalog: {
+      "@type": "OfferCatalog",
+      name: "Vyoniq AI Software Development Services",
+      itemListElement: [
+        {
+          "@type": "Offer",
+          itemOffered: {
+            "@type": "Service",
+            name: "LLM Integration Services",
+            description: "Professional Large Language Model integration and AI agent development",
+          },
+        },
+        {
+          "@type": "Offer",
+          itemOffered: {
+            "@type": "Service",
+            name: "Web & Mobile App Development",
+            description: "AI-powered web and mobile application development with modern frameworks",
+          },
+        },
+        {
+          "@type": "Offer",
+          itemOffered: {
+            "@type": "Service",
+            name: "MCP Server Implementation",
+            description: "Model Context Protocol server development for AI agent integration",
+          },
+        },
+      ],
+    },
   }
 
   return <StructuredData type="Organization" data={organizationData} />
+}
+
+// Website structured data
+export function WebsiteStructuredData() {
+  const websiteData = {
+    "@type": "WebSite",
+    name: "Vyoniq",
+    alternateName: "Vyoniq Technologies",
+    url: "https://vyoniq.com",
+    description:
+      "Professional AI-powered software development company specializing in LLM integration, AI agents, and modern AI development tools.",
+    publisher: {
+      "@type": "Organization",
+      name: "Vyoniq",
+    },
+    potentialAction: {
+      "@type": "SearchAction",
+      target: "https://vyoniq.com/blog?search={search_term_string}",
+      "query-input": "required name=search_term_string",
+    },
+    mainEntity: {
+      "@type": "Organization",
+      name: "Vyoniq",
+    },
+  }
+
+  return <StructuredData type="WebSite" data={websiteData} />
 }
