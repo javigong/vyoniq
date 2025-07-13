@@ -12,13 +12,12 @@ export function VyoniqAppsSection() {
           {/* Content */}
           <div className="flex-1 lg:pr-8">
             <h2 className="text-3xl md:text-4xl font-bold text-vyoniq-blue dark:text-white mb-6">
-              Stay Updated with Vyoniq's Latest Innovations
+              Custom Apps: Built for You
             </h2>
             <p className="text-lg text-vyoniq-text dark:text-vyoniq-dark-text mb-8 leading-relaxed">
-              Get the latest updates on our AI-powered solutions, new blog
-              posts, and innovative tools that we're building. Be the first to
-              know about our newest applications and services that will
-              transform your workflow.
+              Our team develops custom applications to solve your unique
+              challenges. Subscribe to our newsletter for updates on our latest
+              projects.
             </p>
             <Button
               asChild
