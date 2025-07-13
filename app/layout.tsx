@@ -10,55 +10,58 @@ import { getBaseUrl } from "@/lib/utils";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(getBaseUrl()),
-  title: "Vyoniq | AI-Powered Software Development & LLM Integration Services",
+  title: {
+    default: "Vyoniq - LLM AI Agent Development & MCP Server Solutions",
+    template: "%s | Vyoniq - AI Agent Development",
+  },
   description:
-    "Professional AI-powered software development company specializing in LLM integration, AI agents, web & mobile apps, MCP servers, and modern AI development tools. Transform your business with cutting-edge AI solutions.",
+    "Leading AI agent development company specializing in LLM-powered agents, MCP server integration, and agentic AI solutions. Build intelligent AI agents with cutting-edge technologies like AutoGen, CrewAI, and Model Context Protocol.",
   keywords: [
-    "AI software development",
-    "LLM integration",
-    "AI agents",
-    "Vyoniq",
-    "web development",
-    "mobile apps",
-    "MCP servers",
-    "AI integrations",
-    "Cursor IDE",
-    "artificial intelligence",
-    "software development company",
-    "AI consulting",
-    "machine learning",
-    "AI development tools",
-    "newsletter",
-  ],
-  openGraph: {
-    title:
-      "Vyoniq | AI-Powered Software Development & LLM Integration Services",
-    description:
-      "Professional AI-powered software development company specializing in LLM integration, AI agents, web & mobile apps, and modern AI development tools.",
-    url: getBaseUrl(),
-    siteName: "Vyoniq",
-    images: [
-      {
-        url: "/placeholder.svg?height=630&width=1200&text=Vyoniq+AI+Software+Development",
-        width: 1200,
-        height: 630,
-        alt: "Vyoniq - AI-Powered Software Development Services",
-      },
-    ],
-    locale: "en_US",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title:
-      "Vyoniq | AI-Powered Software Development & LLM Integration Services",
-    description:
-      "Professional AI-powered software development company specializing in LLM integration, AI agents, and modern AI development tools.",
-    images: [
-      "/placeholder.svg?height=630&width=1200&text=Vyoniq+AI+Software+Development",
-    ],
-  },
+    // Core AI Agent Technologies
+    "AI agent development",
+    "LLM AI agents",
+    "agentic AI development",
+    "autonomous AI agents",
+    "intelligent AI agents",
+
+    // MCP and Protocol Technologies
+    "MCP server development",
+    "Model Context Protocol",
+    "MCP integration services",
+    "AI agent protocols",
+    "MCP server hosting",
+
+    // Trending AI Technologies 2025
+    "AI agent frameworks",
+    "multi-agent systems",
+    "LLM agent orchestration",
+    "AI agent automation",
+    "conversational AI agents",
+
+    // Development Tools & Frameworks
+    "AutoGen Studio development",
+    "CrewAI implementation",
+    "LangChain agents",
+    "AI agent tools",
+    "custom AI agents",
+
+    // Business Applications
+    "enterprise AI agents",
+    "AI workflow automation",
+    "business process automation",
+    "AI agent consulting",
+    "AI agent integration",
+
+    // Emerging Technologies
+    "computer using agents",
+    "CUA development",
+    "voice AI agents",
+    "coding AI agents",
+    "research AI agents",
+  ].join(", "),
+  authors: [{ name: "Vyoniq Technologies" }],
+  creator: "Vyoniq Technologies",
+  publisher: "Vyoniq Technologies",
   robots: {
     index: true,
     follow: true,
@@ -70,10 +73,38 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
-  verification: {
-    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://vyoniq.com",
+    siteName: "Vyoniq",
+    title: "Vyoniq - LLM AI Agent Development & MCP Server Solutions",
+    description:
+      "Leading AI agent development company specializing in LLM-powered agents, MCP server integration, and agentic AI solutions. Build intelligent AI agents with cutting-edge technologies.",
+    images: [
+      {
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Vyoniq - AI Agent Development Company",
+      },
+    ],
   },
-  generator: "Next.js",
+  twitter: {
+    card: "summary_large_image",
+    title: "Vyoniq - LLM AI Agent Development & MCP Server Solutions",
+    description:
+      "Leading AI agent development company specializing in LLM-powered agents, MCP server integration, and agentic AI solutions.",
+    images: ["/og-image.jpg"],
+    creator: "@vyoniq",
+  },
+  verification: {
+    google: process.env.GOOGLE_SITE_VERIFICATION,
+  },
+  alternates: {
+    canonical: "https://vyoniq.com",
+  },
+  category: "AI Development",
 };
 
 export default function RootLayout({
@@ -107,13 +138,13 @@ export default function RootLayout({
           {/* Google Analytics 4 */}
           {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID && (
             <>
-          <script
-            async
+              <script
+                async
                 src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}`}
-          />
-          <script
-            dangerouslySetInnerHTML={{
-              __html: `
+              />
+              <script
+                dangerouslySetInnerHTML={{
+                  __html: `
                 window.dataLayer = window.dataLayer || [];
                 function gtag(){dataLayer.push(arguments);}
                 gtag('js', new Date());
@@ -122,8 +153,8 @@ export default function RootLayout({
                       page_location: window.location.href,
                     });
               `,
-            }}
-          />
+                }}
+              />
             </>
           )}
         </head>
