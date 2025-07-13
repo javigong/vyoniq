@@ -8,32 +8,32 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Vyoniq Innovation Hub | Stay Updated with Latest AI Solutions",
+  title: "Custom App Development | Vyoniq - Tailored AI-Powered Solutions",
   description:
-    "Stay updated with Vyoniq's latest AI-powered solutions, blog posts, and innovative tools. Subscribe to our newsletter for exclusive insights and updates.",
+    "Get custom applications built specifically for your business needs. Vyoniq creates tailored AI-powered solutions using cutting-edge technology. Contact us to discuss your project.",
   keywords: [
-    "Vyoniq Innovation",
+    "custom app development",
     "AI solutions",
     "software development",
-    "AI integrations",
+    "tailored applications",
     "web development",
     "mobile apps",
-    "hosting services",
-    "newsletter",
-    "technology updates",
+    "custom software",
+    "business solutions",
+    "technology consulting",
   ],
   openGraph: {
-    title: "Vyoniq Innovation Hub | Stay Updated with Latest AI Solutions",
+    title: "Custom App Development | Vyoniq - Tailored AI-Powered Solutions",
     description:
-      "Get the latest updates on Vyoniq's AI-powered solutions, new blog posts, and innovative tools. Subscribe to our newsletter for exclusive insights.",
+      "Get custom applications built specifically for your business needs. Contact us to discuss your tailored AI-powered solution.",
     url: "https://vyoniq.com/vyoniq-apps",
     siteName: "Vyoniq",
     images: [
       {
-        url: "/placeholder.svg?height=630&width=1200&text=Vyoniq+Innovation+Hub",
+        url: "/placeholder.svg?height=630&width=1200&text=Vyoniq+Custom+App+Development",
         width: 1200,
         height: 630,
-        alt: "Vyoniq Innovation Hub - Stay Updated",
+        alt: "Vyoniq Custom App Development - Tailored Solutions",
       },
     ],
     locale: "en_US",
@@ -41,11 +41,11 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Vyoniq Innovation Hub | Stay Updated with Latest AI Solutions",
+    title: "Custom App Development | Vyoniq - Tailored AI-Powered Solutions",
     description:
-      "Get the latest updates on Vyoniq's AI-powered solutions and innovative tools. Subscribe to our newsletter!",
+      "Get custom applications built specifically for your business needs. Contact us to discuss your project!",
     images: [
-      "/placeholder.svg?height=630&width=1200&text=Vyoniq+Innovation+Hub",
+      "/placeholder.svg?height=630&width=1200&text=Vyoniq+Custom+App+Development",
     ],
   },
   alternates: {
@@ -67,27 +67,27 @@ export const metadata: Metadata = {
 const features = [
   {
     icon: Database,
-    title: "AI-Powered Solutions",
+    title: "Tailored Solutions",
     description:
-      "Cutting-edge AI integrations that transform your business processes and workflows.",
+      "Custom applications designed specifically for your business requirements and workflows.",
   },
   {
     icon: MessageSquare,
-    title: "Expert Insights",
+    title: "AI Integration",
     description:
-      "In-depth blog posts and technical articles from our development team.",
+      "Leverage cutting-edge AI and machine learning capabilities in your custom applications.",
   },
   {
     icon: Zap,
-    title: "Latest Updates",
+    title: "Rapid Development",
     description:
-      "Be the first to know about new services, tools, and technological breakthroughs.",
+      "Fast turnaround times with our AI-powered development process and experienced team.",
   },
   {
     icon: Shield,
-    title: "Exclusive Content",
+    title: "Enterprise-Grade",
     description:
-      "Subscriber-only content including case studies, tutorials, and industry insights.",
+      "Secure, scalable, and reliable applications built to enterprise standards.",
   },
 ];
 
@@ -101,18 +101,30 @@ export default function VyoniqAppsPage() {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              Vyoniq Innovation Hub
+              Custom App Development
             </h1>
             <p className="text-xl md:text-2xl mb-8 text-gray-100">
-              Stay ahead with the latest AI-powered solutions and insights
+              We specialize in creating custom applications tailored to your
+              business needs. From AI-powered solutions to enterprise-grade
+              applications, we bring your vision to life.
             </p>
-            <Button
-              asChild
-              size="lg"
-              className="bg-vyoniq-green hover:bg-vyoniq-green/90 text-white font-semibold px-8 py-3 transform hover:scale-105 transition-all duration-200"
-            >
-              <Link href="#newsletter">Subscribe to Newsletter</Link>
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button
+                asChild
+                size="lg"
+                className="bg-vyoniq-green hover:bg-vyoniq-green/90 text-white font-semibold px-8 py-3 transform hover:scale-105 transition-all duration-200"
+              >
+                <Link href="/#contact">Get a Quote</Link>
+              </Button>
+              <Button
+                asChild
+                size="lg"
+                variant="outline"
+                className="border-white text-white hover:bg-white hover:text-vyoniq-blue font-semibold px-8 py-3 transform hover:scale-105 transition-all duration-200"
+              >
+                <Link href="#newsletter">Subscribe to Newsletter</Link>
+              </Button>
+            </div>
           </div>
         </div>
       </section>
@@ -122,11 +134,11 @@ export default function VyoniqAppsPage() {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-vyoniq-blue dark:text-white mb-4">
-              What You'll Get
+              Why Choose Our Custom Development?
             </h2>
             <p className="text-lg text-vyoniq-text dark:text-vyoniq-dark-text max-w-2xl mx-auto">
-              Join our newsletter community and get exclusive access to
-              insights, updates, and innovative solutions
+              We combine cutting-edge technology with deep business
+              understanding to create applications that truly serve your needs
             </p>
           </div>
 
@@ -155,24 +167,88 @@ export default function VyoniqAppsPage() {
         </div>
       </section>
 
-      {/* CTA Section */}
+      {/* Process Section */}
       <section className="py-20 bg-vyoniq-gray dark:bg-vyoniq-slate">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-vyoniq-blue dark:text-white mb-6">
+              Our Development Process
+            </h2>
+            <p className="text-lg text-vyoniq-text dark:text-vyoniq-dark-text mb-8">
+              From initial consultation to deployment and beyond, we guide you
+              through every step
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 mb-12">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-vyoniq-green rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-white font-bold text-xl">1</span>
+              </div>
+              <h3 className="text-xl font-semibold text-vyoniq-blue dark:text-white mb-2">
+                Discovery & Planning
+              </h3>
+              <p className="text-vyoniq-text dark:text-vyoniq-dark-text">
+                We analyze your requirements and create a detailed development
+                plan
+              </p>
+            </div>
+            <div className="text-center">
+              <div className="w-16 h-16 bg-vyoniq-green rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-white font-bold text-xl">2</span>
+              </div>
+              <h3 className="text-xl font-semibold text-vyoniq-blue dark:text-white mb-2">
+                Development & Testing
+              </h3>
+              <p className="text-vyoniq-text dark:text-vyoniq-dark-text">
+                Our AI-powered development process ensures quality and speed
+              </p>
+            </div>
+            <div className="text-center">
+              <div className="w-16 h-16 bg-vyoniq-green rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-white font-bold text-xl">3</span>
+              </div>
+              <h3 className="text-xl font-semibold text-vyoniq-blue dark:text-white mb-2">
+                Deployment & Support
+              </h3>
+              <p className="text-vyoniq-text dark:text-vyoniq-dark-text">
+                We handle deployment and provide ongoing support for your
+                application
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 bg-white dark:bg-vyoniq-dark-bg">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-3xl md:text-4xl font-bold text-vyoniq-blue dark:text-white mb-6">
-              Ready to Stay Updated?
+              Ready to Build Your Custom Application?
             </h2>
             <p className="text-lg text-vyoniq-text dark:text-vyoniq-dark-text mb-8">
-              Subscribe to our newsletter and be the first to know about our
-              latest AI-powered solutions, blog posts, and innovative tools.
+              Let's discuss your project requirements and create a solution that
+              perfectly fits your needs. Get started with a free consultation
+              today.
             </p>
-            <Button
-              asChild
-              size="lg"
-              className="bg-vyoniq-green hover:bg-vyoniq-green/90 text-white font-semibold px-8 py-3 transform hover:scale-105 transition-all duration-200"
-            >
-              <Link href="#newsletter">Subscribe Now</Link>
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button
+                asChild
+                size="lg"
+                className="bg-vyoniq-green hover:bg-vyoniq-green/90 text-white font-semibold px-8 py-3 transform hover:scale-105 transition-all duration-200"
+              >
+                <Link href="/#contact">Contact Us Today</Link>
+              </Button>
+              <Button
+                asChild
+                size="lg"
+                variant="outline"
+                className="border-vyoniq-green text-vyoniq-green hover:bg-vyoniq-green hover:text-white font-semibold px-8 py-3 transform hover:scale-105 transition-all duration-200"
+              >
+                <Link href="#newsletter">Stay Updated</Link>
+              </Button>
+            </div>
           </div>
         </div>
       </section>
