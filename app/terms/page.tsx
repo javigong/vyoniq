@@ -202,30 +202,7 @@ export default function TermsPage() {
 
                 <section>
                   <h2 className="text-2xl font-bold text-vyoniq-blue dark:text-white mb-4">
-                    10. Vyoniq Apps Waitlist
-                  </h2>
-                  <p className="text-vyoniq-text dark:text-vyoniq-dark-text mb-4">
-                    By joining the Vyoniq Apps waitlist, you acknowledge that:
-                  </p>
-                  <ul className="list-disc pl-6 text-vyoniq-text dark:text-vyoniq-dark-text mb-4">
-                    <li>Vyoniq Apps is currently in development</li>
-                    <li>
-                      No guarantee is made regarding release dates or features
-                    </li>
-                    <li>
-                      Waitlist position does not guarantee access to beta or
-                      final versions
-                    </li>
-                    <li>
-                      We may contact you with updates about the product
-                      development
-                    </li>
-                  </ul>
-                </section>
-
-                <section>
-                  <h2 className="text-2xl font-bold text-vyoniq-blue dark:text-white mb-4">
-                    11. Governing Law
+                    10. Governing Law
                   </h2>
                   <p className="text-vyoniq-text dark:text-vyoniq-dark-text mb-4">
                     These terms shall be interpreted and governed in accordance
@@ -237,7 +214,7 @@ export default function TermsPage() {
 
                 <section>
                   <h2 className="text-2xl font-bold text-vyoniq-blue dark:text-white mb-4">
-                    12. Changes to Terms
+                    11. Changes to Terms
                   </h2>
                   <p className="text-vyoniq-text dark:text-vyoniq-dark-text mb-4">
                     We reserve the right to modify these terms at any time.
@@ -249,7 +226,7 @@ export default function TermsPage() {
 
                 <section>
                   <h2 className="text-2xl font-bold text-vyoniq-blue dark:text-white mb-4">
-                    13. Contact Information
+                    12. Contact Information
                   </h2>
                   <p className="text-vyoniq-text dark:text-vyoniq-dark-text mb-4">
                     If you have any questions about these Terms of Service,
