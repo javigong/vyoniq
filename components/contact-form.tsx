@@ -136,11 +136,16 @@ export function ContactForm() {
                       <SelectItem value="web-mobile">
                         Web & Mobile Development
                       </SelectItem>
-                      <SelectItem value="hosting">Hosting Services</SelectItem>
-                      <SelectItem value="ai">AI Integrations</SelectItem>
-                      <SelectItem value="vyoniq-apps">
-                        Vyoniq Apps Interest
+                      <SelectItem value="ai-integration">
+                        AI Integration Project
                       </SelectItem>
+                      <SelectItem value="custom-apps">
+                        Custom App Development
+                      </SelectItem>
+                      <SelectItem value="consultation">
+                        Consultation & Planning
+                      </SelectItem>
+                      <SelectItem value="general">General Inquiry</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
