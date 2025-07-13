@@ -4,13 +4,13 @@
 
 ### Purpose
 
-The Vyoniq SaaS landing page establishes Vyoniq as a leading Software Development company powered by AI agents, delivering innovative solutions with the efficiency of a large team. The page showcases core services—Web and Mobile App Development, Hosting Services, and AI Integrations—while announcing `Vyoniq Tables`, a forthcoming subscription-based web application for data management and interaction via MCP (Multi-Client Platform) servers, currently in development. The landing page aims to drive client inquiries, generate interest in `Vyoniq Tables`, and build a strong brand identity led by the Founder and Software Developer.
+The Vyoniq SaaS landing page establishes Vyoniq as a leading Software Development company powered by AI agents, delivering innovative solutions with the efficiency of a large team. The page showcases core services—Web and Mobile App Development, Hosting Services, and AI Integrations—while highlighting our ability to create custom apps tailored to client needs. The landing page aims to drive client inquiries, promote our newsletter for ongoing communications and news, and build a strong brand identity led by the Founder and Software Developer.
 
 ### Objectives
 
-- **Showcase Vyoniq's Services:** Promote professional software development services enhanced by AI agents.
-- **Announce Vyoniq Tables:** Build anticipation for the upcoming data management app, emphasizing its AI-driven features.
-- **Lead Generation:** Capture inquiries for services and waitlist sign-ups for `Vyoniq Tables`.
+- **Showcase Vyoniq's Services:** Promote professional software development services enhanced by AI agents, including custom app development.
+- **Promote Newsletter:** Encourage sign-ups for our newsletter to stay updated on latest news, communications, and innovations.
+- **Lead Generation:** Capture inquiries for services and newsletter subscriptions.
 - **Establish Brand:** Position Vyoniq as an innovative, AI-powered company, with the Founder and Software Developer as the visionary leader.
 - **MVP Scope:** Deliver a modern landing page using `Next.js`, `shadcn/ui`, `PostgreSQL`, and `Clerk`.
 
@@ -50,7 +50,7 @@ The Vyoniq SaaS landing page establishes Vyoniq as a leading Software Developmen
   - 2-3 fictional client testimonials for credibility (replace with real ones later).
   - Trust badges: "AI-Powered Innovation," "Secured by Clerk," "Built with Next.js."
 - **Contact Form:**
-  - **Fields:** Name, Email, Service Type (dropdown: Web/Mobile, Hosting, AI, `Vyoniq Tables` Interest), Message.
+  - **Fields:** Name, Email, Service Type (dropdown: Web/Mobile, Hosting, AI, Custom App Development), Message.
   - **CTA:** "Submit Inquiry" (stores data in `PostgreSQL` and sends confirmation email via Resend).
 - **Footer:**
   - **Links:** About, Services, Contact, Privacy Policy, Terms of Service.
@@ -59,15 +59,10 @@ The Vyoniq SaaS landing page establishes Vyoniq as a leading Software Developmen
 
 #### Service Detail Pages
 
-- Individual Pages for each service (Web/Mobile App Development, Hosting, AI Integrations):
+- Individual Pages for each service (Web/Mobile App Development, Hosting, AI Integrations, Custom Apps):
   - Detailed description emphasizing AI-driven efficiency and quality.
   - Key benefits (e.g., "AI-enhanced hosting with 99.9% uptime").
   - **CTA:** "Request a Quote" linking to contact form.
-- **Vyoniq Tables Page:**
-  - **Title:** "Vyoniq Tables: Coming Soon"
-  - **Description:** Outline planned features (AI-enhanced data entry, MCP server integration, chat functionality) and note the app is in development.
-  - **CTA:** "Join Waitlist" for updates on launch.
-  - **Visual:** Placeholder mockup with "Work in Progress" watermark.
 
 #### About Page
 
@@ -79,13 +74,13 @@ The Vyoniq SaaS landing page establishes Vyoniq as a leading Software Developmen
 
 #### Authentication (via Clerk)
 
-- **Sign-Up for Vyoniq Tables Waitlist:**
+- **Sign-Up for Newsletter and Updates:**
   - `Clerk`-powered form: Email, Password, Name.
   - Optional: Social login (Google, GitHub).
   - A `user.created` webhook from Clerk triggers creating a user record in the local `PostgreSQL` database and sends a welcome email via `Resend`.
 - **User Dashboard (MVP scope: basic):**
-  - Post-sign-up, displays waitlist status and profile info.
-  - Message: "`Vyoniq Tables` is in development. Stay tuned for updates!"
+  - Displays profile info and newsletter subscription status.
+  - Message: "Stay tuned for our latest updates via newsletter!"
 
 ### Technical Requirements
 
@@ -147,22 +142,21 @@ The Vyoniq SaaS landing page establishes Vyoniq as a leading Software Developmen
 ## 📊 Success Metrics
 
 - **Lead Generation:** 50+ inquiries/month for services.
-- **Waitlist Growth:** 100+ sign-ups for `Vyoniq Tables` within 3 months.
+- **Newsletter Growth:** 100+ subscriptions within 3 months.
 - **Engagement:** Average time on page > 1 minute.
-- **Conversion Rate:** 5% of visitors submit inquiries or join waitlist.
+- **Conversion Rate:** 5% of visitors submit inquiries or subscribe to newsletter.
 
 ## 🚀 Future Considerations
 
-- **`Vyoniq Tables` Launch:** Add demo page upon release.
+- **Newsletter Integration:** Enhance with advanced features (post-MVP).
 - **Portfolio Section:** Showcase AI-driven projects (post-MVP).
-- **Subscription Checkout:** Integrate `Stripe` for `Vyoniq Tables`.
 - **Blog:** Add for SEO and thought leadership.
 
 ## 🗓️ Timeline (MVP)
 
 - **Week 1:** Wireframes, `Next.js` setup, `Clerk`, and `PostgreSQL` configuration.
 - **Week 2:** Build homepage, service pages, and contact form with `shadcn/ui`.
-- **Week 3:** Implement `Clerk` authentication, waitlist, and dashboard.
+- **Week 3:** Implement `Clerk` authentication, newsletter system, and dashboard.
 - **Week 4:** Testing, SEO optimization, `Coolify` deployment.
 
 ## 🤔 Assumptions and Constraints
