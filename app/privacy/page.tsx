@@ -83,8 +83,7 @@ export default function PrivacyPage() {
                   </p>
                   <ul className="list-disc pl-6 text-vyoniq-text dark:text-vyoniq-dark-text mb-4">
                     <li>Fill out contact forms or request quotes</li>
-                    <li>Subscribe to our newsletter or blog updates</li>
-                    <li>Join the Vyoniq Apps waitlist</li>
+                    <li>Subscribe to our newsletter</li>
                     <li>Communicate with us via email or other channels</li>
                     <li>
                       Use our services or engage with our AI development tools
@@ -122,8 +121,8 @@ export default function PrivacyPage() {
                       support
                     </li>
                     <li>
-                      Sending you updates about our services and Vyoniq Apps
-                      development
+                      Sending you updates about our services and latest
+                      innovations
                     </li>
                     <li>
                       Improving our website and services based on your feedback

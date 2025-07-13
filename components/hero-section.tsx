@@ -22,8 +22,8 @@ export function HeroSection() {
               Software Solutions
             </h1>
             <p className="text-lg md:text-xl text-gray-100 dark:text-vyoniq-dark-muted mb-8 max-w-2xl">
-              Web & Mobile Apps, Hosting, AI Integrations, and innovative
-              solutions to accelerate your business growth
+              Customized Web & Mobile Development powered by AI agents to
+              deliver tailored solutions that accelerate your business growth
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <Button

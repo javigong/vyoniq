@@ -1,72 +1,80 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { Twitter, Facebook, Linkedin, Link } from "lucide-react"
-import { useState } from "react"
+import { Share2, Twitter, Linkedin, Facebook } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface BlogShareButtonsProps {
-  title: string
-  slug: string
+  title: string;
+  url: string;
+  description?: string;
 }
 
-export function BlogShareButtons({ title, slug }: BlogShareButtonsProps) {
-  const [copied, setCopied] = useState(false)
+export function BlogShareButtons({
+  title,
+  url,
+  description,
+}: BlogShareButtonsProps) {
+  const encodedTitle = encodeURIComponent(title);
+  const encodedUrl = encodeURIComponent(url);
+  const encodedDescription = encodeURIComponent(description || title);
 
-  const url = `https://vyoniq.com/blog/${slug}`
-  const encodedUrl = encodeURIComponent(url)
-  const encodedTitle = encodeURIComponent(title)
+  // Updated hashtags for AI agent and MCP focus
+  const twitterHashtags = encodeURIComponent(
+    [
+      "AIAgents",
+      "LLM",
+      "MCPServers",
+      "AgenticAI",
+      "AIAutomation",
+      "TechInsights",
+      "AIInnovation",
+    ].join(",")
+  );
 
-  const twitterUrl = `https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`
-  const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`
-  const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`
+  const shareUrls = {
+    twitter: `https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}&hashtags=${twitterHashtags}&via=vyoniq`,
+    linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`,
+    facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedTitle}`,
+  };
 
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(url)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-  }
+  const handleShare = (platform: keyof typeof shareUrls) => {
+    window.open(shareUrls[platform], "_blank", "width=600,height=400");
+  };
 
   return (
-    <div className="mt-12 pt-6 border-t border-gray-200 dark:border-gray-700">
-      <h3 className="text-lg font-bold text-vyoniq-blue dark:text-white mb-4">Share this article</h3>
-      <div className="flex flex-wrap gap-3">
+    <div className="flex items-center gap-4">
+      <span className="text-sm text-gray-600 flex items-center gap-2">
+        <Share2 className="h-4 w-4" />
+        Share this post:
+      </span>
+      <div className="flex gap-2">
         <Button
           variant="outline"
           size="sm"
-          className="flex items-center gap-2 border-gray-200 dark:border-gray-700"
-          onClick={() => window.open(twitterUrl, "_blank")}
+          onClick={() => handleShare("twitter")}
+          className="flex items-center gap-2 hover:bg-blue-50 hover:border-blue-300"
         >
-          <Twitter className="h-4 w-4" />
-          <span>Twitter</span>
+          <Twitter className="h-4 w-4" />X
         </Button>
         <Button
           variant="outline"
           size="sm"
-          className="flex items-center gap-2 border-gray-200 dark:border-gray-700"
-          onClick={() => window.open(facebookUrl, "_blank")}
-        >
-          <Facebook className="h-4 w-4" />
-          <span>Facebook</span>
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          className="flex items-center gap-2 border-gray-200 dark:border-gray-700"
-          onClick={() => window.open(linkedinUrl, "_blank")}
+          onClick={() => handleShare("linkedin")}
+          className="flex items-center gap-2 hover:bg-blue-50 hover:border-blue-300"
         >
           <Linkedin className="h-4 w-4" />
-          <span>LinkedIn</span>
+          LinkedIn
         </Button>
         <Button
           variant="outline"
           size="sm"
-          className="flex items-center gap-2 border-gray-200 dark:border-gray-700"
-          onClick={copyToClipboard}
+          onClick={() => handleShare("facebook")}
+          className="flex items-center gap-2 hover:bg-blue-50 hover:border-blue-300"
         >
-          <Link className="h-4 w-4" />
-          <span>{copied ? "Copied!" : "Copy Link"}</span>
+          <Facebook className="h-4 w-4" />
+          Facebook
         </Button>
       </div>
     </div>
-  )
+  );
 }

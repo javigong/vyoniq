@@ -1,39 +1,40 @@
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { Button } from "@/components/ui/button";
-import { Code, Server, Sparkles, ArrowRight } from "lucide-react";
+import { Code, Zap, Rocket, Shield, ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "AI-Powered Software Development Services | Vyoniq",
+  title: "Customized Web & Mobile Development | AI-Powered Solutions | Vyoniq",
   description:
-    "Comprehensive AI-powered software development services including web & mobile apps, hosting solutions, and AI integrations. Transform your business with cutting-edge technology.",
+    "Get custom web and mobile applications built with AI-powered development. Tailored solutions, AI integration, rapid development, and enterprise-grade support included.",
   keywords: [
-    "AI software development",
-    "web development services",
+    "custom web development",
     "mobile app development",
-    "AI hosting solutions",
-    "AI integrations",
+    "AI-powered development",
+    "tailored solutions",
+    "enterprise applications",
     "software development company",
     "React development",
     "Next.js development",
-    "cloud hosting",
-    "machine learning integration",
+    "AI integration",
+    "rapid development",
   ],
   openGraph: {
-    title: "AI-Powered Software Development Services | Vyoniq",
+    title:
+      "Customized Web & Mobile Development | AI-Powered Solutions | Vyoniq",
     description:
-      "Comprehensive AI-powered software development services including web & mobile apps, hosting solutions, and AI integrations.",
+      "Get custom web and mobile applications built with AI-powered development. Tailored solutions with AI integration and enterprise-grade support.",
     url: "https://vyoniq.com/services",
     siteName: "Vyoniq",
     images: [
       {
-        url: "/placeholder.svg?height=630&width=1200&text=Vyoniq+Services",
+        url: "/placeholder.svg?height=630&width=1200&text=Vyoniq+Custom+Development",
         width: 1200,
         height: 630,
-        alt: "Vyoniq AI-powered software development services",
+        alt: "Vyoniq customized web and mobile development services",
       },
     ],
     locale: "en_US",
@@ -41,10 +42,13 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "AI-Powered Software Development Services | Vyoniq",
+    title:
+      "Customized Web & Mobile Development | AI-Powered Solutions | Vyoniq",
     description:
-      "Comprehensive AI-powered software development services including web & mobile apps, hosting solutions, and AI integrations.",
-    images: ["/placeholder.svg?height=630&width=1200&text=Vyoniq+Services"],
+      "Get custom web and mobile applications built with AI-powered development. Tailored solutions with AI integration.",
+    images: [
+      "/placeholder.svg?height=630&width=1200&text=Vyoniq+Custom+Development",
+    ],
   },
   alternates: {
     canonical: "https://vyoniq.com/services",
@@ -62,43 +66,58 @@ export const metadata: Metadata = {
   },
 };
 
-const services = [
+const capabilities = [
   {
     icon: Code,
-    title: "Web & Mobile Development",
+    title: "Tailored Solutions",
     description:
-      "Create stunning, scalable applications with AI-optimized code and cutting-edge technologies.",
+      "Custom applications designed specifically for your business requirements and workflows.",
     features: [
-      "React & Next.js",
-      "React Native",
-      "AI-Powered Optimization",
-      "Cloud-Native Architecture",
+      "Custom Web Applications",
+      "Mobile App Development",
+      "Business Process Automation",
+      "User Experience Design",
     ],
-    href: "/services/web-mobile",
     image: "/web-mobile-service.jpg",
   },
   {
-    icon: Server,
-    title: "Hosting Services",
+    icon: Zap,
+    title: "AI Integration",
     description:
-      "Reliable, secure, and scalable hosting solutions with AI monitoring and optimization.",
-    features: ["99.9% Uptime", "Auto-Scaling", "AI Monitoring", "Global CDN"],
-    href: "/services/hosting",
-    image: "/hosting-service.jpg",
-  },
-  {
-    icon: Sparkles,
-    title: "AI Integrations",
-    description:
-      "Seamlessly integrate AI capabilities to enhance efficiency and automation.",
+      "Leverage cutting-edge AI and machine learning capabilities integrated seamlessly into your applications.",
     features: [
       "Large Language Models",
-      "Agentic AI",
-      "Custom AI Tools",
-      "Business Automation",
+      "AI Agents & Automation",
+      "Machine Learning Features",
+      "Intelligent Data Processing",
     ],
-    href: "/services/ai-integrations",
     image: "/ai-integrations-service.jpg",
+  },
+  {
+    icon: Rocket,
+    title: "Rapid Development",
+    description:
+      "Fast turnaround times with our AI-powered development process and experienced approach.",
+    features: [
+      "AI-Accelerated Coding",
+      "Agile Development Process",
+      "Continuous Integration",
+      "Quick Prototyping",
+    ],
+    image: "/placeholder.svg?height=300&width=400&text=Rapid+Development",
+  },
+  {
+    icon: Shield,
+    title: "Enterprise-Grade Support",
+    description:
+      "Secure, scalable, and reliable applications with deployment and ongoing support included.",
+    features: [
+      "Cloud Deployment",
+      "Security Best Practices",
+      "Performance Optimization",
+      "Ongoing Maintenance",
+    ],
+    image: "/hosting-service.jpg",
   },
 ];
 
@@ -112,23 +131,40 @@ export default function ServicesPage() {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              Our Services
+              Customized Web & Mobile Development
             </h1>
-            <p className="text-xl md:text-2xl text-gray-100">
-              Comprehensive AI-powered solutions to accelerate your digital
-              transformation
+            <p className="text-xl md:text-2xl text-gray-100 mb-8">
+              AI-powered development that delivers tailored solutions for your
+              unique business needs
             </p>
+            <Button
+              asChild
+              size="lg"
+              className="bg-vyoniq-green hover:bg-vyoniq-green/90 text-white font-semibold px-8 py-3 transform hover:scale-105 transition-all duration-200"
+            >
+              <Link href="/#contact">Get Started</Link>
+            </Button>
           </div>
         </div>
       </section>
 
-      {/* Services Grid */}
+      {/* Capabilities Grid */}
       <section className="py-20 bg-white dark:bg-vyoniq-dark-bg">
         <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-vyoniq-blue dark:text-white mb-4">
+              Our Development Capabilities
+            </h2>
+            <p className="text-lg text-vyoniq-text dark:text-vyoniq-dark-text max-w-2xl mx-auto">
+              We combine cutting-edge technology with deep business
+              understanding to create applications that truly serve your needs
+            </p>
+          </div>
+
           <div className="space-y-20">
-            {services.map((service, index) => (
+            {capabilities.map((capability, index) => (
               <div
-                key={service.title}
+                key={capability.title}
                 className={`flex flex-col ${
                   index % 2 === 1 ? "lg:flex-row-reverse" : "lg:flex-row"
                 } items-center gap-12`}
@@ -136,19 +172,19 @@ export default function ServicesPage() {
                 <div className="flex-1">
                   <div className="flex items-center mb-6">
                     <div className="p-3 bg-vyoniq-blue/5 dark:bg-vyoniq-green/10 rounded-full mr-4">
-                      <service.icon className="h-8 w-8 text-vyoniq-green" />
+                      <capability.icon className="h-8 w-8 text-vyoniq-green" />
                     </div>
-                    <h2 className="text-3xl md:text-4xl font-bold text-vyoniq-blue dark:text-white">
-                      {service.title}
-                    </h2>
+                    <h3 className="text-3xl md:text-4xl font-bold text-vyoniq-blue dark:text-white">
+                      {capability.title}
+                    </h3>
                   </div>
 
                   <p className="text-lg text-vyoniq-text dark:text-vyoniq-dark-text mb-6 leading-relaxed">
-                    {service.description}
+                    {capability.description}
                   </p>
 
-                  <div className="grid grid-cols-2 gap-3 mb-8">
-                    {service.features.map((feature) => (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-8">
+                    {capability.features.map((feature) => (
                       <div key={feature} className="flex items-center">
                         <ArrowRight className="h-4 w-4 text-vyoniq-green mr-2" />
                         <span className="text-vyoniq-text dark:text-vyoniq-dark-text">
@@ -157,20 +193,12 @@ export default function ServicesPage() {
                       </div>
                     ))}
                   </div>
-
-                  <Button
-                    asChild
-                    size="lg"
-                    className="bg-vyoniq-purple hover:bg-vyoniq-purple/90 text-white font-semibold px-8 py-3 transform hover:scale-105 transition-all duration-200"
-                  >
-                    <Link href={service.href}>Learn More</Link>
-                  </Button>
                 </div>
 
                 <div className="flex-1">
                   <Image
-                    src={service.image || "/placeholder.svg"}
-                    alt={`${service.title} illustration`}
+                    src={capability.image || "/placeholder.svg"}
+                    alt={`${capability.title} illustration`}
                     width={400}
                     height={300}
                     className="w-full h-auto rounded-lg shadow-xl"
@@ -178,6 +206,39 @@ export default function ServicesPage() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 bg-vyoniq-gray dark:bg-vyoniq-slate">
+        <div className="container mx-auto px-4">
+          <div className="max-w-3xl mx-auto text-center">
+            <h2 className="text-3xl md:text-4xl font-bold text-vyoniq-blue dark:text-white mb-6">
+              Ready to Build Your Custom Application?
+            </h2>
+            <p className="text-lg text-vyoniq-text dark:text-vyoniq-dark-text mb-8">
+              Let's discuss your project requirements and create a solution that
+              perfectly fits your needs. Get started with a free consultation
+              today.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button
+                asChild
+                size="lg"
+                className="bg-vyoniq-green hover:bg-vyoniq-green/90 text-white font-semibold px-8 py-3 transform hover:scale-105 transition-all duration-200"
+              >
+                <Link href="/#contact">Contact Us Today</Link>
+              </Button>
+              <Button
+                asChild
+                size="lg"
+                variant="outline"
+                className="border-vyoniq-green text-vyoniq-green hover:bg-vyoniq-green hover:text-white font-semibold px-8 py-3 transform hover:scale-105 transition-all duration-200"
+              >
+                <Link href="/vyoniq-apps">Learn More</Link>
+              </Button>
+            </div>
           </div>
         </div>
       </section>

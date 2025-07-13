@@ -57,7 +57,7 @@ Vyoniq is an innovative, AI-driven Software Development company led by the Found
 - **Header**:
   - Sticky navigation bar (bg: #121212, text: #F5F5F7).
   - Logo: "Vyoniq" in Inter Bold, 24px, with AI-inspired icon (e.g., neural network, #00C7B7).
-  - Nav Links: "Home," "Services," "Innovation Hub," "About," "Contact" (right-aligned, hover: #00C7B7 underline).
+  - Nav Links: "Home," "Services," "Custom Apps," "About," "Contact" (right-aligned, hover: #00C7B7 underline).
   - Mobile: Hamburger menu (shadcn/ui DropdownMenu) with slide-in animation.
 - **Hero Section**:
   - Full-width, 600px height (desktop), 400px (mobile).
@@ -99,7 +99,7 @@ Vyoniq is an innovative, AI-driven Software Development company led by the Found
   - Content: Fictional quotes (e.g., "Vyoniq's AI-driven approach transformed our app!"), client name, company (16px, #1D1D1F).
   - Animation: Auto-scroll with pause on hover, dots (#00C7B7) for navigation.
 - **Contact Form**:
-  - shadcn/ui Form with fields: Name (text), Email (email), Service Type (select: Web/Mobile, Hosting, AI, General Inquiry), Message (textarea).
+  - shadcn/ui Form with fields: Name (text), Email (email), Service Type (select: Web/Mobile, Hosting, AI, Custom Apps), Message (textarea).
   - Styles: Background #F5F5F7, inputs with #0F1729 border, focus: #00C7B7.
   - Submit Button: "Submit Inquiry" (#6E56CF, hover: brighten).
   - Validation: Client-side (required fields, email format).
@@ -119,7 +119,7 @@ Vyoniq is an innovative, AI-driven Software Development company led by the Found
 
 ##### 2.2 Service Detail Pages
 
-- **Template** (for Web/Mobile, Hosting, AI Integrations):
+- **Template** (for Web/Mobile, Hosting, AI Integrations, Custom Apps):
   - Header: Same as homepage.
   - Hero: Service-specific headline (e.g., "AI-Powered Web & Mobile Apps", H1, #0F1729), background gradient (#0F1729 to #121212).
   - Content:
@@ -128,15 +128,13 @@ Vyoniq is an innovative, AI-driven Software Development company led by the Found
     - Visual: Service-specific mockup (Next.js Image, lazy-loaded, #00C7B7 accents).
   - Layout: 60% text, 40% visual (stack on mobile).
 
-##### 2.3 Innovation Hub Page
+##### 2.3 Custom Apps Page
 
-- **Hero**: "Vyoniq Innovation Hub" (H1, #0F1729).
-- **Content**:
-  - Description: Information about staying updated with latest solutions, blog posts, and tools (16px, #1D1D1F).
-  - Features: AI-Powered Solutions, Expert Insights, Latest Updates, Exclusive Content.
-  - CTA: "Subscribe to Newsletter" (#6E56CF, links to newsletter).
-  - Visual: Innovation-themed illustration (#00C7B7 accents).
-- **Layout**: Same as other service pages.
+- Hero: “Custom Apps: Tailored Solutions” (H1, #0F1729).
+- Content:
+  - Description: Details on our custom app development services (16px, #1D1D1F).
+  - CTA: “Request a Custom Solution” (#6E56CF, links to contact form).
+  - Visual: Mockup with custom app examples (#00C7B7 accents).
 
 ##### 2.4 About Page
 
@@ -189,7 +187,7 @@ Vyoniq is an innovative, AI-driven Software Development company led by the Found
 ### Deliverables
 
 - Next.js project structure with App Router.
-- Pages: Homepage, Service pages (3), Innovation Hub page, About page, Sign-Up, Dashboard.
+- Pages: Homepage, Service pages (3), Custom Apps page, About page, Sign-Up, Dashboard.
 - shadcn/ui components styled with Tailwind CSS using the updated palette.
 - Clerk authentication integrated for user management.
 - Comprehensive newsletter system with subscription management.

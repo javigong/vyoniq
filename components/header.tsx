@@ -92,8 +92,7 @@ export function Header() {
 
   const navItems = [
     { name: "Home", href: "/" },
-    { name: "Services", href: "/services" },
-    { name: "Apps", href: "/vyoniq-apps" },
+    { name: "Custom Apps", href: "/vyoniq-apps" },
     { name: "Blog", href: "/blog" },
     { name: "About", href: "/about" },
     { name: "Contact", href: "#contact", onClick: handleContactClick },

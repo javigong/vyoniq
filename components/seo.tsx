@@ -1,211 +1,287 @@
 import { Metadata } from "next";
-import { getBaseUrl } from "@/lib/utils";
 
-export interface SEOProps {
-  title?: string;
-  description?: string;
-  keywords?: string[];
-  image?: string;
-  url?: string;
-  type?: "website" | "article" | "product" | "profile";
-  publishedTime?: string;
-  modifiedTime?: string;
-  authors?: string[];
-  section?: string;
-  tags?: string[];
+interface SEOConfig {
+  title: string;
+  description: string;
+  keywords: string[];
   canonical?: string;
-  noindex?: boolean;
-  nofollow?: boolean;
 }
 
-export function generateSEOMetadata({
-  title = "Vyoniq | AI-Powered Software Development & LLM Integration Services",
-  description = "Professional AI-powered software development company specializing in LLM integration, AI agents, web & mobile apps, MCP servers, and modern AI development tools. Transform your business with cutting-edge AI solutions.",
-  keywords = [
-    "AI software development",
-    "LLM integration",
-    "AI agents",
-    "Vyoniq",
-    "web development",
-    "mobile apps",
-    "MCP servers",
-    "AI integrations",
-    "Cursor IDE",
-    "artificial intelligence",
-    "software development company",
-    "AI consulting",
-    "machine learning",
-    "AI development tools",
+// Updated default SEO configuration focusing on AI agents and MCP
+const defaultSEO: SEOConfig = {
+  title: "Vyoniq - LLM AI Agent Development & MCP Server Solutions",
+  description:
+    "Leading AI agent development company specializing in LLM-powered agents, MCP server integration, and agentic AI solutions. Build intelligent AI agents with cutting-edge technologies like AutoGen, CrewAI, and Model Context Protocol.",
+  keywords: [
+    // Core AI Agent Technologies
+    "AI agent development",
+    "LLM AI agents",
+    "agentic AI development",
+    "autonomous AI agents",
+    "intelligent AI agents",
+
+    // MCP and Protocol Technologies
+    "MCP server development",
+    "Model Context Protocol",
+    "MCP integration services",
+    "AI agent protocols",
+    "MCP server hosting",
+
+    // Trending AI Technologies 2025
+    "AI agent frameworks",
+    "multi-agent systems",
+    "LLM agent orchestration",
+    "AI agent automation",
+    "conversational AI agents",
+
+    // Development Tools & Frameworks
+    "AutoGen Studio development",
+    "CrewAI implementation",
+    "LangChain agents",
+    "AI agent tools",
+    "custom AI agents",
+
+    // Business Applications
+    "enterprise AI agents",
+    "AI workflow automation",
+    "business process automation",
+    "AI agent consulting",
+    "AI agent integration",
   ],
-  image = "/placeholder.svg?height=630&width=1200&text=Vyoniq+AI+Software+Development",
-  url,
-  type = "website",
-  publishedTime,
-  modifiedTime,
-  authors,
-  section,
-  tags,
-  canonical,
-  noindex = false,
-  nofollow = false,
-}: SEOProps = {}): Metadata {
-  const baseUrl = getBaseUrl();
-  const fullUrl = url ? `${baseUrl}${url}` : baseUrl;
-  const fullImageUrl = image.startsWith("http") ? image : `${baseUrl}${image}`;
+};
 
-  const openGraphData: any = {
-    title,
-    description,
-    url: fullUrl,
-    siteName: "Vyoniq",
-    images: [
-      {
-        url: fullImageUrl,
-        width: 1200,
-        height: 630,
-        alt: title,
-      },
+// Page-specific SEO configurations
+const pageSEO: Record<string, SEOConfig> = {
+  home: {
+    title: "Vyoniq - LLM AI Agent Development & MCP Server Solutions",
+    description:
+      "Leading AI agent development company specializing in LLM-powered agents, MCP server integration, and agentic AI solutions. Build intelligent AI agents with cutting-edge technologies.",
+    keywords: [
+      "AI agent development company",
+      "LLM AI agents",
+      "MCP server development",
+      "agentic AI solutions",
+      "autonomous AI agents",
+      "Model Context Protocol",
+      "AI agent frameworks",
+      "enterprise AI agents",
+      "custom AI agents",
+      "AI workflow automation",
     ],
-    locale: "en_US",
-    type,
-  };
+  },
 
-  // Add article-specific Open Graph data
-  if (type === "article") {
-    if (publishedTime) openGraphData.publishedTime = publishedTime;
-    if (modifiedTime) openGraphData.modifiedTime = modifiedTime;
-    if (authors) openGraphData.authors = authors;
-    if (section) openGraphData.section = section;
-    if (tags) openGraphData.tags = tags;
-  }
+  about: {
+    title: "About Vyoniq - AI Agent Development Experts",
+    description:
+      "Meet the team behind Vyoniq's cutting-edge AI agent development. Learn about our expertise in LLM-powered agents, MCP server integration, and agentic AI solutions.",
+    keywords: [
+      "AI agent development team",
+      "LLM AI experts",
+      "MCP server specialists",
+      "agentic AI developers",
+      "AI agent consulting",
+      "autonomous AI development",
+      "AI technology experts",
+      "Model Context Protocol specialists",
+    ],
+  },
 
-  const metadata: Metadata = {
-    title,
-    description,
-    keywords,
-    openGraph: openGraphData,
+  services: {
+    title: "AI Agent Development Services - LLM & MCP Solutions | Vyoniq",
+    description:
+      "Comprehensive AI agent development services including LLM-powered agents, MCP server integration, autonomous AI systems, and custom agentic AI solutions for enterprises.",
+    keywords: [
+      "AI agent development services",
+      "LLM AI agent consulting",
+      "MCP server integration",
+      "autonomous AI development",
+      "enterprise AI agents",
+      "custom AI agent solutions",
+      "AI workflow automation",
+      "agentic AI services",
+      "AI agent frameworks",
+      "intelligent automation",
+    ],
+  },
+
+  "custom-apps": {
+    title: "Custom AI Agent Applications - Intelligent Automation Solutions",
+    description:
+      "Discover our portfolio of custom AI agent applications featuring LLM-powered automation, MCP server integration, and intelligent workflow solutions for modern businesses.",
+    keywords: [
+      "custom AI agent applications",
+      "AI automation solutions",
+      "LLM-powered apps",
+      "MCP agent integration",
+      "intelligent workflow automation",
+      "custom agentic AI",
+      "enterprise AI applications",
+      "AI agent portfolio",
+      "autonomous AI systems",
+      "business process automation",
+    ],
+  },
+
+  contact: {
+    title: "Contact Vyoniq - AI Agent Development Consultation",
+    description:
+      "Get in touch with Vyoniq's AI agent development experts. Schedule a consultation for LLM-powered agents, MCP server integration, and custom agentic AI solutions.",
+    keywords: [
+      "AI agent development consultation",
+      "LLM AI agent experts",
+      "MCP server consulting",
+      "agentic AI consultation",
+      "AI agent project inquiry",
+      "autonomous AI development",
+      "enterprise AI consulting",
+      "AI workflow automation experts",
+      "custom AI agent quote",
+      "AI technology consultation",
+    ],
+  },
+
+  blog: {
+    title: "AI Agent Development Blog - LLM & MCP Insights | Vyoniq",
+    description:
+      "Stay updated with the latest insights on AI agent development, LLM technologies, MCP server integration, and agentic AI trends from Vyoniq's expert team.",
+    keywords: [
+      "AI agent development blog",
+      "LLM AI insights",
+      "MCP server tutorials",
+      "agentic AI trends",
+      "AI agent frameworks",
+      "autonomous AI development",
+      "AI technology insights",
+      "Model Context Protocol guides",
+      "AI automation trends",
+      "enterprise AI insights",
+    ],
+  },
+
+  privacy: {
+    title: "Privacy Policy - Vyoniq AI Agent Development",
+    description:
+      "Vyoniq's privacy policy for AI agent development services, data handling in LLM applications, and MCP server integration projects.",
+    keywords: [
+      "AI agent privacy policy",
+      "LLM data privacy",
+      "MCP server data protection",
+      "AI development privacy",
+      "agentic AI data security",
+      "enterprise AI privacy",
+    ],
+  },
+
+  terms: {
+    title: "Terms of Service - Vyoniq AI Agent Development",
+    description:
+      "Terms of service for Vyoniq's AI agent development, LLM integration services, and MCP server solutions.",
+    keywords: [
+      "AI agent terms of service",
+      "LLM development terms",
+      "MCP server service terms",
+      "AI development agreement",
+      "agentic AI service terms",
+    ],
+  },
+};
+
+export function generateSEOMetadata(
+  page: keyof typeof pageSEO,
+  customConfig?: Partial<SEOConfig>
+): Metadata {
+  const config = { ...defaultSEO, ...pageSEO[page], ...customConfig };
+
+  return {
+    title: config.title,
+    description: config.description,
+    keywords: config.keywords.join(", "),
+    openGraph: {
+      title: config.title,
+      description: config.description,
+      url:
+        config.canonical || `https://vyoniq.com/${page === "home" ? "" : page}`,
+      siteName: "Vyoniq",
+      images: [
+        {
+          url: "/og-image.jpg",
+          width: 1200,
+          height: 630,
+          alt: config.title,
+        },
+      ],
+      locale: "en_US",
+      type: "website",
+    },
     twitter: {
       card: "summary_large_image",
-      title,
-      description,
-      images: [fullImageUrl],
+      title: config.title,
+      description: config.description,
+      images: ["/og-image.jpg"],
       creator: "@vyoniq",
-      site: "@vyoniq",
-    },
-    robots: {
-      index: !noindex,
-      follow: !nofollow,
-      googleBot: {
-        index: !noindex,
-        follow: !nofollow,
-        "max-video-preview": -1,
-        "max-image-preview": "large",
-        "max-snippet": -1,
-      },
     },
     alternates: {
-      canonical: canonical || fullUrl,
+      canonical:
+        config.canonical || `https://vyoniq.com/${page === "home" ? "" : page}`,
+    },
+    robots: {
+      index: true,
+      follow: true,
     },
   };
-
-  return metadata;
 }
 
-// Predefined SEO configurations for common pages
-export const SEO_CONFIGS = {
-  home: {
-    title:
-      "Vyoniq | AI-Powered Software Development & LLM Integration Services",
-    description:
-      "Professional AI-powered software development company specializing in LLM integration, AI agents, web & mobile apps, MCP servers, and modern AI development tools. Transform your business with cutting-edge AI solutions.",
-    keywords: [
-      "AI software development",
-      "LLM integration",
-      "AI agents",
-      "Vyoniq",
-      "web development",
-      "mobile apps",
-      "MCP servers",
-      "AI integrations",
-      "Cursor IDE",
-      "artificial intelligence",
-      "software development company",
-      "AI consulting",
-      "machine learning",
-      "AI development tools",
-      "newsletter",
-    ],
-    url: "/",
-  },
-  about: {
-    title: "About Javier Gongora | Founder & Software Developer | Vyoniq",
-    description:
-      "Meet Javier Gongora, founder and software developer behind Vyoniq's AI-powered solutions. Learn about his vision for transforming business through innovative LLM and AI agent development.",
-    keywords: [
-      "Javier Gongora",
-      "Vyoniq founder",
-      "AI software developer",
-      "LLM expert",
-      "AI agent development",
-      "software development leadership",
-      "AI innovation",
-      "tech visionary",
-      "artificial intelligence expert",
-      "business transformation",
-    ],
-    url: "/about",
-    image: "/javier.jpeg",
-  },
-  services: {
-    title: "AI-Powered Software Development Services | Vyoniq",
-    description:
-      "Comprehensive AI-powered software development services including web & mobile apps, hosting solutions, and AI integrations. Transform your business with cutting-edge technology.",
-    keywords: [
-      "AI software development",
-      "web development services",
-      "mobile app development",
-      "AI hosting solutions",
-      "AI integrations",
-      "software development company",
-      "React development",
-      "Next.js development",
-      "cloud hosting",
-      "machine learning integration",
-    ],
-    url: "/services",
-  },
-  blog: {
-    title: "LLM & AI Development Insights | Vyoniq Blog",
-    description:
-      "Expert insights on Large Language Models, AI agents, Cursor IDE, MCP servers, and LLM integration. Stay updated with the latest AI development trends and best practices.",
-    keywords: [
-      "LLM blog",
-      "Large Language Models",
-      "AI agents blog",
-      "Cursor IDE insights",
-      "MCP servers",
-      "LLM integration",
-      "AI development tools",
-      "AI agent development",
-      "tech industry news",
-      "Vyoniq insights",
-    ],
-    url: "/blog",
-  },
-  vyoniqApps: {
-    title: "Stay Updated with Vyoniq's Latest AI Innovations | Newsletter",
-    description:
-      "Subscribe to Vyoniq's newsletter for the latest updates on AI-powered software development, LLM integration, AI agents, and cutting-edge development tools.",
-    keywords: [
-      "Vyoniq newsletter",
-      "AI innovation updates",
-      "LLM integration news",
-      "AI agent development",
-      "software development trends",
-      "AI development tools",
-      "tech innovation",
-      "AI consulting updates",
-    ],
-    url: "/vyoniq-apps",
-  },
-} as const;
+// Blog post SEO metadata generator
+export function generateBlogSEOMetadata(
+  title: string,
+  description: string,
+  slug: string,
+  publishDate?: string,
+  tags?: string[]
+): Metadata {
+  const fullTitle = `${title} | Vyoniq AI Agent Development Blog`;
+  const enhancedKeywords = [
+    ...defaultSEO.keywords.slice(0, 10), // Core keywords
+    ...(tags || []),
+    "AI agent insights",
+    "LLM development guide",
+    "MCP server tutorial",
+  ];
+
+  return {
+    title: fullTitle,
+    description,
+    keywords: enhancedKeywords.join(", "),
+    openGraph: {
+      title: fullTitle,
+      description,
+      url: `https://vyoniq.com/blog/${slug}`,
+      siteName: "Vyoniq",
+      images: [
+        {
+          url: "/og-image.jpg",
+          width: 1200,
+          height: 630,
+          alt: title,
+        },
+      ],
+      locale: "en_US",
+      type: "article",
+      publishedTime: publishDate,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: fullTitle,
+      description,
+      images: ["/og-image.jpg"],
+      creator: "@vyoniq",
+    },
+    alternates: {
+      canonical: `https://vyoniq.com/blog/${slug}`,
+    },
+    robots: {
+      index: true,
+      follow: true,
+    },
+  };
+}

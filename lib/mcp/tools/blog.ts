@@ -1051,14 +1051,14 @@ export async function revalidateBlogHandler(
     if (data.action === "revalidate-all") {
       return createSuccessResponse(
         `✅ Successfully revalidated all blog pages\n` +
-          `Timestamp: ${result.timestamp}\n` +
-          `All blog posts and the blog index page have been updated with the latest content.`
+        `Timestamp: ${result.timestamp}\n` +
+        `All blog posts and the blog index page have been updated with the latest content.`
       );
     } else {
       return createSuccessResponse(
         `✅ Successfully revalidated blog post: ${data.slug}\n` +
-          `Timestamp: ${result.timestamp}\n` +
-          `The blog post page and blog index have been updated with the latest content.`
+        `Timestamp: ${result.timestamp}\n` +
+        `The blog post page and blog index have been updated with the latest content.`
       );
     }
   } catch (error) {
