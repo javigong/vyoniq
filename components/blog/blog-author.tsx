@@ -15,7 +15,7 @@ export function BlogAuthor({ author }: BlogAuthorProps) {
         <div className="relative h-16 w-16 mr-4 flex-shrink-0">
           {author.avatar ? (
             <Image
-              src={author.avatar || "/placeholder.svg"}
+              src={author.avatar}
               alt={author.name}
               fill
               className="object-cover rounded-full"

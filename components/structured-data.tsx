@@ -1,8 +1,8 @@
-import Script from "next/script"
+import Script from "next/script";
 
 interface StructuredDataProps {
-  type: "Organization" | "WebPage" | "Service" | "Product"
-  data: any
+  type: "Organization" | "WebPage" | "Service" | "Product" | "WebSite";
+  data: any;
 }
 
 export function StructuredData({ type, data }: StructuredDataProps) {
@@ -10,7 +10,7 @@ export function StructuredData({ type, data }: StructuredDataProps) {
     "@context": "https://schema.org",
     "@type": type,
     ...data,
-  }
+  };
 
   return (
     <Script
@@ -20,7 +20,7 @@ export function StructuredData({ type, data }: StructuredDataProps) {
         __html: JSON.stringify(structuredData),
       }}
     />
-  )
+  );
 }
 
 // Organization structured data for the main site
@@ -31,18 +31,13 @@ export function OrganizationStructuredData() {
     description:
       "Professional AI-powered software development company specializing in LLM integration, AI agents, web & mobile apps, MCP servers, and modern AI development tools.",
     url: "https://vyoniq.com",
-    logo: {
-      "@type": "ImageObject",
-      url: "https://vyoniq.com/logo.png",
-      width: 200,
-      height: 200,
-    },
-    image: "https://vyoniq.com/placeholder.svg?height=630&width=1200&text=Vyoniq+AI+Software+Development",
+
+    image: "https://vyoniq.com/og-image.jpg",
     contactPoint: [
       {
-      "@type": "ContactPoint",
-      contactType: "customer service",
-      url: "https://vyoniq.com/#contact",
+        "@type": "ContactPoint",
+        contactType: "customer service",
+        url: "https://vyoniq.com/#contact",
         availableLanguage: "English",
       },
       {
@@ -50,7 +45,7 @@ export function OrganizationStructuredData() {
         contactType: "technical support",
         url: "https://vyoniq.com/#contact",
         availableLanguage: "English",
-    },
+      },
     ],
     sameAs: [
       "https://linkedin.com/company/vyoniq",
@@ -62,7 +57,8 @@ export function OrganizationStructuredData() {
       "@type": "Person",
       name: "Javier Gongora",
       jobTitle: "Founder & Software Developer",
-      description: "Expert in LLM integration, AI agents, and modern AI development tools",
+      description:
+        "Expert in LLM integration, AI agents, and modern AI development tools",
       url: "https://vyoniq.com/about",
       sameAs: [
         "https://linkedin.com/in/javier-gongora",
@@ -106,7 +102,8 @@ export function OrganizationStructuredData() {
           itemOffered: {
             "@type": "Service",
             name: "LLM Integration Services",
-            description: "Professional Large Language Model integration and AI agent development",
+            description:
+              "Professional Large Language Model integration and AI agent development",
           },
         },
         {
@@ -114,7 +111,8 @@ export function OrganizationStructuredData() {
           itemOffered: {
             "@type": "Service",
             name: "Web & Mobile App Development",
-            description: "AI-powered web and mobile application development with modern frameworks",
+            description:
+              "AI-powered web and mobile application development with modern frameworks",
           },
         },
         {
@@ -122,14 +120,15 @@ export function OrganizationStructuredData() {
           itemOffered: {
             "@type": "Service",
             name: "MCP Server Implementation",
-            description: "Model Context Protocol server development for AI agent integration",
+            description:
+              "Model Context Protocol server development for AI agent integration",
           },
         },
       ],
     },
-  }
+  };
 
-  return <StructuredData type="Organization" data={organizationData} />
+  return <StructuredData type="Organization" data={organizationData} />;
 }
 
 // Website structured data
@@ -154,7 +153,7 @@ export function WebsiteStructuredData() {
       "@type": "Organization",
       name: "Vyoniq",
     },
-  }
+  };
 
-  return <StructuredData type="WebSite" data={websiteData} />
+  return <StructuredData type="WebSite" data={websiteData} />;
 }

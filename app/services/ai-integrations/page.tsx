@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     siteName: "Vyoniq",
     images: [
       {
-        url: "/placeholder.svg?height=630&width=1200&text=AI+Integration+Services",
+        url: "/og-image.jpg",
         width: 1200,
         height: 630,
         alt: "AI integration services including LLM and agentic AI solutions",
@@ -45,9 +45,7 @@ export const metadata: Metadata = {
     title: "AI Integration Services | LLM & Agentic AI Solutions | Vyoniq",
     description:
       "Transform your business with cutting-edge AI integrations. LLM, Agentic AI, custom tools, and intelligent automation.",
-    images: [
-      "/placeholder.svg?height=630&width=1200&text=AI+Integration+Services",
-    ],
+    images: ["/og-image.jpg"],
   },
   alternates: {
     canonical: "https://vyoniq.com/services/ai-integrations",

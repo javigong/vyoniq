@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     siteName: "Vyoniq",
     images: [
       {
-        url: "/placeholder.svg?height=630&width=1200&text=Vyoniq+Custom+App+Development",
+        url: "/og-image.jpg",
         width: 1200,
         height: 630,
         alt: "Vyoniq Custom App Development - Tailored Solutions",
@@ -44,9 +44,7 @@ export const metadata: Metadata = {
     title: "Custom App Development | Vyoniq - Tailored AI-Powered Solutions",
     description:
       "Get custom applications built specifically for your business needs. Contact us to discuss your project!",
-    images: [
-      "/placeholder.svg?height=630&width=1200&text=Vyoniq+Custom+App+Development",
-    ],
+    images: ["/og-image.jpg"],
   },
   alternates: {
     canonical: "https://vyoniq.com/vyoniq-apps",
