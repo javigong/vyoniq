@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     siteName: "Vyoniq",
     images: [
       {
-        url: "/placeholder.svg?height=630&width=1200&text=Vyoniq+Custom+Development",
+        url: "/og-image.jpg",
         width: 1200,
         height: 630,
         alt: "Vyoniq customized web and mobile development services",
@@ -46,9 +46,7 @@ export const metadata: Metadata = {
       "Customized Web & Mobile Development | AI-Powered Solutions | Vyoniq",
     description:
       "Get custom web and mobile applications built with AI-powered development. Tailored solutions with AI integration.",
-    images: [
-      "/placeholder.svg?height=630&width=1200&text=Vyoniq+Custom+Development",
-    ],
+    images: ["/og-image.jpg"],
   },
   alternates: {
     canonical: "https://vyoniq.com/services",
@@ -104,7 +102,7 @@ const capabilities = [
       "Continuous Integration",
       "Quick Prototyping",
     ],
-    image: "/placeholder.svg?height=300&width=400&text=Rapid+Development",
+    image: "/hosting-service.jpg",
   },
   {
     icon: Shield,
@@ -197,7 +195,7 @@ export default function ServicesPage() {
 
                 <div className="flex-1">
                   <Image
-                    src={capability.image || "/placeholder.svg"}
+                    src={capability.image}
                     alt={`${capability.title} illustration`}
                     width={400}
                     height={300}
