@@ -33,7 +33,7 @@ export function OrganizationStructuredData() {
     url: "https://vyoniq.com",
     logo: {
       "@type": "ImageObject",
-      url: "https://vyoniq.com/logo.png",
+      url: "https://vyoniq.com/placeholder-logo.png",
       width: 200,
       height: 200,
     },
