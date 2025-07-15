@@ -125,10 +125,6 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           publisher: {
             "@type": "Organization",
             name: "Vyoniq",
-            logo: {
-              "@type": "ImageObject",
-              url: "https://vyoniq.com/placeholder-logo.png",
-            },
           },
           description: post.excerpt,
           keywords: post.categories.join(", "),
@@ -173,7 +169,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           <div className="max-w-4xl mx-auto">
             <div className="relative h-80 md:h-96 w-full mb-8 rounded-lg overflow-hidden">
               <Image
-                src={post.coverImage || "/placeholder.svg"}
+                src={post.coverImage}
                 alt={post.title}
                 fill
                 className="object-cover"
@@ -192,7 +188,11 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
               <div className="md:w-3/4">
                 <MarkdownRenderer content={post.content} />
 
-                <BlogShareButtons title={post.title} slug={post.slug} />
+                <BlogShareButtons
+                  title={post.title}
+                  url={`https://vyoniq.com/blog/${post.slug}`}
+                  description={post.excerpt}
+                />
               </div>
 
               {/* Sidebar */}
