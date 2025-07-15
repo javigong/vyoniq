@@ -127,7 +127,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             name: "Vyoniq",
             logo: {
               "@type": "ImageObject",
-              url: "https://vyoniq.com/logo.png",
+              url: "https://vyoniq.com/placeholder-logo.png",
             },
           },
           description: post.excerpt,
