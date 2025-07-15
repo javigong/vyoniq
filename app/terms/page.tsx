@@ -16,13 +16,12 @@ export const metadata: Metadata = {
   ],
   openGraph: {
     title: "Terms of Service | Vyoniq",
-    description:
-      "Read Vyoniq's terms of service for using our AI-powered software development services.",
+    description: "Review the Vyoniq terms of service.",
     url: "https://vyoniq.com/terms",
     siteName: "Vyoniq",
     images: [
       {
-        url: "/placeholder.svg?height=630&width=1200&text=Vyoniq+Terms+of+Service",
+        url: "/og-image.jpg",
         width: 1200,
         height: 630,
         alt: "Vyoniq Terms of Service",
