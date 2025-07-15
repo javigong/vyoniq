@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     siteName: "Vyoniq",
     images: [
       {
-        url: "/placeholder.svg?height=630&width=1200&text=Web+Mobile+Development",
+        url: "/og-image.jpg",
         width: 1200,
         height: 630,
         alt: "AI-powered web and mobile app development services",
@@ -45,9 +45,7 @@ export const metadata: Metadata = {
     title: "AI-Powered Web & Mobile App Development | Vyoniq",
     description:
       "Professional web and mobile app development with AI optimization. React, Next.js, React Native applications.",
-    images: [
-      "/placeholder.svg?height=630&width=1200&text=Web+Mobile+Development",
-    ],
+    images: ["/og-image.jpg"],
   },
   alternates: {
     canonical: "https://vyoniq.com/services/web-mobile",
