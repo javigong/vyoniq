@@ -17,12 +17,12 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Privacy Policy | Vyoniq",
     description:
-      "Learn how Vyoniq protects your privacy and handles your personal information.",
+      "Review the Vyoniq privacy policy to understand how we handle your data.",
     url: "https://vyoniq.com/privacy",
     siteName: "Vyoniq",
     images: [
       {
-        url: "/placeholder.svg?height=630&width=1200&text=Vyoniq+Privacy+Policy",
+        url: "/og-image.jpg",
         width: 1200,
         height: 630,
         alt: "Vyoniq Privacy Policy",
