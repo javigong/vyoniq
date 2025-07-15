@@ -31,10 +31,10 @@ export const metadata: Metadata = {
     siteName: "Vyoniq",
     images: [
       {
-        url: "/placeholder.svg?height=630&width=1200&text=AI+Cloud+Hosting",
+        url: "/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "AI-powered cloud hosting solutions with 99.9% uptime",
+        alt: "AI-powered cloud hosting and deployment services by Vyoniq",
       },
     ],
     locale: "en_US",
@@ -42,10 +42,10 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "AI-Powered Cloud Hosting Solutions | 99.9% Uptime | Vyoniq",
+    title: "AI-Powered Cloud Hosting & Deployment | Vyoniq",
     description:
-      "Reliable, secure, and scalable cloud hosting with AI monitoring and optimization. 99.9% uptime guarantee.",
-    images: ["/placeholder.svg?height=630&width=1200&text=AI+Cloud+Hosting"],
+      "Secure, scalable, and reliable AI-powered cloud hosting. Performance optimization, cloud deployment, and ongoing maintenance.",
+    images: ["/og-image.jpg"],
   },
   alternates: {
     canonical: "https://vyoniq.com/services/hosting",
