@@ -110,15 +110,14 @@ export default function VyoniqAppsPage() {
               <Button
                 asChild
                 size="lg"
-                className="bg-vyoniq-green hover:bg-vyoniq-green/90 text-white font-semibold px-8 py-3 transform hover:scale-105 transition-all duration-200"
+                className="bg-vyoniq-purple hover:bg-vyoniq-purple/90 text-white font-semibold px-8 py-3 transform hover:scale-105 transition-all duration-200"
               >
                 <Link href="/#contact">Get a Quote</Link>
               </Button>
               <Button
                 asChild
                 size="lg"
-                variant="outline"
-                className="border-white text-white hover:bg-white hover:text-vyoniq-blue font-semibold px-8 py-3 transform hover:scale-105 transition-all duration-200"
+                className="border-2 border-white bg-transparent text-white hover:bg-white hover:text-vyoniq-blue font-semibold px-8 py-3 transform hover:scale-105 transition-all duration-200"
               >
                 <Link href="#newsletter">Subscribe to Newsletter</Link>
               </Button>
@@ -234,15 +233,14 @@ export default function VyoniqAppsPage() {
               <Button
                 asChild
                 size="lg"
-                className="bg-vyoniq-green hover:bg-vyoniq-green/90 text-white font-semibold px-8 py-3 transform hover:scale-105 transition-all duration-200"
+                className="bg-vyoniq-purple hover:bg-vyoniq-purple/90 text-white font-semibold px-8 py-3 transform hover:scale-105 transition-all duration-200"
               >
                 <Link href="/#contact">Contact Us Today</Link>
               </Button>
               <Button
                 asChild
                 size="lg"
-                variant="outline"
-                className="border-vyoniq-green text-vyoniq-green hover:bg-vyoniq-green hover:text-white font-semibold px-8 py-3 transform hover:scale-105 transition-all duration-200"
+                className="border-2 border-vyoniq-green bg-transparent text-vyoniq-blue dark:text-vyoniq-green hover:bg-vyoniq-green hover:text-white font-semibold px-8 py-3 transform hover:scale-105 transition-all duration-200"
               >
                 <Link href="#newsletter">Stay Updated</Link>
               </Button>

@@ -29,15 +29,14 @@ export function HeroSection() {
               <Button
                 asChild
                 size="lg"
-                className="bg-accent hover:bg-accent/90 text-white font-semibold px-8 py-4 min-h-[48px] transform hover:scale-105 active:scale-100 transition-all duration-200 touch-manipulation"
+                className="bg-vyoniq-purple hover:bg-vyoniq-purple/90 text-white font-semibold px-8 py-4 min-h-[48px] transform hover:scale-105 active:scale-100 transition-all duration-200 touch-manipulation"
               >
                 <Link href="#contact">Get in Touch</Link>
               </Button>
               <Button
                 asChild
                 size="lg"
-                variant="outline"
-                className="border-2 border-white text-white hover:bg-white hover:text-primary font-semibold px-8 py-4 min-h-[48px] transform hover:scale-105 active:scale-100 transition-all duration-200 touch-manipulation backdrop-blur-sm"
+                className="border-2 border-white bg-transparent text-white hover:bg-white hover:text-vyoniq-blue font-semibold px-8 py-4 min-h-[48px] transform hover:scale-105 active:scale-100 transition-all duration-200 touch-manipulation backdrop-blur-sm"
               >
                 <Link href="#newsletter">Stay Updated</Link>
               </Button>
