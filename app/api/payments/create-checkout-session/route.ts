@@ -109,10 +109,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create line items for Stripe
+    // Create line items for Stripe using budget currency (USD or CAD)
+    const currency = (budget.currency || "USD").toLowerCase();
+    if (!["usd", "cad"].includes(currency)) {
+      return NextResponse.json(
+        { error: "Unsupported currency" },
+        { status: 400 }
+      );
+    }
+
     const lineItems = budget.items.map((item: any) => ({
       price_data: {
-        currency: "usd",
+        currency,
         product_data: {
           name: item.name,
           description: item.description || undefined,
@@ -139,6 +147,7 @@ export async function POST(request: NextRequest) {
         budgetId: budget.id,
         inquiryId: budget.inquiry.id,
         userId: userId,
+        currency,
       },
       billing_address_collection: "required",
       shipping_address_collection: {
@@ -152,6 +161,7 @@ export async function POST(request: NextRequest) {
         budgetId: budget.id,
         stripeSessionId: session.id,
         amount: Number(budget.totalAmount),
+        currency: budget.currency || "USD",
         status: "PENDING",
       },
     });
