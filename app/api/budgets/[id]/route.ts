@@ -49,6 +49,8 @@ const UpdateBudgetSchema = z.object({
   description: z.string().optional(),
   validUntil: z.string().optional(), // ISO date string
   adminNotes: z.string().optional(),
+  // Allow updating currency only if the budget is still in DRAFT or SENT; we'll enforce in handler
+  currency: z.enum(["USD", "CAD"]).optional(),
   status: z
     .enum([
       "DRAFT",
@@ -225,6 +227,10 @@ export async function PUT(
         ...(validUntil && { validUntil: new Date(validUntil) }),
         ...(adminNotes !== undefined && { adminNotes }),
         ...(status && { status }),
+        // Only allow currency change before approval
+        ...(body.currency && ["DRAFT", "SENT"].includes(existingBudget.status)
+          ? { currency: body.currency }
+          : {}),
         ...(items && {
           totalAmount: totalAmount,
           items: {
