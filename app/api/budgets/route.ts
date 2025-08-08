@@ -37,6 +37,9 @@ const CreateBudgetSchema = z.object({
   description: z.string().optional(),
   validUntil: z.string().optional(), // ISO date string
   adminNotes: z.string().optional(),
+  currency: z
+    .enum(["USD", "CAD"]) // Budget-level currency selection
+    .default("USD"),
   items: z
     .array(
       z.object({
@@ -78,8 +81,15 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { inquiryId, title, description, validUntil, adminNotes, items } =
-      CreateBudgetSchema.parse(body);
+    const {
+      inquiryId,
+      title,
+      description,
+      validUntil,
+      adminNotes,
+      currency,
+      items,
+    } = CreateBudgetSchema.parse(body);
 
     // Verify the inquiry exists
     const inquiry = await prisma.inquiry.findUnique({
@@ -104,6 +114,7 @@ export async function POST(request: NextRequest) {
         totalAmount,
         validUntil: validUntil ? new Date(validUntil) : null,
         adminNotes,
+        currency, // Persist chosen currency (USD or CAD)
         createdById: userId,
         items: {
           create: items.map((item) => ({
@@ -212,7 +223,7 @@ export async function GET(request: NextRequest) {
       where.status = status;
     }
 
-    const budgets = await prisma.budget.findMany({
+    const budgets = (await prisma.budget.findMany({
       where,
       include: {
         items: true,
@@ -245,7 +256,7 @@ export async function GET(request: NextRequest) {
       },
       take: limit,
       skip: offset,
-    }) as BudgetWithIncludes[];
+    })) as BudgetWithIncludes[];
 
     const totalCount = await prisma.budget.count({ where });
 
