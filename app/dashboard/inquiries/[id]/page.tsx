@@ -20,6 +20,7 @@ import {
   Clock,
   CheckCircle,
   XCircle,
+  DollarSign,
   Send,
 } from "lucide-react";
 import { InquiryResponseForm } from "@/components/inquiry-response-form";
@@ -28,6 +29,7 @@ const statusColors = {
   PENDING:
     "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300",
   IN_PROGRESS: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
+  PAID: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300",
   RESOLVED: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
   CLOSED: "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300",
 };
@@ -35,6 +37,7 @@ const statusColors = {
 const statusIcons = {
   PENDING: Clock,
   IN_PROGRESS: MessageSquare,
+  PAID: DollarSign,
   RESOLVED: CheckCircle,
   CLOSED: XCircle,
 };
