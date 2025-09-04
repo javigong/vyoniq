@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
 import { z } from "zod";
+import { createUserAccountForStandalone } from "@/lib/auto-user-creation";
 import type {
   Budget,
   BudgetItem,
@@ -30,7 +31,7 @@ type BudgetWithIncludes = Budget & {
   };
 };
 
-// Schema for creating a budget
+// Schema for creating a budget with existing inquiry
 const CreateBudgetSchema = z.object({
   inquiryId: z.string().min(1, "Inquiry ID is required"),
   title: z.string().min(1, "Budget title is required"),
@@ -58,6 +59,49 @@ const CreateBudgetSchema = z.object({
     )
     .min(1, "At least one budget item is required"),
 });
+
+// Schema for creating a standalone budget (creates user and inquiry automatically)
+const CreateStandaloneBudgetSchema = z.object({
+  // Client information
+  clientName: z.string().min(1, "Client name is required"),
+  clientEmail: z.string().email("Valid email is required"),
+  serviceType: z.string().min(1, "Service type is required"),
+  inquiryMessage: z.string().optional(),
+
+  // Budget information
+  title: z.string().min(1, "Budget title is required"),
+  description: z.string().optional(),
+  validUntil: z.string().optional(), // ISO date string
+  adminNotes: z.string().optional(),
+  currency: z
+    .enum(["USD", "CAD"]) // Budget-level currency selection
+    .default("USD"),
+  items: z
+    .array(
+      z.object({
+        name: z.string().min(1, "Item name is required"),
+        description: z.string().optional(),
+        quantity: z
+          .number()
+          .int()
+          .min(1, "Quantity must be at least 1")
+          .default(1),
+        unitPrice: z.number().min(0, "Unit price must be non-negative"),
+        category: z.string().optional(),
+        servicePricingId: z.string().optional(),
+        isCustom: z.boolean().default(false),
+      })
+    )
+    .min(1, "At least one budget item is required"),
+});
+
+// Union schema to handle both types of budget creation
+const CreateBudgetUnionSchema = z.union([
+  CreateBudgetSchema,
+  CreateStandaloneBudgetSchema.extend({
+    isStandalone: z.literal(true), // Flag to identify standalone budgets
+  }),
+]);
 
 // POST - Create a new budget (Admin only)
 export async function POST(request: NextRequest) {
