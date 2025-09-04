@@ -12,6 +12,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { SignOutButton } from "@clerk/nextjs";
+import { UserBudgetSection } from "@/components/user-budget-section";
+import { UserSubscriptionSection } from "@/components/user-subscription-section";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import {
@@ -19,9 +21,12 @@ import {
   Clock,
   CheckCircle,
   XCircle,
+  DollarSign,
   Plus,
   LogOut,
   AlertTriangle,
+  FileText,
+  RefreshCw,
 } from "lucide-react";
 import { DeleteAccountSection } from "@/components/delete-account-section";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -48,6 +53,7 @@ const statusColors = {
   PENDING:
     "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300",
   IN_PROGRESS: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
+  PAID: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300",
   RESOLVED: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
   CLOSED: "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300",
 };
@@ -55,6 +61,7 @@ const statusColors = {
 const statusIcons = {
   PENDING: Clock,
   IN_PROGRESS: MessageSquare,
+  PAID: DollarSign,
   RESOLVED: CheckCircle,
   CLOSED: XCircle,
 };
@@ -192,7 +199,7 @@ export default async function UserDashboard() {
 
     const pendingCount = inquiries.filter((i) => i.status === "PENDING").length;
     const inProgressCount = inquiries.filter(
-      (i) => i.status === "IN_PROGRESS"
+      (i) => i.status === "IN_PROGRESS" || i.status === "PAID"
     ).length;
     const resolvedCount = inquiries.filter(
       (i) => i.status === "RESOLVED"
@@ -211,9 +218,13 @@ export default async function UserDashboard() {
                 <h1 className="text-3xl font-bold text-vyoniq-blue dark:text-white mb-2">
                   Welcome to Your Dashboard
                 </h1>
-                <p className="text-vyoniq-text dark:text-vyoniq-dark-text">
+                <p className="text-vyoniq-text dark:text-vyoniq-dark-text mb-1">
                   Track your inquiries, project progress, and manage your Vyoniq
                   services.
+                </p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Logged in as:{" "}
+                  <span className="font-medium">{user.email}</span>
                 </p>
               </div>
               <div className="flex items-center gap-2">
@@ -340,6 +351,57 @@ export default async function UserDashboard() {
               )}
             </CardContent>
           </Card>
+
+          {/* Budget Section */}
+          <Card className="mb-8">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-vyoniq-blue dark:text-white">
+                    My Budgets
+                  </CardTitle>
+                  <CardDescription>
+                    View and manage your project budgets and quotes
+                  </CardDescription>
+                </div>
+                <Button asChild variant="outline">
+                  <Link href="/dashboard/budgets">
+                    <FileText className="w-4 h-4 mr-2" />
+                    View All Budgets
+                  </Link>
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <UserBudgetSection />
+            </CardContent>
+          </Card>
+
+          {/* Subscription Section */}
+          <Card className="mb-8">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-vyoniq-blue dark:text-white">
+                    My Subscriptions
+                  </CardTitle>
+                  <CardDescription>
+                    View and manage your recurring service subscriptions
+                  </CardDescription>
+                </div>
+                <Button asChild variant="outline">
+                  <Link href="/dashboard/subscriptions">
+                    <RefreshCw className="w-4 h-4 mr-2" />
+                    View All Subscriptions
+                  </Link>
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <UserSubscriptionSection />
+            </CardContent>
+          </Card>
+
           <DeleteAccountSection />
         </main>
 
