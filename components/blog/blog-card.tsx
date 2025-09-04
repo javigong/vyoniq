@@ -41,11 +41,9 @@ export function BlogCard({ post }: BlogCardProps) {
               </Badge>
             ))}
           </div>
-          <Link href={`/blog/${post.slug}`}>
-            <h3 className="text-xl font-bold text-vyoniq-blue dark:text-white mb-2 hover:text-vyoniq-green transition-colors">
-              {post.title}
-            </h3>
-          </Link>
+          <h3 className="text-xl font-bold text-vyoniq-blue dark:text-white mb-2 hover:text-vyoniq-green transition-colors">
+            {post.title}
+          </h3>
           <p className="text-vyoniq-text dark:text-vyoniq-dark-text mb-4 line-clamp-2">
             {post.excerpt}
           </p>
