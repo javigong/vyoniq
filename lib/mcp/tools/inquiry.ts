@@ -6,7 +6,7 @@ import { MCPTool, MCPToolResult, MCPAuthContext } from "../types";
 // Schemas
 const ListInquiriesSchema = z.object({
   status: z
-    .enum(["PENDING", "IN_PROGRESS", "RESOLVED", "CLOSED"])
+    .enum(["PENDING", "IN_PROGRESS", "PAID", "RESOLVED", "CLOSED"])
     .optional()
     .describe("Filter by inquiry status"),
   serviceType: z.string().optional().describe("Filter by service type"),
@@ -37,7 +37,7 @@ const GetInquirySchema = z.object({
 
 const UpdateInquiryStatusSchema = z.object({
   id: z.string().cuid(),
-  status: z.enum(["PENDING", "IN_PROGRESS", "RESOLVED", "CLOSED"]),
+  status: z.enum(["PENDING", "IN_PROGRESS", "PAID", "RESOLVED", "CLOSED"]),
 });
 
 const RespondToInquirySchema = z.object({
@@ -288,7 +288,7 @@ ${conversationHistory || "No messages yet."}
 export const updateInquiryStatusTool: MCPTool = {
   name: "update_inquiry_status",
   description:
-    "Update the status of an inquiry (PENDING, IN_PROGRESS, RESOLVED, CLOSED)",
+    "Update the status of an inquiry (PENDING, IN_PROGRESS, PAID, RESOLVED, CLOSED)",
   inputSchema: zodToJsonSchema(UpdateInquiryStatusSchema, {
     $refStrategy: "none",
   }),

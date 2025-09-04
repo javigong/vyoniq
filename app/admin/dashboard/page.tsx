@@ -20,6 +20,7 @@ import { AdminBlogSection } from "@/components/admin-blog-section";
 import { AdminMCPSection } from "@/components/admin-mcp-section";
 import { AdminInquirySection } from "@/components/admin-inquiry-section";
 import { AdminBudgetSection } from "@/components/admin-budget-section";
+import { AdminSubscriptionSection } from "@/components/admin-subscription-section";
 import prisma from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { SignOutButton } from "@clerk/nextjs";
@@ -72,7 +73,9 @@ async function AdminDashboard() {
     where: { status: "PENDING" },
   });
   const inProgressInquiries = await prisma.inquiry.count({
-    where: { status: "IN_PROGRESS" },
+    where: {
+      OR: [{ status: "IN_PROGRESS" }, { status: "PAID" }],
+    },
   });
   const resolvedInquiries = await prisma.inquiry.count({
     where: { status: "RESOLVED" },
@@ -95,9 +98,15 @@ async function AdminDashboard() {
       <Header />
       <main className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold tracking-tight text-vyoniq-blue dark:text-white">
-            Admin Dashboard
-          </h1>
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight text-vyoniq-blue dark:text-white mb-2">
+              Admin Dashboard
+            </h1>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Admin access for:{" "}
+              <span className="font-medium">{user.email}</span>
+            </p>
+          </div>
           <div className="flex items-center gap-2">
             <Button asChild variant="secondary">
               <Link href="/dashboard">User Dashboard</Link>
@@ -250,6 +259,11 @@ async function AdminDashboard() {
         {/* Budget Management Section */}
         <div className="mb-8">
           <AdminBudgetSection />
+        </div>
+
+        {/* Subscription Management Section */}
+        <div className="mb-8">
+          <AdminSubscriptionSection />
         </div>
 
         {/* MCP Server Management Section */}

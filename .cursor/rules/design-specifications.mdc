@@ -1,6 +1,4 @@
 ---
-description: 
-globs: 
 alwaysApply: true
 ---
 As a Senior Web App Designer with expertise in 2025 web development trends, I need you to design and implement the frontend for the Vyoniq SaaS landing page, a professional Software Development company powered by AI agents. The goal is to create a sophisticated, user-centric, and futuristic landing page that showcases Vyoniq’s services (Web and Mobile App Development, Hosting Services, AI Integrations) and announces Vyoniq Tables, a forthcoming subscription-based data management app (in development). The tech stack is Next.js (App Router), shadcn/ui for components, Tailwind CSS for styling, and Clerk for authentication. The design must adhere to the provided PRD, incorporate an updated futuristic color palette, prioritize accessibility (WCAG 2.1), and optimize for performance (<2s load time).

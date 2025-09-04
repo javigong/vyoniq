@@ -30,3 +30,21 @@ export function getBaseUrl(): string {
   // Fall back to production URL if in production, otherwise localhost
   return isProduction ? "https://vyoniq.com" : "http://localhost:3000";
 }
+
+/**
+ * Format currency with proper symbols for USD and CAD
+ */
+export function formatCurrency(amount: number, currency: string): string {
+  const formattedAmount = new Intl.NumberFormat("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(amount);
+
+  switch (currency.toUpperCase()) {
+    case "CAD":
+      return `CA$${formattedAmount}`;
+    case "USD":
+    default:
+      return `$${formattedAmount}`;
+  }
+}

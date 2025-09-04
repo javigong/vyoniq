@@ -93,7 +93,7 @@ export async function PATCH(
 
     if (
       status &&
-      !["PENDING", "IN_PROGRESS", "RESOLVED", "CLOSED"].includes(status)
+      !["PENDING", "IN_PROGRESS", "PAID", "RESOLVED", "CLOSED"].includes(status)
     ) {
       return NextResponse.json({ error: "Invalid status" }, { status: 400 });
     }

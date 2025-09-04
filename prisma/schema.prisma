@@ -6,6 +6,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("POSTGRES_URL")
+  shadowDatabaseUrl = env("SHADOW_POSTGRES_URL")
 }
 
 model User {
@@ -38,18 +39,19 @@ model ApiKey {
 }
 
 model Inquiry {
-  id          String           @id @default(cuid())
-  name        String
-  email       String
-  serviceType String
-  message     String
-  createdAt   DateTime         @default(now())
-  status      InquiryStatus    @default(PENDING)
-  updatedAt   DateTime         @updatedAt
-  userId      String?
-  budgets     Budget[]
-  user        User?            @relation(fields: [userId], references: [id])
-  messages    InquiryMessage[]
+  id            String           @id @default(cuid())
+  name          String
+  email         String
+  serviceType   String
+  message       String
+  createdAt     DateTime         @default(now())
+  status        InquiryStatus    @default(PENDING)
+  updatedAt     DateTime         @updatedAt
+  userId        String?
+  budgets       Budget[]
+  subscriptions Subscription[]
+  user          User?            @relation(fields: [userId], references: [id])
+  messages      InquiryMessage[]
 
   @@index([status])
   @@index([email])
@@ -132,19 +134,20 @@ model BlogPostCategory {
 }
 
 model ServicePricing {
-  id           String       @id @default(cuid())
-  serviceType  String
-  name         String
-  description  String
-  basePrice    Decimal      @db.Decimal(10, 2)
-  currency     String       @default("USD")
-  billingType  String
-  features     Json
-  isActive     Boolean      @default(true)
-  customizable Boolean      @default(true)
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
-  budgetItems  BudgetItem[]
+  id                String             @id @default(cuid())
+  serviceType       String
+  name              String
+  description       String
+  basePrice         Decimal            @db.Decimal(10, 2)
+  currency          String             @default("USD")
+  billingType       String
+  features          Json
+  isActive          Boolean            @default(true)
+  customizable      Boolean            @default(true)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  budgetItems       BudgetItem[]
+  subscriptionItems SubscriptionItem[]
 
   @@index([serviceType])
   @@index([isActive])
@@ -173,6 +176,33 @@ model Budget {
   @@index([createdAt])
 }
 
+model Subscription {
+  id              String                @id @default(cuid())
+  inquiryId       String
+  title           String
+  description     String?
+  monthlyAmount   Decimal               @db.Decimal(10, 2)
+  currency        String                @default("USD")
+  status          SubscriptionStatus    @default(DRAFT)
+  validUntil      DateTime?
+  adminNotes      String?
+  clientNotes     String?
+  createdById     String
+  billingInterval String                @default("month") // month, year
+  trialPeriodDays Int?                  @default(0)
+  stripeProductId String?
+  stripePriceId   String?
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+  inquiry         Inquiry               @relation(fields: [inquiryId], references: [id], onDelete: Cascade)
+  items           SubscriptionItem[]
+  subscriptions   SubscriptionPayment[]
+
+  @@index([inquiryId])
+  @@index([status])
+  @@index([createdAt])
+}
+
 model BudgetItem {
   id               String          @id @default(cuid())
   budgetId         String
@@ -189,6 +219,24 @@ model BudgetItem {
   servicePricing   ServicePricing? @relation(fields: [servicePricingId], references: [id])
 
   @@index([budgetId])
+}
+
+model SubscriptionItem {
+  id               String          @id @default(cuid())
+  subscriptionId   String
+  servicePricingId String?
+  name             String
+  description      String?
+  quantity         Int             @default(1)
+  unitPrice        Decimal         @db.Decimal(10, 2)
+  totalPrice       Decimal         @db.Decimal(10, 2)
+  isCustom         Boolean         @default(false)
+  category         String?
+  createdAt        DateTime        @default(now())
+  subscription     Subscription    @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  servicePricing   ServicePricing? @relation(fields: [servicePricingId], references: [id])
+
+  @@index([subscriptionId])
 }
 
 model Payment {
@@ -216,9 +264,37 @@ model Payment {
   @@index([stripeSessionId])
 }
 
+model SubscriptionPayment {
+  id                   String                    @id @default(cuid())
+  subscriptionId       String
+  stripeSubscriptionId String?                   @unique
+  stripeCustomerId     String?
+  amount               Decimal                   @db.Decimal(10, 2)
+  currency             String                    @default("USD")
+  status               SubscriptionPaymentStatus @default(PENDING)
+  currentPeriodStart   DateTime?
+  currentPeriodEnd     DateTime?
+  nextBillingDate      DateTime?
+  canceledAt           DateTime?
+  endedAt              DateTime?
+  trialStart           DateTime?
+  trialEnd             DateTime?
+  failureReason        String?
+  metadata             Json?
+  createdAt            DateTime                  @default(now())
+  updatedAt            DateTime                  @updatedAt
+  subscription         Subscription              @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  @@index([subscriptionId])
+  @@index([status])
+  @@index([stripeSubscriptionId])
+  @@index([stripeCustomerId])
+}
+
 enum InquiryStatus {
   PENDING
   IN_PROGRESS
+  PAID
   RESOLVED
   CLOSED
 }
@@ -240,4 +316,28 @@ enum PaymentStatus {
   FAILED
   CANCELLED
   REFUNDED
+}
+
+enum SubscriptionStatus {
+  DRAFT
+  SENT
+  APPROVED
+  REJECTED
+  EXPIRED
+  ACTIVE
+  CANCELLED
+  PAST_DUE
+  COMPLETED
+}
+
+enum SubscriptionPaymentStatus {
+  PENDING
+  ACTIVE
+  PAST_DUE
+  CANCELLED
+  UNPAID
+  INCOMPLETE
+  INCOMPLETE_EXPIRED
+  TRIALING
+  PAUSED
 }

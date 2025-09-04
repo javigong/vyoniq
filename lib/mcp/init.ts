@@ -188,7 +188,7 @@ export function initializeMCPServer() {
           {
             name: "update_inquiry_status",
             description:
-              "Update the status of an inquiry (PENDING, IN_PROGRESS, RESOLVED, CLOSED)",
+              "Update the status of an inquiry (PENDING, IN_PROGRESS, PAID, RESOLVED, CLOSED)",
             category: "Inquiry Management",
           },
           {

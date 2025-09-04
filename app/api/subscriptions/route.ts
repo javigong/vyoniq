@@ -2,45 +2,47 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
 import { z } from "zod";
-import { createUserAccountForStandalone } from "@/lib/auto-user-creation";
 import type {
-  Budget,
-  BudgetItem,
+  Subscription,
+  SubscriptionItem,
   Inquiry,
-  Payment,
+  SubscriptionPayment,
 } from "@/lib/generated/prisma";
 
-type BudgetWithIncludes = Budget & {
-  items: BudgetItem[];
+type SubscriptionWithIncludes = Subscription & {
+  items: SubscriptionItem[];
   inquiry: {
     id: string;
     name: string;
     email: string;
     serviceType: string;
-    status: string;
   };
-  payments: {
+  subscriptions: {
     id: string;
     amount: any; // Decimal type
     status: string;
-    paidAt: Date | null;
+    currentPeriodStart?: Date | null;
+    currentPeriodEnd?: Date | null;
+    nextBillingDate?: Date | null;
   }[];
   _count: {
     items: number;
-    payments: number;
+    subscriptions: number;
   };
 };
 
-// Schema for creating a budget with existing inquiry
-const CreateBudgetSchema = z.object({
+// Schema for creating a subscription
+const CreateSubscriptionSchema = z.object({
   inquiryId: z.string().min(1, "Inquiry ID is required"),
-  title: z.string().min(1, "Budget title is required"),
+  title: z.string().min(1, "Subscription title is required"),
   description: z.string().optional(),
   validUntil: z.string().optional(), // ISO date string
   adminNotes: z.string().optional(),
   currency: z
-    .enum(["USD", "CAD"]) // Budget-level currency selection
+    .enum(["USD", "CAD"]) // Subscription-level currency selection
     .default("USD"),
+  billingInterval: z.enum(["month", "year"]).default("month"),
+  trialPeriodDays: z.number().int().min(0).max(365).optional().default(0),
   items: z
     .array(
       z.object({
@@ -54,56 +56,13 @@ const CreateBudgetSchema = z.object({
         unitPrice: z.number().min(0, "Unit price must be non-negative"),
         category: z.string().optional(),
         servicePricingId: z.string().optional(),
-        isCustom: z.boolean().default(false),
+        isCustom: z.boolean().default(true),
       })
     )
-    .min(1, "At least one budget item is required"),
+    .min(1, "At least one item is required"),
 });
 
-// Schema for creating a standalone budget (creates user and inquiry automatically)
-const CreateStandaloneBudgetSchema = z.object({
-  // Client information
-  clientName: z.string().min(1, "Client name is required"),
-  clientEmail: z.string().email("Valid email is required"),
-  serviceType: z.string().min(1, "Service type is required"),
-  inquiryMessage: z.string().optional(),
-
-  // Budget information
-  title: z.string().min(1, "Budget title is required"),
-  description: z.string().optional(),
-  validUntil: z.string().optional(), // ISO date string
-  adminNotes: z.string().optional(),
-  currency: z
-    .enum(["USD", "CAD"]) // Budget-level currency selection
-    .default("USD"),
-  items: z
-    .array(
-      z.object({
-        name: z.string().min(1, "Item name is required"),
-        description: z.string().optional(),
-        quantity: z
-          .number()
-          .int()
-          .min(1, "Quantity must be at least 1")
-          .default(1),
-        unitPrice: z.number().min(0, "Unit price must be non-negative"),
-        category: z.string().optional(),
-        servicePricingId: z.string().optional(),
-        isCustom: z.boolean().default(false),
-      })
-    )
-    .min(1, "At least one budget item is required"),
-});
-
-// Union schema to handle both types of budget creation
-const CreateBudgetUnionSchema = z.union([
-  CreateBudgetSchema,
-  CreateStandaloneBudgetSchema.extend({
-    isStandalone: z.literal(true), // Flag to identify standalone budgets
-  }),
-]);
-
-// POST - Create a new budget (Admin only)
+// POST - Create a new subscription
 export async function POST(request: NextRequest) {
   try {
     const { userId } = await auth();
@@ -112,7 +71,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Check if user is admin
     const user = await prisma.user.findUnique({
       where: { id: userId },
     });
@@ -132,10 +90,12 @@ export async function POST(request: NextRequest) {
       validUntil,
       adminNotes,
       currency,
+      billingInterval,
+      trialPeriodDays,
       items,
-    } = CreateBudgetSchema.parse(body);
+    } = CreateSubscriptionSchema.parse(body);
 
-    // Verify the inquiry exists
+    // Validate inquiry exists
     const inquiry = await prisma.inquiry.findUnique({
       where: { id: inquiryId },
     });
@@ -145,20 +105,23 @@ export async function POST(request: NextRequest) {
     }
 
     // Calculate total amount
-    const totalAmount = items.reduce((sum, item) => {
-      return sum + item.unitPrice * item.quantity;
-    }, 0);
+    const totalAmount = items.reduce(
+      (sum, item) => sum + item.unitPrice * item.quantity,
+      0
+    );
 
-    // Create the budget with items
-    const budget = await prisma.budget.create({
+    // Create subscription with items
+    const subscription = await prisma.subscription.create({
       data: {
         inquiryId,
         title,
         description,
-        totalAmount,
-        validUntil: validUntil ? new Date(validUntil) : null,
+        monthlyAmount: totalAmount,
+        currency,
+        billingInterval,
+        trialPeriodDays,
+        validUntil: validUntil ? new Date(validUntil) : undefined,
         adminNotes,
-        currency, // Persist chosen currency (USD or CAD)
         createdById: userId,
         items: {
           create: items.map((item) => ({
@@ -187,10 +150,10 @@ export async function POST(request: NextRequest) {
     });
 
     // Serialize Decimal fields to numbers for client components
-    const serializedBudget = {
-      ...budget,
-      totalAmount: Number(budget.totalAmount),
-      items: budget.items.map((item) => ({
+    const serializedSubscription = {
+      ...subscription,
+      monthlyAmount: Number(subscription.monthlyAmount),
+      items: subscription.items.map((item) => ({
         ...item,
         unitPrice: Number(item.unitPrice),
         totalPrice: Number(item.totalPrice),
@@ -199,11 +162,11 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      budget: serializedBudget,
-      message: "Budget created successfully",
+      subscription: serializedSubscription,
+      message: "Subscription created successfully",
     });
   } catch (error) {
-    console.error("Error creating budget:", error);
+    console.error("Error creating subscription:", error);
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -213,13 +176,13 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(
-      { error: "Failed to create budget" },
+      { error: "Failed to create subscription" },
       { status: 500 }
     );
   }
 }
 
-// GET - Fetch budgets
+// GET - Fetch subscriptions
 export async function GET(request: NextRequest) {
   try {
     const { userId } = await auth();
@@ -244,8 +207,8 @@ export async function GET(request: NextRequest) {
 
     const where: any = {};
 
-    // If user is admin, they can see all budgets
-    // If user is not admin, they can only see budgets for their inquiries
+    // If user is admin, they can see all subscriptions
+    // If user is not admin, they can only see subscriptions for their inquiries
     if (!user.isAdmin) {
       const userInquiryIds = await prisma.inquiry.findMany({
         where: {
@@ -267,7 +230,7 @@ export async function GET(request: NextRequest) {
       where.status = status;
     }
 
-    const budgets = (await prisma.budget.findMany({
+    const subscriptions = (await prisma.subscription.findMany({
       where,
       include: {
         items: true,
@@ -277,21 +240,25 @@ export async function GET(request: NextRequest) {
             name: true,
             email: true,
             serviceType: true,
-            status: true,
           },
         },
-        payments: {
+        subscriptions: {
           select: {
             id: true,
             amount: true,
             status: true,
-            paidAt: true,
+            currentPeriodStart: true,
+            currentPeriodEnd: true,
+            nextBillingDate: true,
+          },
+          orderBy: {
+            createdAt: "desc",
           },
         },
         _count: {
           select: {
             items: true,
-            payments: true,
+            subscriptions: true,
           },
         },
       },
@@ -300,34 +267,32 @@ export async function GET(request: NextRequest) {
       },
       take: limit,
       skip: offset,
-    })) as BudgetWithIncludes[];
-
-    const totalCount = await prisma.budget.count({ where });
+    })) as SubscriptionWithIncludes[];
 
     // Serialize Decimal fields to numbers for client components
-    const serializedBudgets = budgets.map((budget) => ({
-      ...budget,
-      totalAmount: Number(budget.totalAmount),
-      items: budget.items.map((item) => ({
+    const serializedSubscriptions = subscriptions.map((subscription) => ({
+      ...subscription,
+      monthlyAmount: Number(subscription.monthlyAmount),
+      items: subscription.items.map((item) => ({
         ...item,
         unitPrice: Number(item.unitPrice),
         totalPrice: Number(item.totalPrice),
       })),
-      payments: budget.payments.map((payment) => ({
+      subscriptions: subscription.subscriptions.map((payment) => ({
         ...payment,
         amount: Number(payment.amount),
       })),
     }));
 
     return NextResponse.json({
-      budgets: serializedBudgets,
-      totalCount,
-      hasMore: totalCount > offset + limit,
+      success: true,
+      subscriptions: serializedSubscriptions,
+      total: subscriptions.length,
     });
   } catch (error) {
-    console.error("Error fetching budgets:", error);
+    console.error("Error fetching subscriptions:", error);
     return NextResponse.json(
-      { error: "Failed to fetch budgets" },
+      { error: "Failed to fetch subscriptions" },
       { status: 500 }
     );
   }
