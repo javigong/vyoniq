@@ -3,12 +3,18 @@ import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
 import { Decimal } from "@prisma/client/runtime/library";
 import { z } from "zod";
+import React from "react";
+import { Resend } from "resend";
+import { getBaseUrl } from "@/lib/utils";
+import { BudgetNotificationEmail } from "@/components/emails/budget-notification-email";
 import type {
   Budget,
   BudgetItem,
   Inquiry,
   Payment,
 } from "@/lib/generated/prisma";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 type BudgetWithIncludes = Budget & {
   items: (BudgetItem & {
@@ -370,6 +376,19 @@ export async function PATCH(
       },
     });
 
+    // Send email notification if budget is being sent to client
+    if (status === "SENT" && user.isAdmin) {
+      try {
+        await sendBudgetNotificationEmail(updatedBudget);
+        console.log(
+          `Budget notification email sent to ${updatedBudget.inquiry.email}`
+        );
+      } catch (error) {
+        console.error("Failed to send budget notification email:", error);
+        // Don't fail the request if email fails
+      }
+    }
+
     // Serialize Decimal fields to numbers for client components
     const serializedBudget = {
       ...updatedBudget,
@@ -470,5 +489,36 @@ export async function DELETE(
       { error: "Failed to delete budget" },
       { status: 500 }
     );
+  }
+}
+
+// Helper function to send budget notification email
+async function sendBudgetNotificationEmail(budget: any) {
+  try {
+    // Prepare budget data for email template
+    const budgetData = {
+      ...budget,
+      totalAmount: Number(budget.totalAmount),
+      items: budget.items.map((item: any) => ({
+        ...item,
+        unitPrice: Number(item.unitPrice),
+        totalPrice: Number(item.totalPrice),
+      })),
+    };
+
+    await resend.emails.send({
+      from: "Vyoniq <noreply@vyoniq.com>",
+      to: budget.inquiry.email,
+      subject: `Budget Proposal Ready: ${budget.title}`,
+      react: BudgetNotificationEmail({
+        budget: budgetData,
+        baseUrl: getBaseUrl(),
+      }) as React.ReactElement,
+    });
+
+    console.log(`Budget notification email sent to ${budget.inquiry.email}`);
+  } catch (error) {
+    console.error("Failed to send budget notification email:", error);
+    throw error;
   }
 }
