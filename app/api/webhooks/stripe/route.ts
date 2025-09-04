@@ -50,6 +50,22 @@ export async function POST(request: NextRequest) {
       case "payment_intent.payment_failed":
         await handlePaymentIntentFailed(event.data.object);
         break;
+      // Subscription webhook handlers
+      case "customer.subscription.created":
+        await handleSubscriptionCreated(event.data.object);
+        break;
+      case "customer.subscription.updated":
+        await handleSubscriptionUpdated(event.data.object);
+        break;
+      case "customer.subscription.deleted":
+        await handleSubscriptionDeleted(event.data.object);
+        break;
+      case "invoice.payment_succeeded":
+        await handleInvoicePaymentSucceeded(event.data.object);
+        break;
+      case "invoice.payment_failed":
+        await handleInvoicePaymentFailed(event.data.object);
+        break;
       default:
         console.log(`Unhandled event type ${event.type}`);
     }
@@ -69,8 +85,21 @@ async function handleCheckoutSessionCompleted(session: any) {
     console.log("Processing checkout session completed:", session.id);
 
     const budgetId = session.metadata?.budgetId;
+    const subscriptionId = session.metadata?.subscriptionId;
     const inquiryId = session.metadata?.inquiryId;
+    const sessionType = session.metadata?.type;
 
+    // Handle subscription checkout session
+    if (sessionType === "subscription" && subscriptionId) {
+      await handleSubscriptionCheckoutCompleted(
+        session,
+        subscriptionId,
+        inquiryId
+      );
+      return;
+    }
+
+    // Handle budget checkout session (existing logic)
     if (!budgetId) {
       console.error("No budgetId found in session metadata");
       return;
@@ -113,11 +142,11 @@ async function handleCheckoutSessionCompleted(session: any) {
       },
     });
 
-    // Update inquiry status to IN_PROGRESS since payment is completed
+    // Update inquiry status to PAID since payment is completed
     if (inquiryId) {
       await prisma.inquiry.update({
         where: { id: inquiryId },
-        data: { status: "IN_PROGRESS" },
+        data: { status: "PAID" },
       });
     }
 
@@ -276,5 +305,427 @@ async function sendPaymentConfirmationEmail(
   } catch (error) {
     console.error("Failed to send payment confirmation email:", error);
     // Don't throw - email failure shouldn't fail the webhook
+  }
+}
+
+// Subscription webhook handlers
+async function handleSubscriptionCheckoutCompleted(
+  session: any,
+  subscriptionId: string,
+  inquiryId?: string
+) {
+  try {
+    console.log(
+      "Processing subscription checkout session completed:",
+      session.id
+    );
+
+    // Update subscription payment record
+    await prisma.subscriptionPayment.updateMany({
+      where: {
+        subscriptionId: subscriptionId,
+        metadata: {
+          path: ["checkoutSessionId"],
+          equals: session.id,
+        },
+      },
+      data: {
+        status: "PENDING", // Will be updated when actual subscription is created
+        stripeCustomerId: session.customer,
+        metadata: {
+          ...session,
+          stripeSessionId: session.id, // Store session ID for easy lookup
+        },
+      },
+    });
+
+    // Update inquiry status to PAID since checkout is completed
+    if (inquiryId) {
+      await prisma.inquiry.update({
+        where: { id: inquiryId },
+        data: { status: "PAID" },
+      });
+    }
+
+    console.log(
+      `Successfully processed subscription checkout for subscription ${subscriptionId}`
+    );
+  } catch (error) {
+    console.error("Error handling subscription checkout completed:", error);
+    throw error;
+  }
+}
+
+async function handleSubscriptionCreated(subscription: any) {
+  try {
+    console.log("Processing subscription created:", subscription.id);
+
+    // Find the subscription payment record by customer ID
+    // Try multiple approaches to find the right record
+    let subscriptionPayment = await prisma.subscriptionPayment.findFirst({
+      where: {
+        stripeCustomerId: subscription.customer,
+        status: "PENDING", // Look for pending payments
+      },
+      include: {
+        subscription: {
+          include: {
+            inquiry: true,
+          },
+        },
+      },
+    });
+
+    // If not found by pending status, try by customer ID only
+    if (!subscriptionPayment) {
+      subscriptionPayment = await prisma.subscriptionPayment.findFirst({
+        where: {
+          stripeCustomerId: subscription.customer,
+        },
+        include: {
+          subscription: {
+            include: {
+              inquiry: true,
+            },
+          },
+        },
+        orderBy: {
+          createdAt: "desc", // Get the most recent one
+        },
+      });
+    }
+
+    if (!subscriptionPayment) {
+      console.error(
+        "No subscription payment record found for subscription:",
+        subscription.id,
+        "customer:",
+        subscription.customer
+      );
+
+      // Log all subscription payments for this customer for debugging
+      const allPayments = await prisma.subscriptionPayment.findMany({
+        where: {
+          stripeCustomerId: subscription.customer,
+        },
+        select: {
+          id: true,
+          status: true,
+          stripeCustomerId: true,
+          stripeSubscriptionId: true,
+          createdAt: true,
+        },
+      });
+      console.log("All payments for this customer:", allPayments);
+      return;
+    }
+
+    // Update subscription payment with Stripe subscription details
+    await prisma.subscriptionPayment.update({
+      where: { id: subscriptionPayment.id },
+      data: {
+        stripeSubscriptionId: subscription.id,
+        status: "ACTIVE",
+        currentPeriodStart: new Date(subscription.current_period_start * 1000),
+        currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+        nextBillingDate: new Date(subscription.current_period_end * 1000),
+        trialStart: subscription.trial_start
+          ? new Date(subscription.trial_start * 1000)
+          : null,
+        trialEnd: subscription.trial_end
+          ? new Date(subscription.trial_end * 1000)
+          : null,
+        metadata: subscription,
+      },
+    });
+
+    // CRITICAL: Also update the main Subscription status to ACTIVE
+    await prisma.subscription.update({
+      where: { id: subscriptionPayment.subscriptionId },
+      data: {
+        status: "ACTIVE",
+        stripeProductId: subscription.items.data[0]?.price?.product,
+        stripePriceId: subscription.items.data[0]?.price?.id,
+      },
+    });
+
+    // Update inquiry status to PAID since subscription is active
+    if (subscriptionPayment.subscription.inquiry) {
+      await prisma.inquiry.update({
+        where: { id: subscriptionPayment.subscription.inquiry.id },
+        data: { status: "PAID" },
+      });
+    }
+
+    console.log(
+      `Successfully activated subscription ${subscriptionPayment.subscriptionId}`
+    );
+  } catch (error) {
+    console.error("Error handling subscription created:", error);
+    throw error;
+  }
+}
+
+async function handleSubscriptionUpdated(subscription: any) {
+  try {
+    console.log("Processing subscription updated:", subscription.id);
+
+    // Find the subscription payment record
+    const subscriptionPayment = await prisma.subscriptionPayment.findFirst({
+      where: {
+        stripeSubscriptionId: subscription.id,
+      },
+    });
+
+    if (!subscriptionPayment) {
+      console.error(
+        "No subscription payment record found for subscription:",
+        subscription.id
+      );
+      return;
+    }
+
+    // Map Stripe status to our status
+    let status = "ACTIVE";
+    switch (subscription.status) {
+      case "active":
+        status = "ACTIVE";
+        break;
+      case "past_due":
+        status = "PAST_DUE";
+        break;
+      case "canceled":
+        status = "CANCELLED";
+        break;
+      case "unpaid":
+        status = "UNPAID";
+        break;
+      case "incomplete":
+        status = "INCOMPLETE";
+        break;
+      case "incomplete_expired":
+        status = "INCOMPLETE_EXPIRED";
+        break;
+      case "trialing":
+        status = "TRIALING";
+        break;
+      case "paused":
+        status = "PAUSED";
+        break;
+      default:
+        status = "PENDING";
+    }
+
+    // Update subscription payment record
+    await prisma.subscriptionPayment.update({
+      where: { id: subscriptionPayment.id },
+      data: {
+        status,
+        currentPeriodStart: new Date(subscription.current_period_start * 1000),
+        currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+        nextBillingDate:
+          subscription.status === "active"
+            ? new Date(subscription.current_period_end * 1000)
+            : null,
+        canceledAt: subscription.canceled_at
+          ? new Date(subscription.canceled_at * 1000)
+          : null,
+        endedAt: subscription.ended_at
+          ? new Date(subscription.ended_at * 1000)
+          : null,
+        metadata: subscription,
+      },
+    });
+
+    // Update subscription status based on Stripe subscription status
+    const subscriptionStatus =
+      subscription.status === "active"
+        ? "ACTIVE"
+        : subscription.status === "canceled"
+        ? "CANCELLED"
+        : subscription.status === "past_due"
+        ? "PAST_DUE"
+        : "ACTIVE";
+
+    await prisma.subscription.update({
+      where: { id: subscriptionPayment.subscriptionId },
+      data: { status: subscriptionStatus },
+    });
+
+    console.log(
+      `Successfully updated subscription ${subscriptionPayment.subscriptionId} with status ${status}`
+    );
+  } catch (error) {
+    console.error("Error handling subscription updated:", error);
+    throw error;
+  }
+}
+
+async function handleSubscriptionDeleted(subscription: any) {
+  try {
+    console.log("Processing subscription deleted:", subscription.id);
+
+    // Find the subscription payment record
+    const subscriptionPayment = await prisma.subscriptionPayment.findFirst({
+      where: {
+        stripeSubscriptionId: subscription.id,
+      },
+    });
+
+    if (!subscriptionPayment) {
+      console.error(
+        "No subscription payment record found for subscription:",
+        subscription.id
+      );
+      return;
+    }
+
+    // Update subscription payment record
+    await prisma.subscriptionPayment.update({
+      where: { id: subscriptionPayment.id },
+      data: {
+        status: "CANCELLED",
+        canceledAt: new Date(),
+        endedAt: new Date(),
+        metadata: subscription,
+      },
+    });
+
+    // Update subscription status to CANCELLED
+    await prisma.subscription.update({
+      where: { id: subscriptionPayment.subscriptionId },
+      data: { status: "CANCELLED" },
+    });
+
+    console.log(
+      `Successfully cancelled subscription ${subscriptionPayment.subscriptionId}`
+    );
+  } catch (error) {
+    console.error("Error handling subscription deleted:", error);
+    throw error;
+  }
+}
+
+async function handleInvoicePaymentSucceeded(invoice: any) {
+  try {
+    console.log("Processing invoice payment succeeded:", invoice.id);
+
+    if (!invoice.subscription) {
+      console.log("Invoice is not for a subscription, skipping");
+      return;
+    }
+
+    // Find the subscription payment record
+    const subscriptionPayment = await prisma.subscriptionPayment.findFirst({
+      where: {
+        stripeSubscriptionId: invoice.subscription,
+      },
+      include: {
+        subscription: {
+          include: {
+            inquiry: true,
+          },
+        },
+      },
+    });
+
+    if (!subscriptionPayment) {
+      console.error(
+        "No subscription payment record found for subscription:",
+        invoice.subscription
+      );
+      return;
+    }
+
+    // Update the payment record with successful payment details
+    await prisma.subscriptionPayment.update({
+      where: { id: subscriptionPayment.id },
+      data: {
+        status: "ACTIVE",
+        currentPeriodStart: new Date(invoice.period_start * 1000),
+        currentPeriodEnd: new Date(invoice.period_end * 1000),
+        nextBillingDate: new Date(invoice.period_end * 1000),
+        amount: invoice.amount_paid / 100, // Convert from cents
+        currency: invoice.currency.toUpperCase(),
+        metadata: {
+          ...subscriptionPayment.metadata,
+          lastInvoice: invoice,
+        },
+      },
+    });
+
+    // Also ensure the main subscription status is ACTIVE
+    await prisma.subscription.update({
+      where: { id: subscriptionPayment.subscriptionId },
+      data: { status: "ACTIVE" },
+    });
+
+    // Update inquiry status to PAID since payment succeeded
+    if (subscriptionPayment.subscription.inquiry) {
+      await prisma.inquiry.update({
+        where: { id: subscriptionPayment.subscription.inquiry.id },
+        data: { status: "PAID" },
+      });
+    }
+
+    console.log(
+      `Successfully processed invoice payment for subscription ${subscriptionPayment.subscriptionId}`
+    );
+  } catch (error) {
+    console.error("Error handling invoice payment succeeded:", error);
+    throw error;
+  }
+}
+
+async function handleInvoicePaymentFailed(invoice: any) {
+  try {
+    console.log("Processing invoice payment failed:", invoice.id);
+
+    if (!invoice.subscription) {
+      console.log("Invoice is not for a subscription, skipping");
+      return;
+    }
+
+    // Find the subscription payment record
+    const subscriptionPayment = await prisma.subscriptionPayment.findFirst({
+      where: {
+        stripeSubscriptionId: invoice.subscription,
+      },
+    });
+
+    if (!subscriptionPayment) {
+      console.error(
+        "No subscription payment record found for subscription:",
+        invoice.subscription
+      );
+      return;
+    }
+
+    // Update the payment record with failed payment details
+    await prisma.subscriptionPayment.update({
+      where: { id: subscriptionPayment.id },
+      data: {
+        status: "PAST_DUE",
+        failureReason:
+          invoice.last_finalization_error?.message || "Payment failed",
+        metadata: {
+          ...subscriptionPayment.metadata,
+          failedInvoice: invoice,
+        },
+      },
+    });
+
+    // Update subscription status to PAST_DUE
+    await prisma.subscription.update({
+      where: { id: subscriptionPayment.subscriptionId },
+      data: { status: "PAST_DUE" },
+    });
+
+    console.log(
+      `Successfully processed failed invoice payment for subscription ${subscriptionPayment.subscriptionId}`
+    );
+  } catch (error) {
+    console.error("Error handling invoice payment failed:", error);
+    throw error;
   }
 }
