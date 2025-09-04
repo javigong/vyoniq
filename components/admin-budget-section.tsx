@@ -44,6 +44,8 @@ import {
   Clock,
   CheckCircle,
   XCircle,
+  Users,
+  UserPlus,
 } from "lucide-react";
 import { z } from "zod";
 
@@ -131,6 +133,13 @@ export function AdminBudgetSection() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedInquiry, setSelectedInquiry] = useState<string>("");
+  const [isStandalone, setIsStandalone] = useState(false);
+  const [standaloneClientForm, setStandaloneClientForm] = useState({
+    clientName: "",
+    clientEmail: "",
+    serviceType: "",
+    inquiryMessage: "",
+  });
   const [budgetItems, setBudgetItems] = useState<BudgetItem[]>([
     {
       name: "",
@@ -171,7 +180,9 @@ export function AdminBudgetSection() {
 
   const fetchInquiries = async () => {
     try {
-      const response = await fetch("/api/inquiries?status=PENDING,IN_PROGRESS");
+      const response = await fetch(
+        "/api/inquiries?status=PENDING,IN_PROGRESS,PAID"
+      );
       if (response.ok) {
         const data = await response.json();
         setInquiries(data.inquiries);
@@ -251,12 +262,26 @@ export function AdminBudgetSection() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/budgets", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
+      const apiEndpoint = isStandalone
+        ? "/api/budgets/standalone"
+        : "/api/budgets";
+
+      let requestBody;
+      if (isStandalone) {
+        requestBody = {
+          clientName: standaloneClientForm.clientName,
+          clientEmail: standaloneClientForm.clientEmail,
+          serviceType: standaloneClientForm.serviceType,
+          inquiryMessage: standaloneClientForm.inquiryMessage || undefined,
+          title: budgetForm.title,
+          description: budgetForm.description,
+          validUntil: budgetForm.validUntil || undefined,
+          adminNotes: budgetForm.adminNotes,
+          currency: budgetForm.currency,
+          items: budgetItems.filter((item) => item.name && item.unitPrice > 0),
+        };
+      } else {
+        requestBody = {
           inquiryId: selectedInquiry,
           title: budgetForm.title,
           description: budgetForm.description,
@@ -264,7 +289,15 @@ export function AdminBudgetSection() {
           adminNotes: budgetForm.adminNotes,
           currency: budgetForm.currency,
           items: budgetItems.filter((item) => item.name && item.unitPrice > 0),
-        }),
+        };
+      }
+
+      const response = await fetch(apiEndpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestBody),
       });
 
       if (!response.ok) {
@@ -272,9 +305,11 @@ export function AdminBudgetSection() {
         throw new Error(error.error || "Failed to create budget");
       }
 
+      const data = await response.json();
+
       toast({
         title: "Success",
-        description: "Budget created successfully",
+        description: data.message || "Budget created successfully",
       });
 
       setIsCreateDialogOpen(false);
@@ -312,6 +347,13 @@ export function AdminBudgetSection() {
       },
     ]);
     setSelectedInquiry("");
+    setIsStandalone(false);
+    setStandaloneClientForm({
+      clientName: "",
+      clientEmail: "",
+      serviceType: "",
+      inquiryMessage: "",
+    });
   };
 
   const updateBudgetStatus = async (budgetId: string, status: string) => {
@@ -330,7 +372,10 @@ export function AdminBudgetSection() {
 
       toast({
         title: "Success",
-        description: `Budget ${status.toLowerCase()} successfully`,
+        description:
+          status === "SENT"
+            ? "Budget sent successfully! Client has been notified via email."
+            : `Budget ${status.toLowerCase()} successfully`,
       });
 
       fetchBudgets();
@@ -384,27 +429,158 @@ export function AdminBudgetSection() {
               </DialogHeader>
 
               <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="inquiry">Select Inquiry *</Label>
-                    <Select
-                      value={selectedInquiry}
-                      onValueChange={setSelectedInquiry}
-                      required
+                {/* Budget Type Selection */}
+                <div className="border-b pb-4">
+                  <div className="flex items-center space-x-4">
+                    <button
+                      type="button"
+                      onClick={() => setIsStandalone(false)}
+                      className={`flex items-center space-x-2 px-4 py-2 rounded-lg border transition-colors ${
+                        !isStandalone
+                          ? "bg-teal-600 text-white border-teal-600 hover:bg-teal-700"
+                          : "bg-gray-50 text-gray-700 border-gray-300 hover:bg-gray-100"
+                      }`}
                     >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Choose an inquiry" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {inquiries.map((inquiry) => (
-                          <SelectItem key={inquiry.id} value={inquiry.id}>
-                            {inquiry.name} - {inquiry.serviceType} (
-                            {inquiry.email})
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                      <Users className="w-4 h-4" />
+                      <span>Existing Inquiry</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setIsStandalone(true)}
+                      className={`flex items-center space-x-2 px-4 py-2 rounded-lg border transition-colors ${
+                        isStandalone
+                          ? "bg-purple-600 text-white border-purple-600 hover:bg-purple-700"
+                          : "bg-gray-50 text-gray-700 border-gray-300 hover:bg-gray-100"
+                      }`}
+                    >
+                      <UserPlus className="w-4 h-4" />
+                      <span>New Client</span>
+                    </button>
                   </div>
+                  <p className="text-sm text-gray-600 mt-2">
+                    {isStandalone
+                      ? "Create a budget for a new client. We'll create their account and send them login credentials."
+                      : "Create a budget for an existing inquiry from a registered client."}
+                  </p>
+                </div>
+
+                {/* Client Information (Standalone Mode) */}
+                {isStandalone && (
+                  <div className="border-l-4 border-vyoniq-purple pl-4 space-y-4">
+                    <h3 className="font-semibold text-vyoniq-purple">
+                      New Client Information
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="clientName">Client Name *</Label>
+                        <Input
+                          id="clientName"
+                          value={standaloneClientForm.clientName}
+                          onChange={(e) =>
+                            setStandaloneClientForm({
+                              ...standaloneClientForm,
+                              clientName: e.target.value,
+                            })
+                          }
+                          placeholder="e.g., John Smith"
+                          required={isStandalone}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="clientEmail">Client Email *</Label>
+                        <Input
+                          id="clientEmail"
+                          type="email"
+                          value={standaloneClientForm.clientEmail}
+                          onChange={(e) =>
+                            setStandaloneClientForm({
+                              ...standaloneClientForm,
+                              clientEmail: e.target.value,
+                            })
+                          }
+                          placeholder="e.g., john@example.com"
+                          required={isStandalone}
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="serviceType">Service Type *</Label>
+                        <Select
+                          value={standaloneClientForm.serviceType}
+                          onValueChange={(value) =>
+                            setStandaloneClientForm({
+                              ...standaloneClientForm,
+                              serviceType: value,
+                            })
+                          }
+                          required={isStandalone}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select service type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Web & Mobile Development">
+                              Web & Mobile Development
+                            </SelectItem>
+                            <SelectItem value="Hosting Services">
+                              Hosting Services
+                            </SelectItem>
+                            <SelectItem value="AI Integrations">
+                              AI Integrations
+                            </SelectItem>
+                            <SelectItem value="Vyoniq Apps">
+                              Vyoniq Apps
+                            </SelectItem>
+                            <SelectItem value="Custom Software">
+                              Custom Software
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="inquiryMessage">
+                          Project Description
+                        </Label>
+                        <Textarea
+                          id="inquiryMessage"
+                          value={standaloneClientForm.inquiryMessage}
+                          onChange={(e) =>
+                            setStandaloneClientForm({
+                              ...standaloneClientForm,
+                              inquiryMessage: e.target.value,
+                            })
+                          }
+                          placeholder="Brief description of the client's project needs..."
+                          rows={2}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {!isStandalone && (
+                    <div className="space-y-2">
+                      <Label htmlFor="inquiry">Select Inquiry *</Label>
+                      <Select
+                        value={selectedInquiry}
+                        onValueChange={setSelectedInquiry}
+                        required={!isStandalone}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Choose an inquiry" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {inquiries.map((inquiry) => (
+                            <SelectItem key={inquiry.id} value={inquiry.id}>
+                              {inquiry.name} - {inquiry.serviceType} (
+                              {inquiry.email})
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
 
                   <div className="space-y-2">
                     <Label htmlFor="title">Budget Title *</Label>
