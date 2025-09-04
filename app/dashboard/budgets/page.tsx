@@ -212,6 +212,7 @@ export default async function BudgetsPage() {
                 })),
                 payments: budget.payments.map((payment) => ({
                   ...payment,
+                  amount: Number(payment.amount),
                   paidAt: payment.paidAt?.toISOString() || null,
                 })),
               }))}
