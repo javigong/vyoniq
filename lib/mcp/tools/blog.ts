@@ -1,4 +1,5 @@
 import prisma from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
 import {
@@ -77,40 +78,25 @@ function createErrorResponse(message: string): MCPToolResult {
   };
 }
 
-// Helper function for automatic blog cache revalidation
+// Helper function for automatic blog cache revalidation using direct Next.js revalidation
 async function autoRevalidateBlog(
-  slug?: string,
-  auth?: MCPAuthContext
+  slug?: string
 ): Promise<{ success: boolean; message: string }> {
   try {
-    const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
-
-    // Determine revalidation action
-    const action = slug ? "revalidate-post" : "revalidate-all";
-
-    const response = await fetch(`${baseUrl}/api/revalidate/blog`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        // Use internal authorization for automatic revalidation
-        Authorization: `Bearer ${auth?.apiKeyId || "internal"}`,
-      },
-      body: JSON.stringify({
-        action,
-        slug,
-      }),
-    });
-
-    if (!response.ok) {
-      const errorMessage = `Auto-revalidation failed for ${action}${
-        slug ? ` (${slug})` : ""
-      }: ${response.status}`;
-      console.warn(errorMessage);
-      return { success: false, message: errorMessage };
+    if (slug) {
+      // Revalidate specific blog post and blog index
+      revalidatePath(`/blog/${slug}`);
+      revalidatePath("/blog");
+      
+      const successMessage = `Auto-revalidated blog post cache: ${slug}`;
+      console.log(successMessage);
+      return { success: true, message: successMessage };
     } else {
-      const successMessage = `Auto-revalidated blog cache for ${action}${
-        slug ? ` (${slug})` : ""
-      }`;
+      // Revalidate all blog pages
+      revalidatePath("/blog");
+      revalidatePath("/blog/[slug]", "page");
+      
+      const successMessage = "Auto-revalidated all blog pages";
       console.log(successMessage);
       return { success: true, message: successMessage };
     }
@@ -202,7 +188,7 @@ export async function createBlogPostHandler(
     // Automatically revalidate blog cache only for published posts
     let revalidationMessage = "";
     if (blogPost.published) {
-      const revalidationResult = await autoRevalidateBlog(blogPost.slug, auth);
+      const revalidationResult = await autoRevalidateBlog(blogPost.slug);
       revalidationMessage = revalidationResult.success
         ? `✅ Blog cache automatically revalidated`
         : `⚠️ ${revalidationResult.message}`;
@@ -318,54 +304,51 @@ export async function updateBlogPostHandler(
     const isNowPublished = updatedPost.published;
     const slugChanged = data.title && existingPost.slug !== updatedPost.slug;
 
-    if (wasPublished || isNowPublished) {
-      // Case 1: Published post became unpublished - revalidate old slug to remove from cache
-      if (wasPublished && !isNowPublished) {
-        const oldSlugResult = await autoRevalidateBlog(existingPost.slug, auth);
-        revalidationResults.push(
-          oldSlugResult.success
-            ? `✅ Removed unpublished post from cache (${existingPost.slug})`
-            : `⚠️ Failed to remove from cache: ${oldSlugResult.message}`
-        );
-      }
+     if (wasPublished || isNowPublished) {
+       // Case 1: Published post became unpublished - revalidate old slug to remove from cache
+       if (wasPublished && !isNowPublished) {
+         const oldSlugResult = await autoRevalidateBlog(existingPost.slug);
+         revalidationResults.push(
+           oldSlugResult.success
+             ? `✅ Removed unpublished post from cache (${existingPost.slug})`
+             : `⚠️ Failed to remove from cache: ${oldSlugResult.message}`
+         );
+       }
 
-      // Case 2: Slug changed for a published post - revalidate old slug
-      if (
-        slugChanged &&
-        wasPublished &&
-        existingPost.slug !== updatedPost.slug
-      ) {
-        const oldSlugResult = await autoRevalidateBlog(existingPost.slug, auth);
-        revalidationResults.push(
-          oldSlugResult.success
-            ? `✅ Revalidated old slug cache (${existingPost.slug})`
-            : `⚠️ Failed to revalidate old slug: ${oldSlugResult.message}`
-        );
-      }
+       // Case 2: Slug changed for a published post - revalidate old slug
+       if (
+         slugChanged &&
+         wasPublished &&
+         existingPost.slug !== updatedPost.slug
+       ) {
+         const oldSlugResult = await autoRevalidateBlog(existingPost.slug);
+         revalidationResults.push(
+           oldSlugResult.success
+             ? `✅ Revalidated old slug cache (${existingPost.slug})`
+             : `⚠️ Failed to revalidate old slug: ${oldSlugResult.message}`
+         );
+       }
 
-      // Case 3: Currently published post - revalidate new/current slug
-      if (isNowPublished) {
-        const currentSlugResult = await autoRevalidateBlog(
-          updatedPost.slug,
-          auth
-        );
-        revalidationResults.push(
-          currentSlugResult.success
-            ? `✅ Updated published post cache (${updatedPost.slug})`
-            : `⚠️ Failed to update cache: ${currentSlugResult.message}`
-        );
-      }
+       // Case 3: Currently published post - revalidate new/current slug
+       if (isNowPublished) {
+         const currentSlugResult = await autoRevalidateBlog(updatedPost.slug);
+         revalidationResults.push(
+           currentSlugResult.success
+             ? `✅ Updated published post cache (${updatedPost.slug})`
+             : `⚠️ Failed to update cache: ${currentSlugResult.message}`
+         );
+       }
 
-      // Always revalidate blog index when published status changes or published post is updated
-      if (wasPublished !== isNowPublished || isNowPublished) {
-        const indexResult = await autoRevalidateBlog(undefined, auth);
-        revalidationResults.push(
-          indexResult.success
-            ? `✅ Blog index cache revalidated`
-            : `⚠️ Failed to revalidate blog index: ${indexResult.message}`
-        );
-      }
-    }
+       // Always revalidate blog index when published status changes or published post is updated
+       if (wasPublished !== isNowPublished || isNowPublished) {
+         const indexResult = await autoRevalidateBlog();
+         revalidationResults.push(
+           indexResult.success
+             ? `✅ Blog index cache revalidated`
+             : `⚠️ Failed to revalidate blog index: ${indexResult.message}`
+         );
+       }
+     }
 
     revalidationMessage =
       revalidationResults.length > 0
@@ -422,8 +405,7 @@ export async function publishBlogPostHandler(
 
     // Automatically revalidate blog cache (always needed for publish/unpublish)
     const revalidationResult = await autoRevalidateBlog(
-      updatedPost.published ? updatedPost.slug : undefined,
-      auth
+      updatedPost.published ? updatedPost.slug : undefined
     );
     const revalidationMessage = revalidationResult.success
       ? `✅ Blog cache automatically revalidated`
@@ -483,7 +465,7 @@ export async function deleteBlogPostHandler(
     });
 
     // Automatically revalidate blog cache after deletion (always revalidate all)
-    const revalidationResult = await autoRevalidateBlog(undefined, auth);
+    const revalidationResult = await autoRevalidateBlog();
     const revalidationMessage = revalidationResult.success
       ? `✅ Blog cache automatically revalidated`
       : `⚠️ ${revalidationResult.message}`;
@@ -964,7 +946,7 @@ export async function bulkUpdatePostsHandler(
     }
 
     // Automatically revalidate blog cache after bulk operations (always revalidate all)
-    const revalidationResult = await autoRevalidateBlog(undefined, auth);
+    const revalidationResult = await autoRevalidateBlog();
     const revalidationMessage = revalidationResult.success
       ? `✅ Blog cache automatically revalidated`
       : `⚠️ ${revalidationResult.message}`;
