@@ -224,7 +224,10 @@ export async function publishBlogPostTweet(
     const response = await client.v2.tweet(tweetContent);
 
     if (response.data) {
-      const tweetUrl = `https://x.com/vyoniq/status/${response.data.id}`;
+      // Get the authenticated user's username for the correct tweet URL
+      const user = await client.v2.me();
+      const username = user.data.username;
+      const tweetUrl = `https://x.com/${username}/status/${response.data.id}`;
       console.log(`Successfully published tweet: ${tweetUrl}`);
       return {
         success: true,
