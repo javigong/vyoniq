@@ -201,7 +201,7 @@ export async function createBlogPostHandler(
     let tweetMessage = "";
     if (blogPost.published) {
       try {
-        const categoryNames = blogPost.categories.map(c => c.category.name);
+        const categoryNames = blogPost.categories.map((c) => c.category.name);
         const tweetResult = await publishBlogPostTweet(
           blogPost.title,
           blogPost.excerpt,
@@ -213,8 +213,10 @@ export async function createBlogPostHandler(
           ? `🐦 Tweet published successfully`
           : `⚠️ Tweet failed: ${tweetResult.message}`;
       } catch (error) {
-        console.error('Tweet publishing error:', error);
-        tweetMessage = `⚠️ Tweet failed: ${error instanceof Error ? error.message : 'Unknown error'}`;
+        console.error("Tweet publishing error:", error);
+        tweetMessage = `⚠️ Tweet failed: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`;
       }
     } else {
       tweetMessage = "📝 Draft post - no tweet published";
@@ -228,7 +230,8 @@ export async function createBlogPostHandler(
         `Categories: ${blogPost.categories
           .map((c) => c.category.name)
           .join(", ")}\n` +
-        revalidationMessage + "\n" +
+        revalidationMessage +
+        "\n" +
         tweetMessage
     );
   } catch (error) {
@@ -375,24 +378,29 @@ export async function updateBlogPostHandler(
       }
     }
 
-     revalidationMessage =
-       revalidationResults.length > 0
-         ? revalidationResults.join("\n")
-         : "📝 Draft post - no cache revalidation needed";
+    revalidationMessage =
+      revalidationResults.length > 0
+        ? revalidationResults.join("\n")
+        : "📝 Draft post - no cache revalidation needed";
 
     // Publish update tweet for significant changes to published posts
     let tweetMessage = "";
     if (updatedPost.published) {
       try {
         // Determine if this is a significant update worth tweeting about
-        const hasContentUpdate = data.content && data.content !== existingPost.content;
+        const hasContentUpdate =
+          data.content && data.content !== existingPost.content;
         const hasTitleUpdate = data.title && data.title !== existingPost.title;
-        const hasNewPublication = !existingPost.published && updatedPost.published;
-        
-        const isSignificantUpdate = hasContentUpdate || hasTitleUpdate || hasNewPublication;
-        
+        const hasNewPublication =
+          !existingPost.published && updatedPost.published;
+
+        const isSignificantUpdate =
+          hasContentUpdate || hasTitleUpdate || hasNewPublication;
+
         if (isSignificantUpdate) {
-          const categoryNames = updatedPost.categories.map(c => c.category.name);
+          const categoryNames = updatedPost.categories.map(
+            (c) => c.category.name
+          );
           const tweetResult = await publishBlogPostTweet(
             updatedPost.title,
             updatedPost.excerpt,
@@ -407,8 +415,10 @@ export async function updateBlogPostHandler(
           tweetMessage = "📝 Minor update - no tweet published";
         }
       } catch (error) {
-        console.error('Update tweet publishing error:', error);
-        tweetMessage = `⚠️ Update tweet failed: ${error instanceof Error ? error.message : 'Unknown error'}`;
+        console.error("Update tweet publishing error:", error);
+        tweetMessage = `⚠️ Update tweet failed: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`;
       }
     } else {
       tweetMessage = "📝 Draft post - no tweet published";
@@ -422,7 +432,8 @@ export async function updateBlogPostHandler(
         `Categories: ${updatedPost.categories
           .map((c) => c.category.name)
           .join(", ")}\n` +
-        revalidationMessage + "\n" +
+        revalidationMessage +
+        "\n" +
         tweetMessage
     );
   } catch (error) {
@@ -486,7 +497,9 @@ export async function publishBlogPostHandler(
         });
 
         if (postWithCategories) {
-          const categoryNames = postWithCategories.categories.map(c => c.category.name);
+          const categoryNames = postWithCategories.categories.map(
+            (c) => c.category.name
+          );
           const tweetResult = await publishBlogPostTweet(
             updatedPost.title,
             postWithCategories.excerpt,
@@ -499,17 +512,22 @@ export async function publishBlogPostHandler(
             : `⚠️ Tweet failed: ${tweetResult.message}`;
         }
       } catch (error) {
-        console.error('Publish tweet error:', error);
-        tweetMessage = `⚠️ Tweet failed: ${error instanceof Error ? error.message : 'Unknown error'}`;
+        console.error("Publish tweet error:", error);
+        tweetMessage = `⚠️ Tweet failed: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`;
       }
     } else {
-      tweetMessage = data.published ? "📝 Tweet publishing skipped" : "📝 Post unpublished - no tweet";
+      tweetMessage = data.published
+        ? "📝 Tweet publishing skipped"
+        : "📝 Post unpublished - no tweet";
     }
 
     const action = data.published ? "published" : "unpublished";
     return createSuccessResponse(
       `Successfully ${action} blog post: "${updatedPost.title}"\n` +
-        revalidationMessage + "\n" +
+        revalidationMessage +
+        "\n" +
         tweetMessage
     );
   } catch (error) {
