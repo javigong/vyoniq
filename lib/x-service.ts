@@ -69,18 +69,23 @@ function generateTweetContent(
   const prefix = isUpdate ? "📝 Updated:" : "🚀 New Post:";
   const hashtags = generateHashtags(categories).join(" ");
 
-  // Calculate available space for title and excerpt
-  // Tweet format: "{prefix} {content}\n\n🔗 {blogUrl}\n\n{hashtags}"
+  // Dynamic URL length detection with safety buffer
+  const tcoUrlLength = 23; // Standard t.co length
+  const urlLengthBuffer = 2; // Safety buffer for URL length variations
+  const effectiveUrlLength = tcoUrlLength + urlLengthBuffer;
+
+  // Calculate available space using MOCK shortened URL for accurate calculation
+  // Tweet format: "{prefix} {content}\n\n🔗 {shortenedUrl}\n\n{hashtags}"
+  const mockShortenedUrl = "https://t.co/xxxxxxxxxx"; // 23 chars - standard t.co format
   const prefixLength = prefix.length + 1; // +1 for space after prefix
   const urlPrefixLength = 3; // "🔗 " (emoji + space)
-  const urlLength = 23; // Twitter's t.co URL length
   const hashtagsLength = hashtags.length;
   const newlinesLength = 4; // Two sets of double newlines (\n\n)
 
   const fixedOverhead =
     prefixLength +
     urlPrefixLength +
-    urlLength +
+    effectiveUrlLength +
     hashtagsLength +
     newlinesLength;
   const availableSpace = 280 - fixedOverhead;
@@ -101,32 +106,85 @@ function generateTweetContent(
     }
   }
 
-  const tweet = `${prefix} ${content}
+  // Create tweet using MOCK URL for length calculation, but we'll use real URL in final output
+  const mockTweet = `${prefix} ${content}
 
-🔗 ${blogUrl}
+🔗 ${mockShortenedUrl}
 
 ${hashtags}`;
 
-  // Validate tweet length and truncate if necessary
-  let finalTweet = tweet;
-  if (tweet.length > 280) {
+  // Validate mock tweet length and adjust content if necessary
+  if (mockTweet.length > 280) {
     console.warn(
-      `Tweet exceeds 280 characters (${tweet.length}), truncating...`
+      `Tweet calculation exceeds 280 characters (${mockTweet.length}), adjusting content...`
     );
 
-    // Emergency truncation: reduce content until tweet fits
-    let truncatedContent = content;
-    while (finalTweet.length > 280 && truncatedContent.length > 10) {
-      truncatedContent =
-        truncatedContent.substring(0, truncatedContent.length - 10) + "...";
-      finalTweet = `${prefix} ${truncatedContent}
+    // Calculate exact excess and remove precisely what's needed
+    const excess = mockTweet.length - 280;
+    const ellipsis = "...";
+    const newContentLength = content.length - excess - ellipsis.length;
+
+    if (newContentLength > 10) {
+      content = content.substring(0, newContentLength) + ellipsis;
+    } else {
+      // Fallback: use only title, truncated if necessary
+      const maxTitleLength = availableSpace - ellipsis.length;
+      content =
+        title.length > maxTitleLength
+          ? title.substring(0, maxTitleLength) + ellipsis
+          : title;
+    }
+  }
+
+  // Create final tweet with actual URL
+  const finalTweet = `${prefix} ${content}
 
 🔗 ${blogUrl}
 
 ${hashtags}`;
+
+  // Final safety check with optimized emergency truncation
+  if (finalTweet.length > 280) {
+    console.warn(
+      `Final tweet exceeds 280 characters (${finalTweet.length}), applying emergency truncation...`
+    );
+
+    const excess = finalTweet.length - 280;
+    const ellipsis = "...";
+    let adjustedContent = content;
+
+    // Binary search approach for optimal truncation
+    let left = 0;
+    let right = content.length;
+    let bestContent = content.substring(0, 10) + ellipsis; // Fallback
+
+    while (left <= right) {
+      const mid = Math.floor((left + right) / 2);
+      const testContent = content.substring(0, mid) + ellipsis;
+      const testTweet = `${prefix} ${testContent}
+
+🔗 ${blogUrl}
+
+${hashtags}`;
+
+      if (testTweet.length <= 280) {
+        bestContent = testContent;
+        left = mid + 1;
+      } else {
+        right = mid - 1;
+      }
     }
 
-    console.log(`Tweet truncated to ${finalTweet.length} characters`);
+    const emergencyTweet = `${prefix} ${bestContent}
+
+🔗 ${blogUrl}
+
+${hashtags}`;
+
+    console.log(
+      `Emergency truncation applied: ${emergencyTweet.length}/280 characters`
+    );
+    return emergencyTweet;
   }
 
   return finalTweet;
