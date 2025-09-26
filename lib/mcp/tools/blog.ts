@@ -77,6 +77,41 @@ function createErrorResponse(message: string): MCPToolResult {
   };
 }
 
+// Helper function for automatic blog cache revalidation
+async function autoRevalidateBlog(
+  slug?: string,
+  auth?: MCPAuthContext
+): Promise<void> {
+  try {
+    const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+    
+    // Determine revalidation action
+    const action = slug ? "revalidate-post" : "revalidate-all";
+    
+    const response = await fetch(`${baseUrl}/api/revalidate/blog`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        // Use internal authorization for automatic revalidation
+        Authorization: `Bearer ${auth?.apiKeyId || "internal"}`,
+      },
+      body: JSON.stringify({
+        action,
+        slug,
+      }),
+    });
+
+    if (!response.ok) {
+      console.warn(`Auto-revalidation failed for ${action}${slug ? ` (${slug})` : ""}: ${response.status}`);
+    } else {
+      console.log(`Auto-revalidated blog cache for ${action}${slug ? ` (${slug})` : ""}`);
+    }
+  } catch (error) {
+    console.warn("Auto-revalidation error:", error);
+    // Don't throw error - revalidation failure shouldn't break the main operation
+  }
+}
+
 // Create Blog Post Tool
 export const createBlogPostTool: MCPTool = {
   name: "create_blog_post",
@@ -153,6 +188,9 @@ export async function createBlogPostHandler(
       },
     });
 
+    // Automatically revalidate blog cache
+    await autoRevalidateBlog(blogPost.published ? blogPost.slug : undefined, auth);
+
     return createSuccessResponse(
       `Successfully created blog post: "${blogPost.title}" (ID: ${blogPost.id})\n` +
         `Slug: ${blogPost.slug}\n` +
@@ -160,7 +198,8 @@ export async function createBlogPostHandler(
         `Featured: ${blogPost.featured ? "Yes" : "No"}\n` +
         `Categories: ${blogPost.categories
           .map((c) => c.category.name)
-          .join(", ")}`
+          .join(", ")}\n` +
+        `✅ Blog cache automatically revalidated`
     );
   } catch (error) {
     console.error("Error creating blog post:", error);
@@ -251,6 +290,9 @@ export async function updateBlogPostHandler(
       },
     });
 
+    // Automatically revalidate blog cache
+    await autoRevalidateBlog(updatedPost.published ? updatedPost.slug : undefined, auth);
+
     return createSuccessResponse(
       `Successfully updated blog post: "${updatedPost.title}"\n` +
         `Slug: ${updatedPost.slug}\n` +
@@ -258,7 +300,8 @@ export async function updateBlogPostHandler(
         `Featured: ${updatedPost.featured ? "Yes" : "No"}\n` +
         `Categories: ${updatedPost.categories
           .map((c) => c.category.name)
-          .join(", ")}`
+          .join(", ")}\n` +
+        `✅ Blog cache automatically revalidated`
     );
   } catch (error) {
     console.error("Error updating blog post:", error);
@@ -298,9 +341,13 @@ export async function publishBlogPostHandler(
       include: { author: true },
     });
 
+    // Automatically revalidate blog cache
+    await autoRevalidateBlog(updatedPost.published ? updatedPost.slug : undefined, auth);
+
     const action = data.published ? "published" : "unpublished";
     return createSuccessResponse(
-      `Successfully ${action} blog post: "${updatedPost.title}"`
+      `Successfully ${action} blog post: "${updatedPost.title}"\n` +
+      `✅ Blog cache automatically revalidated`
     );
   } catch (error) {
     console.error("Error publishing blog post:", error);
@@ -350,8 +397,12 @@ export async function deleteBlogPostHandler(
       where: { id: data.id },
     });
 
+    // Automatically revalidate blog cache after deletion
+    await autoRevalidateBlog(undefined, auth); // Revalidate all since post is deleted
+
     return createSuccessResponse(
-      `Successfully deleted blog post: "${post.title}"`
+      `Successfully deleted blog post: "${post.title}"\n` +
+      `✅ Blog cache automatically revalidated`
     );
   } catch (error) {
     console.error("Error deleting blog post:", error);
@@ -825,10 +876,13 @@ export async function bulkUpdatePostsHandler(
       results.push(`Removed ${deleteResult.count} category assignments`);
     }
 
+    // Automatically revalidate blog cache after bulk operations
+    await autoRevalidateBlog(undefined, auth); // Revalidate all for bulk operations
+
     return createSuccessResponse(
       `Bulk update completed for ${
         data.postIds.length
-      } posts:\n\n${results.join("\n")}`
+      } posts:\n\n${results.join("\n")}\n\n✅ Blog cache automatically revalidated`
     );
   } catch (error) {
     console.error("Error in bulk update:", error);
