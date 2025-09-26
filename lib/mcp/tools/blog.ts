@@ -981,12 +981,47 @@ export async function getBlogPostHandler(
       return createErrorResponse(`Blog post with ID ${data.id} not found`);
     }
 
+    // Format the complete blog post data
+    const formattedPost = {
+      id: post.id,
+      slug: post.slug,
+      title: post.title,
+      excerpt: post.excerpt,
+      content: post.content,
+      coverImage: post.coverImage,
+      publishDate: post.publishDate.toISOString(),
+      readTime: post.readTime,
+      featured: post.featured,
+      tintColor: post.tintColor,
+      published: post.published,
+      createdAt: post.createdAt.toISOString(),
+      updatedAt: post.updatedAt.toISOString(),
+      author: {
+        id: post.author.id,
+        name: post.author.name,
+        avatar: post.author.avatar,
+      },
+      categories: post.categories.map((c) => ({
+        id: c.category.id,
+        name: c.category.name,
+        slug: c.category.slug,
+      })),
+    };
+
     return createSuccessResponse(
-      `Blog post "${post.title}" (ID: ${post.id}) - Status: ${
-        post.published ? "Published" : "Draft"
-      } - Publish Date: ${post.publishDate.toLocaleDateString()} - Created: ${post.createdAt.toLocaleDateString()} - Author: ${
-        post.author.name
-      } - Categories: ${post.categories.map((c) => c.category.name).join(", ")}`
+      `Blog Post: "${post.title}"\n` +
+      `ID: ${post.id}\n` +
+      `Slug: ${post.slug}\n` +
+      `Status: ${post.published ? "Published" : "Draft"}\n` +
+      `Featured: ${post.featured ? "Yes" : "No"}\n` +
+      `Publish Date: ${post.publishDate.toLocaleDateString()}\n` +
+      `Read Time: ${post.readTime} minutes\n` +
+      `Author: ${post.author.name}\n` +
+      `Categories: ${post.categories.map((c) => c.category.name).join(", ")}\n` +
+      `Tint Color: ${post.tintColor || "None"}\n\n` +
+      `EXCERPT:\n${post.excerpt}\n\n` +
+      `CONTENT:\n${post.content}\n\n` +
+      `Full JSON Data:\n${JSON.stringify(formattedPost, null, 2)}`
     );
   } catch (error) {
     console.error("Error getting blog post:", error);
