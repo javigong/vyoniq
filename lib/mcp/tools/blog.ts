@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { publishBlogPostTweet } from "@/lib/x-service";
 import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
 import {
@@ -196,6 +197,29 @@ export async function createBlogPostHandler(
       revalidationMessage = "📝 Draft post - no cache revalidation needed";
     }
 
+    // Publish tweet for published posts (fire-and-forget)
+    let tweetMessage = "";
+    if (blogPost.published) {
+      try {
+        const categoryNames = blogPost.categories.map(c => c.category.name);
+        const tweetResult = await publishBlogPostTweet(
+          blogPost.title,
+          blogPost.excerpt,
+          blogPost.slug,
+          categoryNames,
+          false // isUpdate = false for new posts
+        );
+        tweetMessage = tweetResult.success
+          ? `🐦 Tweet published successfully`
+          : `⚠️ Tweet failed: ${tweetResult.message}`;
+      } catch (error) {
+        console.error('Tweet publishing error:', error);
+        tweetMessage = `⚠️ Tweet failed: ${error instanceof Error ? error.message : 'Unknown error'}`;
+      }
+    } else {
+      tweetMessage = "📝 Draft post - no tweet published";
+    }
+
     return createSuccessResponse(
       `Successfully created blog post: "${blogPost.title}" (ID: ${blogPost.id})\n` +
         `Slug: ${blogPost.slug}\n` +
@@ -204,7 +228,8 @@ export async function createBlogPostHandler(
         `Categories: ${blogPost.categories
           .map((c) => c.category.name)
           .join(", ")}\n` +
-        revalidationMessage
+        revalidationMessage + "\n" +
+        tweetMessage
     );
   } catch (error) {
     console.error("Error creating blog post:", error);
@@ -350,10 +375,44 @@ export async function updateBlogPostHandler(
       }
     }
 
-    revalidationMessage =
-      revalidationResults.length > 0
-        ? revalidationResults.join("\n")
-        : "📝 Draft post - no cache revalidation needed";
+     revalidationMessage =
+       revalidationResults.length > 0
+         ? revalidationResults.join("\n")
+         : "📝 Draft post - no cache revalidation needed";
+
+    // Publish update tweet for significant changes to published posts
+    let tweetMessage = "";
+    if (updatedPost.published) {
+      try {
+        // Determine if this is a significant update worth tweeting about
+        const hasContentUpdate = data.content && data.content !== existingPost.content;
+        const hasTitleUpdate = data.title && data.title !== existingPost.title;
+        const hasNewPublication = !existingPost.published && updatedPost.published;
+        
+        const isSignificantUpdate = hasContentUpdate || hasTitleUpdate || hasNewPublication;
+        
+        if (isSignificantUpdate) {
+          const categoryNames = updatedPost.categories.map(c => c.category.name);
+          const tweetResult = await publishBlogPostTweet(
+            updatedPost.title,
+            updatedPost.excerpt,
+            updatedPost.slug,
+            categoryNames,
+            true // isUpdate = true for updates
+          );
+          tweetMessage = tweetResult.success
+            ? `🐦 Update tweet published successfully`
+            : `⚠️ Update tweet failed: ${tweetResult.message}`;
+        } else {
+          tweetMessage = "📝 Minor update - no tweet published";
+        }
+      } catch (error) {
+        console.error('Update tweet publishing error:', error);
+        tweetMessage = `⚠️ Update tweet failed: ${error instanceof Error ? error.message : 'Unknown error'}`;
+      }
+    } else {
+      tweetMessage = "📝 Draft post - no tweet published";
+    }
 
     return createSuccessResponse(
       `Successfully updated blog post: "${updatedPost.title}"\n` +
@@ -363,7 +422,8 @@ export async function updateBlogPostHandler(
         `Categories: ${updatedPost.categories
           .map((c) => c.category.name)
           .join(", ")}\n` +
-        revalidationMessage
+        revalidationMessage + "\n" +
+        tweetMessage
     );
   } catch (error) {
     console.error("Error updating blog post:", error);
@@ -411,10 +471,46 @@ export async function publishBlogPostHandler(
       ? `✅ Blog cache automatically revalidated`
       : `⚠️ ${revalidationResult.message}`;
 
+    // Publish tweet when publishing a post (not when unpublishing)
+    let tweetMessage = "";
+    if (data.published && updatedPost.published) {
+      try {
+        // Get post with categories for tweet
+        const postWithCategories = await prisma.blogPost.findUnique({
+          where: { id: data.id },
+          include: {
+            categories: {
+              include: { category: true },
+            },
+          },
+        });
+
+        if (postWithCategories) {
+          const categoryNames = postWithCategories.categories.map(c => c.category.name);
+          const tweetResult = await publishBlogPostTweet(
+            updatedPost.title,
+            postWithCategories.excerpt,
+            updatedPost.slug,
+            categoryNames,
+            false // isUpdate = false for newly published posts
+          );
+          tweetMessage = tweetResult.success
+            ? `🐦 Tweet published successfully`
+            : `⚠️ Tweet failed: ${tweetResult.message}`;
+        }
+      } catch (error) {
+        console.error('Publish tweet error:', error);
+        tweetMessage = `⚠️ Tweet failed: ${error instanceof Error ? error.message : 'Unknown error'}`;
+      }
+    } else {
+      tweetMessage = data.published ? "📝 Tweet publishing skipped" : "📝 Post unpublished - no tweet";
+    }
+
     const action = data.published ? "published" : "unpublished";
     return createSuccessResponse(
       `Successfully ${action} blog post: "${updatedPost.title}"\n` +
-        revalidationMessage
+        revalidationMessage + "\n" +
+        tweetMessage
     );
   } catch (error) {
     console.error("Error publishing blog post:", error);
