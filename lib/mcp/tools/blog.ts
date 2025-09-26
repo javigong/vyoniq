@@ -77,6 +77,52 @@ function createErrorResponse(message: string): MCPToolResult {
   };
 }
 
+// Helper function for automatic blog cache revalidation
+async function autoRevalidateBlog(
+  slug?: string,
+  auth?: MCPAuthContext
+): Promise<{ success: boolean; message: string }> {
+  try {
+    const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+
+    // Determine revalidation action
+    const action = slug ? "revalidate-post" : "revalidate-all";
+
+    const response = await fetch(`${baseUrl}/api/revalidate/blog`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        // Use internal authorization for automatic revalidation
+        Authorization: `Bearer ${auth?.apiKeyId || "internal"}`,
+      },
+      body: JSON.stringify({
+        action,
+        slug,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorMessage = `Auto-revalidation failed for ${action}${
+        slug ? ` (${slug})` : ""
+      }: ${response.status}`;
+      console.warn(errorMessage);
+      return { success: false, message: errorMessage };
+    } else {
+      const successMessage = `Auto-revalidated blog cache for ${action}${
+        slug ? ` (${slug})` : ""
+      }`;
+      console.log(successMessage);
+      return { success: true, message: successMessage };
+    }
+  } catch (error) {
+    const errorMessage = `Auto-revalidation error: ${
+      error instanceof Error ? error.message : "Unknown error"
+    }`;
+    console.warn(errorMessage);
+    return { success: false, message: errorMessage };
+  }
+}
+
 // Create Blog Post Tool
 export const createBlogPostTool: MCPTool = {
   name: "create_blog_post",
@@ -153,6 +199,17 @@ export async function createBlogPostHandler(
       },
     });
 
+    // Automatically revalidate blog cache only for published posts
+    let revalidationMessage = "";
+    if (blogPost.published) {
+      const revalidationResult = await autoRevalidateBlog(blogPost.slug, auth);
+      revalidationMessage = revalidationResult.success
+        ? `✅ Blog cache automatically revalidated`
+        : `⚠️ ${revalidationResult.message}`;
+    } else {
+      revalidationMessage = "📝 Draft post - no cache revalidation needed";
+    }
+
     return createSuccessResponse(
       `Successfully created blog post: "${blogPost.title}" (ID: ${blogPost.id})\n` +
         `Slug: ${blogPost.slug}\n` +
@@ -160,7 +217,8 @@ export async function createBlogPostHandler(
         `Featured: ${blogPost.featured ? "Yes" : "No"}\n` +
         `Categories: ${blogPost.categories
           .map((c) => c.category.name)
-          .join(", ")}`
+          .join(", ")}\n` +
+        revalidationMessage
     );
   } catch (error) {
     console.error("Error creating blog post:", error);
@@ -251,6 +309,69 @@ export async function updateBlogPostHandler(
       },
     });
 
+    // Improved cache revalidation logic
+    let revalidationMessage = "";
+    const revalidationResults = [];
+
+    // Determine what needs revalidation based on the update
+    const wasPublished = existingPost.published;
+    const isNowPublished = updatedPost.published;
+    const slugChanged = data.title && existingPost.slug !== updatedPost.slug;
+
+    if (wasPublished || isNowPublished) {
+      // Case 1: Published post became unpublished - revalidate old slug to remove from cache
+      if (wasPublished && !isNowPublished) {
+        const oldSlugResult = await autoRevalidateBlog(existingPost.slug, auth);
+        revalidationResults.push(
+          oldSlugResult.success
+            ? `✅ Removed unpublished post from cache (${existingPost.slug})`
+            : `⚠️ Failed to remove from cache: ${oldSlugResult.message}`
+        );
+      }
+
+      // Case 2: Slug changed for a published post - revalidate old slug
+      if (
+        slugChanged &&
+        wasPublished &&
+        existingPost.slug !== updatedPost.slug
+      ) {
+        const oldSlugResult = await autoRevalidateBlog(existingPost.slug, auth);
+        revalidationResults.push(
+          oldSlugResult.success
+            ? `✅ Revalidated old slug cache (${existingPost.slug})`
+            : `⚠️ Failed to revalidate old slug: ${oldSlugResult.message}`
+        );
+      }
+
+      // Case 3: Currently published post - revalidate new/current slug
+      if (isNowPublished) {
+        const currentSlugResult = await autoRevalidateBlog(
+          updatedPost.slug,
+          auth
+        );
+        revalidationResults.push(
+          currentSlugResult.success
+            ? `✅ Updated published post cache (${updatedPost.slug})`
+            : `⚠️ Failed to update cache: ${currentSlugResult.message}`
+        );
+      }
+
+      // Always revalidate blog index when published status changes or published post is updated
+      if (wasPublished !== isNowPublished || isNowPublished) {
+        const indexResult = await autoRevalidateBlog(undefined, auth);
+        revalidationResults.push(
+          indexResult.success
+            ? `✅ Blog index cache revalidated`
+            : `⚠️ Failed to revalidate blog index: ${indexResult.message}`
+        );
+      }
+    }
+
+    revalidationMessage =
+      revalidationResults.length > 0
+        ? revalidationResults.join("\n")
+        : "📝 Draft post - no cache revalidation needed";
+
     return createSuccessResponse(
       `Successfully updated blog post: "${updatedPost.title}"\n` +
         `Slug: ${updatedPost.slug}\n` +
@@ -258,7 +379,8 @@ export async function updateBlogPostHandler(
         `Featured: ${updatedPost.featured ? "Yes" : "No"}\n` +
         `Categories: ${updatedPost.categories
           .map((c) => c.category.name)
-          .join(", ")}`
+          .join(", ")}\n` +
+        revalidationMessage
     );
   } catch (error) {
     console.error("Error updating blog post:", error);
@@ -298,9 +420,19 @@ export async function publishBlogPostHandler(
       include: { author: true },
     });
 
+    // Automatically revalidate blog cache (always needed for publish/unpublish)
+    const revalidationResult = await autoRevalidateBlog(
+      updatedPost.published ? updatedPost.slug : undefined,
+      auth
+    );
+    const revalidationMessage = revalidationResult.success
+      ? `✅ Blog cache automatically revalidated`
+      : `⚠️ ${revalidationResult.message}`;
+
     const action = data.published ? "published" : "unpublished";
     return createSuccessResponse(
-      `Successfully ${action} blog post: "${updatedPost.title}"`
+      `Successfully ${action} blog post: "${updatedPost.title}"\n` +
+        revalidationMessage
     );
   } catch (error) {
     console.error("Error publishing blog post:", error);
@@ -350,8 +482,14 @@ export async function deleteBlogPostHandler(
       where: { id: data.id },
     });
 
+    // Automatically revalidate blog cache after deletion (always revalidate all)
+    const revalidationResult = await autoRevalidateBlog(undefined, auth);
+    const revalidationMessage = revalidationResult.success
+      ? `✅ Blog cache automatically revalidated`
+      : `⚠️ ${revalidationResult.message}`;
+
     return createSuccessResponse(
-      `Successfully deleted blog post: "${post.title}"`
+      `Successfully deleted blog post: "${post.title}"\n` + revalidationMessage
     );
   } catch (error) {
     console.error("Error deleting blog post:", error);
@@ -825,10 +963,16 @@ export async function bulkUpdatePostsHandler(
       results.push(`Removed ${deleteResult.count} category assignments`);
     }
 
+    // Automatically revalidate blog cache after bulk operations (always revalidate all)
+    const revalidationResult = await autoRevalidateBlog(undefined, auth);
+    const revalidationMessage = revalidationResult.success
+      ? `✅ Blog cache automatically revalidated`
+      : `⚠️ ${revalidationResult.message}`;
+
     return createSuccessResponse(
       `Bulk update completed for ${
         data.postIds.length
-      } posts:\n\n${results.join("\n")}`
+      } posts:\n\n${results.join("\n")}\n\n${revalidationMessage}`
     );
   } catch (error) {
     console.error("Error in bulk update:", error);
