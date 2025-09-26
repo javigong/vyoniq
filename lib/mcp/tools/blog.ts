@@ -1010,18 +1010,20 @@ export async function getBlogPostHandler(
 
     return createSuccessResponse(
       `Blog Post: "${post.title}"\n` +
-      `ID: ${post.id}\n` +
-      `Slug: ${post.slug}\n` +
-      `Status: ${post.published ? "Published" : "Draft"}\n` +
-      `Featured: ${post.featured ? "Yes" : "No"}\n` +
-      `Publish Date: ${post.publishDate.toLocaleDateString()}\n` +
-      `Read Time: ${post.readTime} minutes\n` +
-      `Author: ${post.author.name}\n` +
-      `Categories: ${post.categories.map((c) => c.category.name).join(", ")}\n` +
-      `Tint Color: ${post.tintColor || "None"}\n\n` +
-      `EXCERPT:\n${post.excerpt}\n\n` +
-      `CONTENT:\n${post.content}\n\n` +
-      `Full JSON Data:\n${JSON.stringify(formattedPost, null, 2)}`
+        `ID: ${post.id}\n` +
+        `Slug: ${post.slug}\n` +
+        `Status: ${post.published ? "Published" : "Draft"}\n` +
+        `Featured: ${post.featured ? "Yes" : "No"}\n` +
+        `Publish Date: ${post.publishDate.toLocaleDateString()}\n` +
+        `Read Time: ${post.readTime} minutes\n` +
+        `Author: ${post.author.name}\n` +
+        `Categories: ${post.categories
+          .map((c) => c.category.name)
+          .join(", ")}\n` +
+        `Tint Color: ${post.tintColor || "None"}\n\n` +
+        `EXCERPT:\n${post.excerpt}\n\n` +
+        `CONTENT:\n${post.content}\n\n` +
+        `Full JSON Data:\n${JSON.stringify(formattedPost, null, 2)}`
     );
   } catch (error) {
     console.error("Error getting blog post:", error);
@@ -1086,14 +1088,14 @@ export async function revalidateBlogHandler(
     if (data.action === "revalidate-all") {
       return createSuccessResponse(
         `✅ Successfully revalidated all blog pages\n` +
-        `Timestamp: ${result.timestamp}\n` +
-        `All blog posts and the blog index page have been updated with the latest content.`
+          `Timestamp: ${result.timestamp}\n` +
+          `All blog posts and the blog index page have been updated with the latest content.`
       );
     } else {
       return createSuccessResponse(
         `✅ Successfully revalidated blog post: ${data.slug}\n` +
-        `Timestamp: ${result.timestamp}\n` +
-        `The blog post page and blog index have been updated with the latest content.`
+          `Timestamp: ${result.timestamp}\n` +
+          `The blog post page and blog index have been updated with the latest content.`
       );
     }
   } catch (error) {
