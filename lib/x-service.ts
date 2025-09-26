@@ -52,7 +52,7 @@ function generateHashtags(categories: string[]): string[] {
   // Always include core Vyoniq hashtags
   const coreHashtags = ["#SoftwareDevelopment", "#TechBlog"];
 
-  return [...new Set([...hashtags, ...coreHashtags])].slice(0, 4); // Max 4 hashtags
+  return Array.from(new Set([...hashtags, ...coreHashtags])).slice(0, 4); // Max 4 hashtags
 }
 
 // Generate tweet content for a blog post
