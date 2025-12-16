@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import prisma from "@/lib/prisma";
+import { Prisma } from "@/lib/generated/prisma";
 import Link from "next/link";
 import {
   CheckCircle,
@@ -74,32 +75,54 @@ export default async function PaymentSuccessPage({ searchParams }: PageProps) {
     } else {
       // If no budget payment found, look for subscription payment via metadata
       // We need to find subscription payments that were created for this session
-      const stripeSessionMetadata = await prisma.subscriptionPayment.findFirst({
-        where: {
-          metadata: {
-            path: ["stripeSessionId"],
-            equals: session_id,
-          },
-        },
-        include: {
-          subscription: {
-            include: {
-              inquiry: {
-                select: {
-                  id: true,
-                  name: true,
-                  email: true,
-                  serviceType: true,
-                },
-              },
-              items: true,
+      type SubscriptionPaymentWithSubscription =
+        Prisma.SubscriptionPaymentGetPayload<{
+          include: {
+            subscription: {
+              include: {
+                inquiry: {
+                  select: {
+                    id: true;
+                    name: true;
+                    email: true;
+                    serviceType: true;
+                  };
+                };
+                items: true;
+              };
+            };
+          };
+        }>;
+
+      const stripeSessionMetadata = (await prisma.subscriptionPayment.findFirst(
+        {
+          where: {
+            metadata: {
+              path: ["stripeSessionId"],
+              equals: session_id,
             },
           },
-        },
-      });
+          include: {
+            subscription: {
+              include: {
+                inquiry: {
+                  select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    serviceType: true,
+                  },
+                },
+                items: true,
+              },
+            },
+          },
+        }
+      )) as SubscriptionPaymentWithSubscription | null;
 
       if (stripeSessionMetadata) {
         subscriptionPayment = stripeSessionMetadata;
+        // TypeScript now properly infers the included relation type
         subscription = stripeSessionMetadata.subscription;
         paymentType = "subscription";
       }
