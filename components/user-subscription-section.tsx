@@ -368,14 +368,15 @@ export function UserSubscriptionSection() {
             </div>
 
             {/* Trial Period Info */}
-            {subscription.trialPeriodDays > 0 && (
-              <div className="mb-3">
-                <Badge variant="secondary" className="text-xs">
-                  <Calendar className="w-3 h-3 mr-1" />
-                  {subscription.trialPeriodDays} day trial period
-                </Badge>
-              </div>
-            )}
+            {subscription.trialPeriodDays &&
+              subscription.trialPeriodDays > 0 && (
+                <div className="mb-3">
+                  <Badge variant="secondary" className="text-xs">
+                    <Calendar className="w-3 h-3 mr-1" />
+                    {subscription.trialPeriodDays} day trial period
+                  </Badge>
+                </div>
+              )}
 
             {/* Subscription Status and Actions */}
             <div className="flex justify-between items-center">

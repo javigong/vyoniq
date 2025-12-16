@@ -97,7 +97,7 @@ export async function POST(req: Request) {
         to: [primaryEmail],
         subject: "Welcome to Vyoniq - Stay Updated!",
         react: NewsletterWelcomeEmail({
-          name,
+          email: primaryEmail,
           unsubscribeToken: "", // Will be generated when needed
         }) as React.ReactElement,
       });
