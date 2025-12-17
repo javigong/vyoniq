@@ -3,6 +3,7 @@ import { stripe } from "@/lib/stripe";
 import prisma from "@/lib/prisma";
 import { Resend } from "resend";
 import { getBaseUrl } from "@/lib/utils";
+import { SubscriptionPaymentStatus } from "@/lib/generated/prisma";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -486,7 +487,7 @@ async function handleSubscriptionUpdated(subscription: any) {
     }
 
     // Map Stripe status to our status
-    let status = "ACTIVE";
+    let status: SubscriptionPaymentStatus = "ACTIVE";
     switch (subscription.status) {
       case "active":
         status = "ACTIVE";
@@ -648,7 +649,10 @@ async function handleInvoicePaymentSucceeded(invoice: any) {
         amount: invoice.amount_paid / 100, // Convert from cents
         currency: invoice.currency.toUpperCase(),
         metadata: {
-          ...subscriptionPayment.metadata,
+          ...(subscriptionPayment.metadata &&
+          typeof subscriptionPayment.metadata === "object"
+            ? subscriptionPayment.metadata
+            : {}),
           lastInvoice: invoice,
         },
       },
@@ -709,7 +713,10 @@ async function handleInvoicePaymentFailed(invoice: any) {
         failureReason:
           invoice.last_finalization_error?.message || "Payment failed",
         metadata: {
-          ...subscriptionPayment.metadata,
+          ...(subscriptionPayment.metadata &&
+          typeof subscriptionPayment.metadata === "object"
+            ? subscriptionPayment.metadata
+            : {}),
           failedInvoice: invoice,
         },
       },
