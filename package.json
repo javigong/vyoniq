@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "pnpm dlx prisma migrate deploy && pnpm dlx prisma generate && next build",
+    "postinstall": "chmod -R u+w node_modules/.prisma 2>/dev/null || true",
+    "build": "pnpm exec prisma migrate deploy && pnpm exec prisma generate && pnpm exec next build",
     "start": "next start",
     "lint": "next lint"
   },
